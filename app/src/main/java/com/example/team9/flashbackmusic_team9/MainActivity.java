@@ -52,7 +52,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        String[] a;
+        AssetManager manager = getAssets();
+        try {
+            System.out.println("sbdfsdbjh");
+            a = manager.list("lala");
 
+            for (String each:a)
+            {
+                System.out.println("##################");
+
+                System.out.println(each);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,21 +75,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        AssetManager manager = getAssets();
-        try {
-            System.out.println("sbdfsdbjh");
-            String[] a = manager.list("lala");
-            if(a == null)
-            {
-                System.out.println("fuck");
-            }
-            for (String i:a)
-            {
-                System.out.print(i);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override
