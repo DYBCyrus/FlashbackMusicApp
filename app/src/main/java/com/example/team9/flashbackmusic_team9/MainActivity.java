@@ -1,15 +1,50 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
+
+    ArrayList<String> SongNames;
+
+    private MediaPlayer mediaPlayer;
+    private static final int MEDIA_RES_ID = R.raw.deaddovedonoteat;
+
+    String path = Environment.getExternalStorageState().toString();
+
+    public void loadMedia(int resourceId) {
+        if (mediaPlayer == null) {
+            mediaPlayer = new MediaPlayer();
+        }
+
+        AssetFileDescriptor assetFileDescriptor = this.getResources().openRawResourceFd(resourceId);
+        try {
+            mediaPlayer.setDataSource(assetFileDescriptor);
+            mediaPlayer.prepareAsync();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +61,21 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        AssetManager manager = getAssets();
+        try {
+            System.out.println("sbdfsdbjh");
+            String[] a = manager.list("lala");
+            if(a == null)
+            {
+                System.out.println("fuck");
+            }
+            for (String i:a)
+            {
+                System.out.print(i);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
