@@ -1,11 +1,15 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.content.res.AssetManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,7 +18,18 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
+
+    ArrayList<String> SongNames;
+
+    private MediaPlayer mediaPlayer;
+    private static final int MEDIA_RES_ID = R.raw.deaddovedonoteat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        LoadFile file = new LoadFile(this);
 
         Button showAlbums = (Button) findViewById(R.id.all_albums);
         showAlbums.setOnClickListener(new View.OnClickListener() {
@@ -44,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
     }
 
     public void launchActivity() {
