@@ -1,15 +1,21 @@
 package com.example.team9.flashbackmusic_team9;
 
+import java.io.Serializable;
+
 /**
  * Created by Chutong Yang on 2/5/2018.
  */
 
-public class Track
+public class Track implements Serializable
 {
     private String name;
     private int hour;
     private int date;
     private int month;
+
+    public Track(String name) {
+        this.name = name;
+    }
 
     public String getName()
     {

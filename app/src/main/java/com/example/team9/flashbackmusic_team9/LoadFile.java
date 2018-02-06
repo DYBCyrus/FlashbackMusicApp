@@ -1,77 +1,37 @@
 package com.example.team9.flashbackmusic_team9;
 
-import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
-import android.content.res.Resources;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by Chutong on 2/5/18.
  */
 
 public class LoadFile {
-
-    private String[] album;
-    private String[][] song;
-
-    public LoadFile(MainActivity main)
+    public static void loadFile(MainActivity main, ArrayList<Track> tracks, ArrayList<Album> album)
     {
-
         AssetManager manager = main.getAssets();
         try {
-            album = manager.list("");
-
-            song = new String[album.length][];
-
-            int i = 0;
-            while (i < album.length)
-            {
-
-                song[i] = manager.list(album[i]);
-                boolean s = false;
-                for(String each:song[i] )
-                {
-                    if (each.substring(each.length()-4, each.length()).compareTo(".mp3")==0)
-                    {
-                        s = true;
+            for (String al : manager.list("")) {
+                boolean notAlbum = false;
+                Album alb = new Album(al);
+                for (String track : manager.list(al)) {
+                    if (track.substring(track.length()-4, track.length()).compareTo(".mp3")==0) {
+                        Track trackTobeAdd = new Track(track);
+                        tracks.add(trackTobeAdd);
+                        alb.addSong(trackTobeAdd);
+                    } else {
+                        notAlbum = true;
+                        break;
                     }
                 }
-                if(!s)
-                {
-                    String alb[] = new String[album.length-1];
-                    String so[][] = new String[album.length-1][];
-                    for(int j = 0; j < album.length - 1; j++)
-                    {
-                        if( j < i )
-                        {
-                            alb[j] = album[j];
-                            so[j] = song[j];
-                        }
-                        else if( j >= i )
-                        {
-                            alb[j] = album[j+1];
-                            so[j] = song[j+1];
-                        }
-                    }
-                    album = alb;
-                    song = so;
-                }
-                else
-                {
-                    i++;
+                if (!notAlbum) {
+                    album.add(alb);
                 }
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public String[] getAlbum() {
-        return album;
-    }
-
-    public String[][] getSong() {
-        return song;
     }
 }

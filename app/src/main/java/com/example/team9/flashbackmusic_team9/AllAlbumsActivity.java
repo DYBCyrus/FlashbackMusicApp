@@ -8,12 +8,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 public class AllAlbumsActivity extends AppCompatActivity {
+
+    private ArrayList<Album> album;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,15 +33,18 @@ public class AllAlbumsActivity extends AppCompatActivity {
             }
         });
 
-        String[] albums = {"album1", "album2", "album3"};
-        ListAdapter albumsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, albums);
+        Bundle bundle = getIntent().getExtras();
+        album = (ArrayList<Album>) bundle.getSerializable("allAlbum");
+
+        ListAdapter albumsAdapter = new AlbumListAdapter(this, android.R.layout.simple_list_item_1, album);
         ListView albumView = (ListView) findViewById(R.id.album_list);
         albumView.setAdapter(albumsAdapter);
 
         albumView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                launchActivity();
+                Album al = (Album) adapterView.getAdapter().getItem(i);
+                launchActivity(al);
             }
         });
 
@@ -52,9 +58,9 @@ public class AllAlbumsActivity extends AppCompatActivity {
         });
     }
 
-    public void launchActivity() {
+    public void launchActivity(Album al) {
         Intent intent = new Intent(this, AlbumTracksActivity.class);
-        intent.putExtra("all_tracks", new String[]{"track1", "track2"});
+        intent.putExtra("all_tracks", al.getSongs());
         startActivity(intent);
     }
 

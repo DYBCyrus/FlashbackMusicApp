@@ -1,35 +1,24 @@
 package com.example.team9.flashbackmusic_team9;
 
-import android.content.res.AssetManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<String> SongNames;
-
-    private MediaPlayer mediaPlayer;
-    private static final int MEDIA_RES_ID = R.raw.deaddovedonoteat;
+    private ArrayList<Track> allTracks = new ArrayList<>();
+    private ArrayList<Album> allAlbums = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +27,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        LoadFile file = new LoadFile(this);
+        LoadFile.loadFile(this, allTracks, allAlbums);
+        ListAdapter tracksAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, allTracks);
+        ListView trackView = (ListView) findViewById(R.id.track_list);
+        trackView.setAdapter(tracksAdapter);
 
         Button showAlbums = (Button) findViewById(R.id.all_albums);
         showAlbums.setOnClickListener(new View.OnClickListener() {
@@ -47,11 +39,6 @@ public class MainActivity extends AppCompatActivity {
                 launchActivity();
             }
         });
-
-        String[] tracks = {"track1", "track2", "track3"};
-        ListAdapter tracksAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, tracks);
-        ListView trackView = (ListView) findViewById(R.id.track_list);
-        trackView.setAdapter(tracksAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -66,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void launchActivity() {
         Intent intent = new Intent(this, AllAlbumsActivity.class);
+        intent.putExtra("allAlbum", allAlbums);
         startActivity(intent);
     }
 

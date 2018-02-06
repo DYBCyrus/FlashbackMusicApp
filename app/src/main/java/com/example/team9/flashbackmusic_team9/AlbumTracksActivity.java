@@ -6,12 +6,15 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 public class AlbumTracksActivity extends AppCompatActivity {
+
+    private ArrayList<Track> tracks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +23,10 @@ public class AlbumTracksActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ListAdapter trackOfAlbumAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getIntent().getStringArrayExtra("all_tracks"));
+        Bundle bundle = getIntent().getExtras();
+        tracks = (ArrayList<Track>) bundle.getSerializable("all_tracks");
+
+        ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, tracks);
         ListView trackOfAlbum = (ListView) findViewById(R.id.album_track_list);
         trackOfAlbum.setAdapter(trackOfAlbumAdapter);
 
