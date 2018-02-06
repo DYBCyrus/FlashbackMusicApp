@@ -5,28 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.team9.flashbackmusic_team9.MainActivity"
-    tools:showIn="@layout/activity_main">
+    tools:context="com.example.team9.flashbackmusic_team9.AllAlbumsActivity"
+    tools:showIn="@layout/activity_all_albums">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="All Tracks"
+        android:text="All Albums"
         android:textSize="30dp"
-        android:layout_marginBottom="450dp"
-        android:layout_marginRight="200dp"
-        android:textColor="#ff0000"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/all_albums"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="All albums"
-        android:textSize="25dp"
         android:layout_marginBottom="450dp"
         android:layout_marginLeft="200dp"
         android:textColor="#ff0000"
@@ -35,8 +21,22 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/all_tracks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="All Tracks"
+        android:textSize="25dp"
+        android:layout_marginBottom="450dp"
+        android:layout_marginRight="200dp"
+        android:textColor="#ff0000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ListView
-        android:id="@+id/track_list"
+        android:id="@+id/album_list"
         android:layout_width="368dp"
         android:layout_height="437dp"
         android:layout_marginTop="70dp"
