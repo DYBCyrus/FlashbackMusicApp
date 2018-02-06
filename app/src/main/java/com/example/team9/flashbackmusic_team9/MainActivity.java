@@ -52,18 +52,56 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        String[] a;
+        String[] album;
+        String[][] song;
         AssetManager manager = getAssets();
         try {
-            System.out.println("sbdfsdbjh");
-            a = manager.list("lala");
+            album = manager.list("");
 
-            for (String each:a)
+            song = new String[album.length][];
+
+            for (int i = 0; i < album.length; i++)
             {
-                System.out.println("##################");
-
-                System.out.println(each);
+                song[i] = manager.list(album[i]);
+                boolean s = false;
+                for(String each:song[i] )
+                {
+                    if (each.substring(each.length()-4, each.length()-1).compareTo(".mp3")==0)
+                    {
+                        s = true;
+                    }
+                }
+                if(!s)
+                {
+                    String alb[] = new String[album.length-1];
+                    String so[][] = new String[album.length-1][];
+                    for(int j = 0; j < album.length - 1; j++)
+                    {
+                        if( j < i )
+                        {
+                            alb[j] = album[j];
+                            so[j] = song[j];
+                        }
+                        if( j >= i )
+                        {
+                            alb[j] = album[j+1];
+                            so[j] = song[j+1];
+                        }
+                    }
+                    album = alb;
+                    song = so;
+                }
             }
+
+            for(int i = 0; i < song.length; i++ )
+            {
+                System.out.println("###################");
+                for(int j = 0; j < song[i].length; j++)
+                {
+                    System.out.println(song[i][j]);
+                }
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
