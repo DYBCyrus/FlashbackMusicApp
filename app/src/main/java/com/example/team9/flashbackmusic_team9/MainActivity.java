@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         LoadFile file = new LoadFile(this);
+
         Button showAlbums = (Button) findViewById(R.id.all_albums);
         showAlbums.setOnClickListener(new View.OnClickListener() {
             @Override
