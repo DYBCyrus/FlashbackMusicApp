@@ -6,10 +6,10 @@ package com.example.team9.flashbackmusic_team9;
 
 public class Track
 {
-    String name;
-    int hour;
-    int date;
-    int month;
+    private String name;
+    private int hour;
+    private int date;
+    private int month;
 
     public String getName()
     {

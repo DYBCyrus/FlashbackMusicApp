@@ -29,82 +29,15 @@ public class MainActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private static final int MEDIA_RES_ID = R.raw.deaddovedonoteat;
 
-    String path = Environment.getExternalStorageState().toString();
-
-    public void loadMedia(int resourceId) {
-        if (mediaPlayer == null) {
-            mediaPlayer = new MediaPlayer();
-        }
-
-        AssetFileDescriptor assetFileDescriptor = this.getResources().openRawResourceFd(resourceId);
-        try {
-            mediaPlayer.setDataSource(assetFileDescriptor);
-            mediaPlayer.prepareAsync();
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        String[] album;
-        String[][] song;
-        AssetManager manager = getAssets();
-        try {
-            album = manager.list("");
 
-            song = new String[album.length][];
+        LoadFile file = new LoadFile(this);
 
-            for (int i = 0; i < album.length; i++)
-            {
-                song[i] = manager.list(album[i]);
-                boolean s = false;
-                for(String each:song[i] )
-                {
-                    if (each.substring(each.length()-4, each.length()-1).compareTo(".mp3")==0)
-                    {
-                        s = true;
-                    }
-                }
-                if(!s)
-                {
-                    String alb[] = new String[album.length-1];
-                    String so[][] = new String[album.length-1][];
-                    for(int j = 0; j < album.length - 1; j++)
-                    {
-                        if( j < i )
-                        {
-                            alb[j] = album[j];
-                            so[j] = song[j];
-                        }
-                        if( j >= i )
-                        {
-                            alb[j] = album[j+1];
-                            so[j] = song[j+1];
-                        }
-                    }
-                    album = alb;
-                    song = so;
-                }
-            }
-
-            for(int i = 0; i < song.length; i++ )
-            {
-                System.out.println("###################");
-                for(int j = 0; j < song[i].length; j++)
-                {
-                    System.out.println(song[i][j]);
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

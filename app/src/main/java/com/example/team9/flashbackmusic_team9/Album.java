@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Album
 {
-    ArrayList<String> songs = new ArrayList<>();
+    private ArrayList<String> songs = new ArrayList<>();
 
     public void addSong(String song)
     {
