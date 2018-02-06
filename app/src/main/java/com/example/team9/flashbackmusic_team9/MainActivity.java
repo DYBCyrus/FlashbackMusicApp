@@ -1,7 +1,10 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,17 +12,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Track> allTracks = new ArrayList<>();
     private ArrayList<Album> allAlbums = new ArrayList<>();
+    Player player = new Player();
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,11 +34,20 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+
         LoadFile.loadFile(this, allTracks, allAlbums);
         ListAdapter tracksAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, allTracks);
         ListView trackView = (ListView) findViewById(R.id.track_list);
         trackView.setAdapter(tracksAdapter);
-
+        trackView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Track track = (Track) adapterView.getAdapter().getItem(i);
+                launchActivity(track);
+            }
+        });
         Button showAlbums = (Button) findViewById(R.id.all_albums);
         showAlbums.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void launchActivity(Track track) {
+        player.start(track);
+    }
     public void launchActivity() {
         Intent intent = new Intent(this, AllAlbumsActivity.class);
         intent.putExtra("allAlbum", allAlbums);

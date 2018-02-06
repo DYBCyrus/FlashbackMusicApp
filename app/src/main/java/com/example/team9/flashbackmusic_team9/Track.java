@@ -1,5 +1,7 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.content.res.AssetFileDescriptor;
+
 import java.io.Serializable;
 
 /**
@@ -9,12 +11,14 @@ import java.io.Serializable;
 public class Track implements Serializable
 {
     private String name;
+    private AssetFileDescriptor fileDescriptor;
     private int hour;
     private int date;
     private int month;
 
-    public Track(String name) {
+    public Track(String name, AssetFileDescriptor fileDescriptor) {
         this.name = name;
+        this.fileDescriptor = fileDescriptor;
     }
 
     public String getName()
@@ -27,6 +31,9 @@ public class Track implements Serializable
         name = n;
     }
 
+    public AssetFileDescriptor getFileDescriptor(){
+        return fileDescriptor;
+    }
     public int getHour()
     {
         return hour;
