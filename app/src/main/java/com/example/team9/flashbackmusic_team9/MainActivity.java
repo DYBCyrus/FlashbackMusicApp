@@ -1,9 +1,7 @@
 package com.example.team9.flashbackmusic_team9;
 
-import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.media.MediaPlayer;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
@@ -15,6 +13,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,11 +26,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<String> SongNames;
-
-    private MediaPlayer mediaPlayer;
-    private static final int MEDIA_RES_ID = R.raw.deaddovedonoteat;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +34,18 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         LoadFile file = new LoadFile(this);
+        Button showAlbums = (Button) findViewById(R.id.all_albums);
+        showAlbums.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchActivity();
+            }
+        });
+
+        String[] tracks = {"track1", "track2", "track3"};
+        ListAdapter tracksAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, tracks);
+        ListView trackView = (ListView) findViewById(R.id.track_list);
+        trackView.setAdapter(tracksAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -47,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void launchActivity() {
+        Intent intent = new Intent(this, AllAlbumsActivity.class);
+        startActivity(intent);
     }
 
     @Override
