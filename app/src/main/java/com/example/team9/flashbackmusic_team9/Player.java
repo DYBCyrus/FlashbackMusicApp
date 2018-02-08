@@ -1,5 +1,6 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -11,22 +12,27 @@ import java.io.IOException;
  */
 
 public class Player {
-    private MediaPlayer player;
-    public Player() {
-        player = new MediaPlayer();
-    }
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void start(Track track) {
+    private static MediaPlayer player = new MediaPlayer();
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void start(Track track) {
+        player.reset();
         try {
-            player.setDataSource(track.getFileDescriptor());
+            AssetFileDescriptor afd = track.getDescriptor();
+            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        player.start();
+        player.prepareAsync();
+        player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                mediaPlayer.start();
+            }
+        });
 
     }
-    public void pause() {
+    public static void pause() {
         player.pause();
     }
 }

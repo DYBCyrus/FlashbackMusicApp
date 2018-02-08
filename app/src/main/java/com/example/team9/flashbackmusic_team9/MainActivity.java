@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,11 +23,8 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<Track> allTracks = new ArrayList<>();
-    private ArrayList<Album> allAlbums = new ArrayList<>();
-    Player player = new Player();
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        LoadFile.loadFile(this, allTracks, allAlbums);
-        ListAdapter tracksAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, allTracks);
+        DataBase.loadFile(this);
+        ListAdapter tracksAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, DataBase.getAllTracks());
         ListView trackView = (ListView) findViewById(R.id.track_list);
         trackView.setAdapter(tracksAdapter);
         trackView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -52,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         showAlbums.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                launchActivity();
+                launchAllAlbumsActivity();
             }
         });
 
@@ -69,11 +67,10 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void launchActivity(Track track) {
-        player.start(track);
+        Player.start(track);
     }
-    public void launchActivity() {
+    public void launchAllAlbumsActivity() {
         Intent intent = new Intent(this, AllAlbumsActivity.class);
-        intent.putExtra("allAlbum", allAlbums);
         startActivity(intent);
     }
 

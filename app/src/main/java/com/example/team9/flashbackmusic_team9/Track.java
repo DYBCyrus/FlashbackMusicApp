@@ -11,14 +11,16 @@ import java.io.Serializable;
 public class Track implements Serializable
 {
     private String name;
-    private AssetFileDescriptor fileDescriptor;
+    private AssetFileDescriptor afd;
+    private Album album;
     private int hour;
     private int date;
     private int month;
 
-    public Track(String name, AssetFileDescriptor fileDescriptor) {
+    public Track(String name, Album album, AssetFileDescriptor afd) {
         this.name = name;
-        this.fileDescriptor = fileDescriptor;
+        this.album = album;
+        this.afd = afd;
     }
 
     public String getName()
@@ -31,8 +33,15 @@ public class Track implements Serializable
         name = n;
     }
 
-    public AssetFileDescriptor getFileDescriptor(){
-        return fileDescriptor;
+    public Album getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(Album al) {
+        album = al;
+    }
+    public AssetFileDescriptor getDescriptor(){
+        return afd;
     }
     public int getHour()
     {
