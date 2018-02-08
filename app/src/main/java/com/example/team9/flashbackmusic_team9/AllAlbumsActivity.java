@@ -33,8 +33,7 @@ public class AllAlbumsActivity extends AppCompatActivity {
             }
         });
 
-        Bundle bundle = getIntent().getExtras();
-        album = (ArrayList<Album>) bundle.getSerializable("allAlbum");
+        album = DataBase.getAllAlbums();
 
         ListAdapter albumsAdapter = new AlbumListAdapter(this, android.R.layout.simple_list_item_1, album);
         ListView albumView = (ListView) findViewById(R.id.album_list);
@@ -43,8 +42,8 @@ public class AllAlbumsActivity extends AppCompatActivity {
         albumView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Album al = (Album) adapterView.getAdapter().getItem(i);
-                launchActivity(al);
+
+                launchActivity(i);
             }
         });
 
@@ -58,9 +57,9 @@ public class AllAlbumsActivity extends AppCompatActivity {
         });
     }
 
-    public void launchActivity(Album al) {
+    public void launchActivity(int index) {
         Intent intent = new Intent(this, AlbumTracksActivity.class);
-        intent.putExtra("all_tracks", al.getSongs());
+        intent.putExtra("index", index);
         startActivity(intent);
     }
 

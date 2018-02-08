@@ -9,22 +9,17 @@ import java.util.ArrayList;
 
 public class Album implements Serializable
 {
-    private ArrayList<Track> songs;
+    private ArrayList<Track> tracks;
     private String name;
 
     public Album(String name) {
         this.name = name;
-        songs = new ArrayList<Track>();
+        tracks = new ArrayList<Track>();
     }
 
-    public void addSong(Track song)
-    {
-        songs.add(song);
-    }
-    public void removeSong(String song)
-    {
-        songs.remove(song);
+    public void addTrack(Track track) {
+        tracks.add(track);
     }
     public String getName() { return name; }
-    public ArrayList<Track> getSongs() { return songs; }
+    public ArrayList<Track> getTracks() { return tracks; }
 }
