@@ -26,7 +26,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_tracks);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         final ImageButton pausePlay;
@@ -71,6 +71,13 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
+        Button playAll = findViewById(R.id.playAll);
+        playAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         displaySong.setText(currentSong);
 
@@ -80,6 +87,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 Drawable d = pausePlay.getBackground();
                 Drawable backGround = getResources().getDrawable(R.drawable.play);
                 mediaPlayer = Player.getPlayer();
+
 
                 if( d.getConstantState().equals(backGround.getConstantState()) ){
                     pausePlay.setBackground(getResources().getDrawable(R.drawable.pause));
@@ -106,6 +114,8 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 displaySong.setText("Prev Button Clicked!");
             }
         });
+
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
