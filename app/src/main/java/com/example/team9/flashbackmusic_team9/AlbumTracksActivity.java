@@ -1,29 +1,27 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.widget.ImageButton;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 
 public class AlbumTracksActivity extends AppCompatActivity {
 
-    private ArrayList<Track> tracks;
     private Button songName;
     private ImageButton pausePlay;
     private ImageButton nextButton;
     private ImageButton previousButton;
+    private Album album;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,13 +30,20 @@ public class AlbumTracksActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Bundle bundle = getIntent().getExtras();
-        tracks = (ArrayList<Track>) bundle.getSerializable("all_tracks");
+        int index = getIntent().getExtras().getInt("index");
+        album = DataBase.getAlbum(index);
 
-        ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, tracks);
+        ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, album.getTracks());
         ListView trackOfAlbum = (ListView) findViewById(R.id.album_track_list);
         trackOfAlbum.setAdapter(trackOfAlbumAdapter);
-
+        trackOfAlbum.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Track track = (Track) adapterView.getAdapter().getItem(i);
+                launchActivity(track);
+            }
+        });
         Button backAlbum = (Button) findViewById(R.id.back);
         backAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,8 +81,6 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
             v.setBackgroundResource(mBackgrounds.getResourceId(mBackgroundIndex, 0));
 
-            songName.setText(tracks.toString());
-
         }
 
         @Override
@@ -85,6 +88,11 @@ public class AlbumTracksActivity extends AppCompatActivity {
             mBackgrounds.recycle();
             super.finalize();
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void launchActivity(Track track) {
+        Player.start(track);
     }
 
 }
