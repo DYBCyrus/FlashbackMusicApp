@@ -18,12 +18,7 @@ import android.widget.ListView;
 
 public class AlbumTracksActivity extends AppCompatActivity {
 
-    private  Button displaySong;
-    private ImageButton pausePlay;
-    private ImageButton nextButton;
-    private ImageButton previousButton;
-    private Album album;
-    private Track track;
+    private  Button displaySong;;
     private MediaPlayer mediaPlayer;
     private Player player;
     private String currentSong;
@@ -32,11 +27,25 @@ public class AlbumTracksActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_tracks);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+
+        ImageButton pausePlay;
+        ImageButton nextButton;
+        ImageButton previousButton;
+        Album album;
+        Track track;
 
         int index = getIntent().getExtras().getInt("index");
         album = DataBase.getAlbum(index);
+
+        displaySong = (Button) findViewById(R.id.songName);
+        pausePlay = (ImageButton) findViewById(R.id.pauseplay);
+        nextButton = (ImageButton) findViewById(R.id.next);
+        previousButton = (ImageButton) findViewById(R.id.previous);
+
+        track = player.getCurrentTrack();
+        currentSong = track.getName();
 
         ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, album.getTracks());
         ListView trackOfAlbum = (ListView) findViewById(R.id.album_track_list);
@@ -47,6 +56,9 @@ public class AlbumTracksActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapterView.getAdapter().getItem(i);
                 launchActivity(track);
+                currentSong = track.getName();
+                displaySong.setText(currentSong);
+
             }
         });
         Button backAlbum = (Button) findViewById(R.id.back);
@@ -57,13 +69,8 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
-        track = player.getCurrentTrack();
-        currentSong = track.getName();
 
-        displaySong = (Button) findViewById(R.id.songName);
-        pausePlay = (ImageButton) findViewById(R.id.pauseplay);
-        nextButton = (ImageButton) findViewById(R.id.next);
-        previousButton = (ImageButton) findViewById(R.id.previous);
+
 
         displaySong.setText(currentSong);
         pausePlay.setOnClickListener(new MyClickListener(this));
