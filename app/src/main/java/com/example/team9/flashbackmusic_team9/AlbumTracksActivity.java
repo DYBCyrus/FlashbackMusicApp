@@ -20,8 +20,10 @@ import java.util.ArrayList;
 public class AlbumTracksActivity extends AppCompatActivity {
 
     private ArrayList<Track> tracks;
-
+    private Button songName;
     private ImageButton pausePlay;
+    private ImageButton nextButton;
+    private ImageButton previousButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,29 +47,25 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
+        songName = (Button) findViewById(R.id.songName);
         pausePlay = (ImageButton) findViewById(R.id.pauseplay);
+        nextButton = (ImageButton) findViewById(R.id.next);
+        previousButton = (ImageButton) findViewById(R.id.previous);
+
         pausePlay.setOnClickListener(new MyClickListener(this));
 
     }
 
-    private static class MyClickListener implements View.OnClickListener {
+    private class MyClickListener implements View.OnClickListener {
 
         private int mBackgroundIndex = 0;
         private final TypedArray mBackgrounds;
 
-        public MyClickListener(Context context) {
+        private MyClickListener(Context context) {
             mBackgrounds = context.getResources().obtainTypedArray(R.array.backgrounds);
         }
 
+        // TODO: Update this function for pause and play functionality
         @Override
         public void onClick(View v) {
             // myBackgroundIndex == 0 means pause for pausePlay button
@@ -77,6 +75,9 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 mBackgroundIndex = 0;
             }
             v.setBackgroundResource(mBackgrounds.getResourceId(mBackgroundIndex, 0));
+
+            songName.setText(tracks.toString());
+
         }
 
         @Override

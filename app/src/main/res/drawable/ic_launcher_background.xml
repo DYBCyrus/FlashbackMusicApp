@@ -178,8 +178,6 @@
     <item android:drawable="@drawable/fastforward"></item>
     <item android:drawable="@drawable/rewind"></item>
 
-
-
 </vector>
 
 
