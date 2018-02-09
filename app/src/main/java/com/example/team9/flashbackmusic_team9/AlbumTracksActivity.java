@@ -1,10 +1,9 @@
 package com.example.team9.flashbackmusic_team9;
 
-//import android.support.v7.widget.Toolbar;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +21,8 @@ public class AlbumTracksActivity extends AppCompatActivity {
     private  Button displaySong;
     private MediaPlayer mediaPlayer;
     private String currentSong;
+    private int trackNumber = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Button playAll = findViewById(R.id.playAll);
+        Button backAlbum = findViewById(R.id.back);
         final ImageButton pausePlay;
         ImageButton nextButton;
         final ImageButton previousButton;
@@ -60,12 +62,12 @@ public class AlbumTracksActivity extends AppCompatActivity {
         }
 
         if( currentSong.equals("") ){
-            Drawable d = getResources().getDrawable(R.drawable.play);
+            Drawable d = ResourcesCompat.getDrawable(getResources(), R.drawable.play, null);
             pausePlay.setBackground(d);
         }
 
         ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, album.getTracks());
-        ListView trackOfAlbum = findViewById(R.id.album_track_list);
+        final ListView trackOfAlbum = findViewById(R.id.album_track_list);
         trackOfAlbum.setAdapter(trackOfAlbumAdapter);
         trackOfAlbum.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -76,21 +78,13 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 displaySong.setText(currentSong);
                 launchActivity(track);
 
-                Drawable d = getResources().getDrawable(R.drawable.pause);
+                Drawable d = ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null);
                 pausePlay.setBackground(d);
+                trackNumber = i;
             }
         });
 
-
-        Button backAlbum = findViewById(R.id.back);
-        backAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-
-
+        // Clicking play all songs button
         playAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,21 +94,22 @@ public class AlbumTracksActivity extends AppCompatActivity {
 
         displaySong.setText(currentSong);
 
+        // Clicking the pause/play song button
         pausePlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Drawable d = pausePlay.getBackground();
-                Drawable backGround = getResources().getDrawable(R.drawable.play);
+                Drawable backGround = ResourcesCompat.getDrawable(getResources(), R.drawable.play, null);
                 mediaPlayer = Player.getPlayer();
 
 
                 if( d.getConstantState().equals(backGround.getConstantState()) &&
                         !currentSong.equals("") ){
-                    pausePlay.setBackground(getResources().getDrawable(R.drawable.pause));
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null));
                     mediaPlayer.start();
                 }
                 else{
-                    pausePlay.setBackground(getResources().getDrawable(R.drawable.play));
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.play, null));
                     mediaPlayer.pause();
                 }
 
@@ -122,18 +117,42 @@ public class AlbumTracksActivity extends AppCompatActivity {
         });
 
 
+        // Clicking the next song button
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displaySong.setText("Next Button Clicked!");
+                trackNumber++;
+
+                Track nextTrack = (Track) trackOfAlbum.getItemAtPosition(trackNumber);
+                currentSong = nextTrack.getName();
+                displaySong.setText(currentSong);
+                launchActivity(nextTrack);
             }
         });
 
 
+        // Clicking the previous song button
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displaySong.setText("Prev Button Clicked!");
+                trackNumber--;
+
+                if( trackNumber < 0 ){
+                    trackNumber = 0;
+                }
+
+                Track nextTrack = (Track) trackOfAlbum.getItemAtPosition(trackNumber);
+                currentSong = nextTrack.getName();
+                displaySong.setText(currentSong);
+                launchActivity(nextTrack);
+            }
+        });
+
+        // Clicking the back button
+        backAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
 
