@@ -167,4 +167,17 @@
         android:pathData="M79,19L79,89"
         android:strokeColor="#33FFFFFF"
         android:strokeWidth="0.8" />
+
+    <item android:drawable="@drawable/pauseplay">
+    </item>
+
+    <item android:drawable="@drawable/pause"></item>
+    <item android:drawable="@drawable/play"></item>
+    <item android:drawable="@drawable/next"></item>
+    <item android:drawable="@drawable/previous"></item>
+    <item android:drawable="@drawable/fastforward"></item>
+    <item android:drawable="@drawable/rewind"></item>
+
 </vector>
+
+

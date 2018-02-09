@@ -1,11 +1,11 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.widget.ImageButton;
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -14,10 +14,13 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 
 public class AlbumTracksActivity extends AppCompatActivity {
 
+    private Button songName;
+    private ImageButton pausePlay;
+    private ImageButton nextButton;
+    private ImageButton previousButton;
     private Album album;
 
     @Override
@@ -49,15 +52,44 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        songName = (Button) findViewById(R.id.songName);
+        pausePlay = (ImageButton) findViewById(R.id.pauseplay);
+        nextButton = (ImageButton) findViewById(R.id.next);
+        previousButton = (ImageButton) findViewById(R.id.previous);
+
+        pausePlay.setOnClickListener(new MyClickListener(this));
+
     }
+
+    private class MyClickListener implements View.OnClickListener {
+
+        private int mBackgroundIndex = 0;
+        private final TypedArray mBackgrounds;
+
+        private MyClickListener(Context context) {
+            mBackgrounds = context.getResources().obtainTypedArray(R.array.backgrounds);
+        }
+
+        // TODO: Update this function for pause and play functionality
+        @Override
+        public void onClick(View v) {
+            // myBackgroundIndex == 0 means pause for pausePlay button
+            // myBackgroundIndex == 1 means play for pausePlay button
+            mBackgroundIndex++;
+            if (mBackgroundIndex >= mBackgrounds.length()) {
+                mBackgroundIndex = 0;
+            }
+            v.setBackgroundResource(mBackgrounds.getResourceId(mBackgroundIndex, 0));
+
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            mBackgrounds.recycle();
+            super.finalize();
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void launchActivity(Track track) {
         Player.start(track);
