@@ -1,8 +1,10 @@
 package com.example.team9.flashbackmusic_team9;
 
+//import android.support.v7.widget.Toolbar;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,8 +25,12 @@ public class AlbumTracksActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("AlbumTracksActivity", "Location 1");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_tracks);
+
+        Log.d("AlbumTracksActivity", "Location 2");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -35,16 +41,35 @@ public class AlbumTracksActivity extends AppCompatActivity {
         Album album;
         Track track;
 
+        Log.d("AlbumTracksActivity", "Location 3");
+
         int index = getIntent().getExtras().getInt("index");
         album = DataBase.getAlbum(index);
+
+        Log.d("AlbumTracksActivity", "Location 4");
 
         displaySong = findViewById(R.id.songName);
         pausePlay = findViewById(R.id.pauseplay);
         nextButton = findViewById(R.id.next);
         previousButton = findViewById(R.id.previous);
 
+        Log.d("AlbumTracksActivity", "Location 5");
+
         track = Player.getCurrentTrack();
-        currentSong = track.getName();
+
+        if( track == null ){
+            currentSong = "";
+        }
+        else{
+            currentSong = track.getName();
+        }
+
+        if( currentSong.equals("") ){
+            Drawable d = getResources().getDrawable(R.drawable.play);
+            pausePlay.setBackground(d);
+        }
+        Log.d("AlbumTracksActivity", "Location 6");
+
 
         ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, album.getTracks());
         ListView trackOfAlbum = findViewById(R.id.album_track_list);
@@ -63,6 +88,9 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
+        Log.d("AlbumTracksActivity", "Location 7");
+
+
         Button backAlbum = findViewById(R.id.back);
         backAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,6 +99,9 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
+        Log.d("AlbumTracksActivity", "Location 8");
+
+
         Button playAll = findViewById(R.id.playAll);
         playAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +109,8 @@ public class AlbumTracksActivity extends AppCompatActivity {
 
             }
         });
+
+        Log.d("AlbumTracksActivity", "Location 9");
 
         displaySong.setText(currentSong);
 
@@ -89,7 +122,8 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 mediaPlayer = Player.getPlayer();
 
 
-                if( d.getConstantState().equals(backGround.getConstantState()) ){
+                if( d.getConstantState().equals(backGround.getConstantState()) &&
+                        !currentSong.equals("") ){
                     pausePlay.setBackground(getResources().getDrawable(R.drawable.pause));
                     mediaPlayer.start();
                 }
@@ -101,6 +135,9 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
+        Log.d("AlbumTracksActivity", "Location 10");
+
+
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,12 +145,16 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
+        Log.d("AlbumTracksActivity", "Location 11");
+
+
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 displaySong.setText("Prev Button Clicked!");
             }
         });
+        Log.d("AlbumTracksActivity", "Location 12");
 
 
     }
