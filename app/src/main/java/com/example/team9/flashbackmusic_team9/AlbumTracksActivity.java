@@ -2,6 +2,7 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.support.v7.widget.Toolbar;
 import android.widget.ImageButton;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +19,6 @@ public class AlbumTracksActivity extends AppCompatActivity {
 
     private  Button displaySong;
     private MediaPlayer mediaPlayer;
-//    private Player player;
     private String currentSong;
 
     @Override
@@ -26,8 +26,8 @@ public class AlbumTracksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_tracks);
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         final ImageButton pausePlay;
         ImageButton nextButton;
