@@ -1,5 +1,6 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.media.MediaPlayer;
 import android.widget.ImageButton;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -17,11 +18,15 @@ import android.widget.ListView;
 
 public class AlbumTracksActivity extends AppCompatActivity {
 
-    private Button songName;
+    private  Button displaySong;
     private ImageButton pausePlay;
     private ImageButton nextButton;
     private ImageButton previousButton;
     private Album album;
+    private Track track;
+    private MediaPlayer mediaPlayer;
+    private Player player;
+    private String currentSong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +57,30 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
-        songName = (Button) findViewById(R.id.songName);
+        track = player.getCurrentTrack();
+        currentSong = track.getName();
+
+        displaySong = (Button) findViewById(R.id.songName);
         pausePlay = (ImageButton) findViewById(R.id.pauseplay);
         nextButton = (ImageButton) findViewById(R.id.next);
         previousButton = (ImageButton) findViewById(R.id.previous);
 
+        displaySong.setText(currentSong);
         pausePlay.setOnClickListener(new MyClickListener(this));
 
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displaySong.setText("Next Button Clicked!");
+            }
+        });
+
+        previousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displaySong.setText("Prev Button Clicked!");
+            }
+        });
     }
 
     private class MyClickListener implements View.OnClickListener {
@@ -75,11 +97,18 @@ public class AlbumTracksActivity extends AppCompatActivity {
         public void onClick(View v) {
             // myBackgroundIndex == 0 means pause for pausePlay button
             // myBackgroundIndex == 1 means play for pausePlay button
-            mBackgroundIndex++;
-            if (mBackgroundIndex >= mBackgrounds.length()) {
-                mBackgroundIndex = 0;
+            mediaPlayer = player.getPlayer();
+
+            if( mBackgroundIndex == 0 ){
+                mBackgroundIndex = 1;
+                v.setBackgroundResource(mBackgrounds.getResourceId(mBackgroundIndex, 0));
+                mediaPlayer.pause();
             }
-            v.setBackgroundResource(mBackgrounds.getResourceId(mBackgroundIndex, 0));
+            else{
+                mBackgroundIndex = 0;
+                v.setBackgroundResource(mBackgrounds.getResourceId(mBackgroundIndex, 0));
+                mediaPlayer.start();
+            }
 
         }
 

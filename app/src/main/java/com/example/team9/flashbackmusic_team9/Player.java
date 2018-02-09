@@ -13,6 +13,7 @@ import java.io.IOException;
 
 public class Player {
     private static MediaPlayer player = new MediaPlayer();
+    private static Track currentTrack;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static void start(Track track) {
@@ -20,6 +21,7 @@ public class Player {
         try {
             AssetFileDescriptor afd = track.getDescriptor();
             player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            currentTrack = track;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,6 +34,9 @@ public class Player {
         });
 
     }
+
+    public static MediaPlayer getPlayer(){ return player; }
+    public static Track getCurrentTrack(){ return currentTrack; }
     public static void pause() {
         player.pause();
     }

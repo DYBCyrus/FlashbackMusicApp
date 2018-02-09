@@ -177,6 +177,7 @@
     <item android:drawable="@drawable/previous"></item>
     <item android:drawable="@drawable/fastforward"></item>
     <item android:drawable="@drawable/rewind"></item>
+    <item android:drawable="@drawable/back"></item>
 
 </vector>
 
