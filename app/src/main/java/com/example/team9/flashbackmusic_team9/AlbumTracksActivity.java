@@ -18,7 +18,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
 
     private  Button displaySong;
     private MediaPlayer mediaPlayer;
-    private Player player;
+//    private Player player;
     private String currentSong;
 
     @Override
@@ -43,7 +43,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
         nextButton = findViewById(R.id.next);
         previousButton = findViewById(R.id.previous);
 
-        track = player.getCurrentTrack();
+        track = Player.getCurrentTrack();
         currentSong = track.getName();
 
         ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, album.getTracks());
@@ -79,7 +79,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Drawable d = pausePlay.getBackground();
                 Drawable backGround = getResources().getDrawable(R.drawable.play);
-                mediaPlayer = player.getPlayer();
+                mediaPlayer = Player.getPlayer();
 
                 if( d.getConstantState().equals(backGround.getConstantState()) ){
                     pausePlay.setBackground(getResources().getDrawable(R.drawable.pause));
