@@ -2,7 +2,6 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 public class AlbumTracksActivity extends AppCompatActivity {
 
     private Album album;
+    private ArrayList<Track> playList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +46,14 @@ public class AlbumTracksActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        Button playAll = (Button)findViewById(R.id.playAll);
+        playAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
