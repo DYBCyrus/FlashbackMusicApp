@@ -52,6 +52,14 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
+        Button playAll = (Button)findViewById(R.id.playAll);
+        playAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
         songName = (Button) findViewById(R.id.songName);
         pausePlay = (ImageButton) findViewById(R.id.pauseplay);
         nextButton = (ImageButton) findViewById(R.id.next);

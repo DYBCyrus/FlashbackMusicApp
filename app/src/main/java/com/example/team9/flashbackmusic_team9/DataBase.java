@@ -51,6 +51,7 @@ public class DataBase {
                 retriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                 String albumName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
                 String trackName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                String artistName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
 
                 if (map.get(albumName) == null) {
                     Album newAlbum = new Album(albumName);
@@ -58,7 +59,7 @@ public class DataBase {
                     map.put(albumName, newAlbum);
                 }
                 Album al = map.get(albumName);
-                Track newTrack = new Track(trackName, al, afd);
+                Track newTrack = new Track(trackName, artistName, al, afd);
                 al.addTrack(newTrack);
                 allTracks.add(newTrack);
             }
