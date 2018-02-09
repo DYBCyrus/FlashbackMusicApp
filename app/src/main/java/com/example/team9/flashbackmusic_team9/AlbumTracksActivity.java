@@ -25,35 +25,30 @@ public class AlbumTracksActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("AlbumTracksActivity", "Location 1");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_tracks);
 
-        Log.d("AlbumTracksActivity", "Location 2");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Button playAll = findViewById(R.id.playAll);
         final ImageButton pausePlay;
         ImageButton nextButton;
         final ImageButton previousButton;
         Album album;
         Track track;
 
-        Log.d("AlbumTracksActivity", "Location 3");
 
         int index = getIntent().getExtras().getInt("index");
         album = DataBase.getAlbum(index);
 
-        Log.d("AlbumTracksActivity", "Location 4");
 
         displaySong = findViewById(R.id.songName);
         pausePlay = findViewById(R.id.pauseplay);
         nextButton = findViewById(R.id.next);
         previousButton = findViewById(R.id.previous);
 
-        Log.d("AlbumTracksActivity", "Location 5");
 
         track = Player.getCurrentTrack();
 
@@ -68,8 +63,6 @@ public class AlbumTracksActivity extends AppCompatActivity {
             Drawable d = getResources().getDrawable(R.drawable.play);
             pausePlay.setBackground(d);
         }
-        Log.d("AlbumTracksActivity", "Location 6");
-
 
         ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, album.getTracks());
         ListView trackOfAlbum = findViewById(R.id.album_track_list);
@@ -88,8 +81,6 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
-        Log.d("AlbumTracksActivity", "Location 7");
-
 
         Button backAlbum = findViewById(R.id.back);
         backAlbum.setOnClickListener(new View.OnClickListener() {
@@ -99,18 +90,13 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
-        Log.d("AlbumTracksActivity", "Location 8");
 
-
-        Button playAll = findViewById(R.id.playAll);
         playAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
             }
         });
-
-        Log.d("AlbumTracksActivity", "Location 9");
 
         displaySong.setText(currentSong);
 
@@ -135,8 +121,6 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
-        Log.d("AlbumTracksActivity", "Location 10");
-
 
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,8 +129,6 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
-        Log.d("AlbumTracksActivity", "Location 11");
-
 
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,7 +136,6 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 displaySong.setText("Prev Button Clicked!");
             }
         });
-        Log.d("AlbumTracksActivity", "Location 12");
 
 
     }
