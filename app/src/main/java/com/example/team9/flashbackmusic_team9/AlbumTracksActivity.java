@@ -39,7 +39,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
         ImageButton nextButton;
         final ImageButton previousButton;
         Album album;
-        Track track;
+        final Track track;
 
 
         int index = getIntent().getExtras().getInt("index");
@@ -122,6 +122,10 @@ public class AlbumTracksActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 trackNumber++;
+
+                if( trackNumber == trackOfAlbum.getAdapter().getCount() ){
+                    trackNumber = trackOfAlbum.getAdapter().getCount() - 1;
+                }
 
                 Track nextTrack = (Track) trackOfAlbum.getItemAtPosition(trackNumber);
                 currentSong = nextTrack.getName();
