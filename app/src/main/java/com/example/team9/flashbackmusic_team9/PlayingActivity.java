@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 
 public class PlayingActivity extends AppCompatActivity {
@@ -28,6 +29,13 @@ public class PlayingActivity extends AppCompatActivity {
             }
         });
 
+        TextView title = (TextView)findViewById(R.id.title);
+        TextView artist = (TextView)findViewById(R.id.artist);
+        TextView album = (TextView)findViewById(R.id.album);
+
+        title.setText(Player.getCurrentTrack().getName());
+        artist.setText(Player.getCurrentTrack().getArtist());
+        album.setText(Player.getCurrentTrack().getAlbum().getName());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
