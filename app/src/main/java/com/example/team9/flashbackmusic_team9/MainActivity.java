@@ -113,6 +113,8 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void launchActivity(Track track) {
         Player.start(track);
+        Intent intent = new Intent(this, PlayingActivity.class);
+        startActivity(intent);
     }
     public void launchAllAlbumsActivity() {
         Intent intent = new Intent(this, AllAlbumsActivity.class);
