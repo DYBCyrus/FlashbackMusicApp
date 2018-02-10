@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.team9.flashbackmusic_team9.PlayingActivity"
+    tools:showIn="@layout/activity_playing">
+
+    <Button
+        android:id = "@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text = "BACK"/>
+
+    <ImageButton
+        android:id = "@+id/imageButtonFav"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft = "180dp"
+        android:layout_toRightOf="@id/back"
+        android:src = "@drawable/check"
+        android:scaleType="fitXY"
+        />
+
+    <TextView
+        android:id = "@+id/title"
+        android:layout_marginTop = "50dp"
+        android:layout_marginLeft = "140dp"
+        android:textSize = "30dp"
+        android:layout_below="@id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text = "Title"/>
+
+    <TextView
+        android:id = "@+id/artist"
+        android:layout_below="@id/title"
+        android:text = "Artist"
+        android:textSize = "30dp"
+        android:layout_marginLeft="135dp"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id = "@+id/album"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop = "10dp"
+        android:layout_marginLeft = "130dp"
+        android:text = "Album"
+        android:textSize = "30dp"
+        android:layout_below="@id/artist"/>
+
+
+    <ImageButton
+        android:id = "@+id/imageButtonPrev"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/album"
+        android:layout_marginTop = "100dp"
+        android:scaleType="fitXY"
+        android:layout_marginLeft = "15dp"
+        android:src="@drawable/previous" />
+
+    <ImageButton
+        android:id = "@+id/imageButtonPrause"
+        android:layout_toRightOf="@id/imageButtonPrev"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below = "@id/album"
+        android:layout_marginTop = "100dp"
+        android:layout_marginLeft = "50dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/pause"/>
+
+    <ImageButton
+        android:id = "@+id/imageButtonNext"
+        android:layout_toRightOf="@id/imageButtonPrause"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below = "@id/album"
+        android:layout_marginTop = "100dp"
+        android:layout_marginLeft = "50dp"
+        android:scaleType="fitXY"
+        android:src = "@drawable/next"/>
+
+
+
+</RelativeLayout>
