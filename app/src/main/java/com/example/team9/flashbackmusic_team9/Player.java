@@ -31,6 +31,7 @@ public class Player {
         try {
             AssetFileDescriptor afd = track.getDescriptor();
             player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            currentTrack = track;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -39,7 +40,9 @@ public class Player {
         player.prepareAsync();
     }
 
-    public static MediaPlayer getPlayer() {return player;}
+    public static MediaPlayer getPlayer(){ return player; }
+    public static Track getCurrentTrack(){ return currentTrack; }
+
     public static void pause() {
         player.pause();
     }
