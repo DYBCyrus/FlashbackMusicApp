@@ -14,7 +14,7 @@ import java.util.Date;
  */
 
 public class Player {
-    private static MediaPlayer player = new MediaPlayer();
+    private static MediaPlayer player;
     private static Track currentTrack;
 
     public static void setPlayer(MediaPlayer playerToSet) {
