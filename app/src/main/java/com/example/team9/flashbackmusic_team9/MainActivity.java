@@ -1,13 +1,19 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -18,10 +24,12 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
+    
+    private LocationManager locationManager;
+    private Location mLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +38,22 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                100);
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
+        MediaPlayer player = new MediaPlayer();
+        player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                Location loc = getLocation();
+                Player.setCurrentTrackLocation(loc);
+                Player.setCurrentTrackTime(Calendar.getInstance().getTime());
+                mediaPlayer.start();
+            }
+        });
+        Player.setPlayer(player);
 
         DataBase.loadFile(this);
         ListAdapter tracksAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, DataBase.getAllTracks());
@@ -57,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void launchActivity(Track track) {
         Player.start(track);
+        Intent intent = new Intent(this, PlayingActivity.class);
+        startActivity(intent);
     }
     public void launchAllAlbumsActivity() {
         Intent intent = new Intent(this, AllAlbumsActivity.class);
@@ -83,5 +108,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public Location getLocation() {
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                mLocation = location;
+            }
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {}
+            @Override
+            public void onProviderEnabled(String s) {}
+            @Override
+            public void onProviderDisabled(String s){}
+        };
+
+        String locationProvider = LocationManager.GPS_PROVIDER;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return null;
+        }
+        locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
+        return mLocation;
     }
 }

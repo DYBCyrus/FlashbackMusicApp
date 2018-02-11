@@ -1,50 +1,210 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.widget.Toolbar;
 import android.widget.ImageButton;
-import android.content.Context;
-import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 
 public class AlbumTracksActivity extends AppCompatActivity {
 
-    private Button songName;
-    private ImageButton pausePlay;
-    private ImageButton nextButton;
-    private ImageButton previousButton;
-    private Album album;
+    private  Button displaySong;
+    private MediaPlayer mediaPlayer;
+    private String currentSong;
+    private PlayList playList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_tracks);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        mediaPlayer = Player.getPlayer();
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Button playAll = findViewById(R.id.playAll);
+        Button backAlbum = findViewById(R.id.back);
+        final ImageButton pausePlay;
+        ImageButton nextButton;
+        final ImageButton previousButton;
+        final Album album;
+        final Track track;
+
 
         int index = getIntent().getExtras().getInt("index");
         album = DataBase.getAlbum(index);
 
+
+        displaySong = findViewById(R.id.songName);
+        pausePlay = findViewById(R.id.pauseplay);
+        nextButton = findViewById(R.id.next);
+        previousButton = findViewById(R.id.previous);
+
+
+        track = Player.getCurrentTrack();
+
+        if( track == null ){
+            currentSong = "";
+        }
+        else{
+            currentSong = track.getName();
+        }
+
+        if( currentSong.equals("") ){
+            Drawable d = ResourcesCompat.getDrawable(getResources(), R.drawable.play, null);
+            pausePlay.setBackground(d);
+        }
+
         ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, album.getTracks());
-        ListView trackOfAlbum = (ListView) findViewById(R.id.album_track_list);
+        final ListView trackOfAlbum = findViewById(R.id.album_track_list);
         trackOfAlbum.setAdapter(trackOfAlbumAdapter);
         trackOfAlbum.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapterView.getAdapter().getItem(i);
+                ArrayList<Track> temp = new ArrayList<Track>();
+                temp.add(track);
+                setPlaylist(temp, 0);
+                Player.setPlayList(getPlayList());
+                currentSong = track.getName();
+                displaySong.setText(currentSong);
+                switchActivity();
                 launchActivity(track);
+
+                Drawable d = ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null);
+                pausePlay.setBackground(d);
             }
         });
-        Button backAlbum = (Button) findViewById(R.id.back);
+
+        // Clicking play all songs button
+        playAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setPlaylist(album.getTracks(), 0);
+                Player.setPlayList(getPlayList());
+                if (Player.getPlayList().hasNext()) {
+                    Track track = Player.getPlayList().next();
+                    Player.start(track);
+                    currentSong = track.getName();
+                    displaySong.setText(currentSong);
+                }
+                if (Player.getPlayer().isPlaying()) {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.play, null));
+                } else {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null));
+                }
+                switchActivity();
+                launchActivity(Player.getCurrentTrack());
+            }
+        });
+
+        Player.getPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (Player.getPlayList().hasNext()) {
+                    Track track = Player.getPlayList().next();
+                    Player.start(track);
+                    currentSong = track.getName();
+                    displaySong.setText(currentSong);
+                }
+            }
+        });
+
+
+        displaySong.setText(currentSong);
+
+        // Clicking the pause/play song button
+        pausePlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Drawable d = pausePlay.getBackground();
+                Drawable backGround = ResourcesCompat.getDrawable(getResources(), R.drawable.play, null);
+
+                if( d.getConstantState().equals(backGround.getConstantState()) &&
+                        !currentSong.equals("") ){
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null));
+                    mediaPlayer.start();
+                }
+                else{
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.play, null));
+                    mediaPlayer.pause();
+                }
+
+            }
+        });
+
+
+        // Clicking the next song button
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //trackNumber++;
+
+//                if( trackNumber == trackOfAlbum.getAdapter().getCount() ){
+//                    trackNumber = trackOfAlbum.getAdapter().getCount() - 1;
+//                }
+                if (Player.getPlayList().hasNext()) {
+//                    Track nextTrack = (Track) trackOfAlbum.getItemAtPosition(trackNumber);
+                    Track nextTrack = Player.getPlayList().next();
+                    currentSong = nextTrack.getName();
+                    displaySong.setText(currentSong);
+                    launchActivity(nextTrack);
+                } else {
+                    Player.getPlayer().reset();
+                }
+                if (Player.getPlayer().isPlaying()) {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.play, null));
+                } else {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null));
+                }
+            }
+        });
+
+
+        // Clicking the previous song button
+        previousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //trackNumber--;
+
+//                if( trackNumber < 0 ){
+//                    trackNumber = 0;
+//                }
+                Track nextTrack;
+                if (Player.getPlayList().hasPrevious()) {
+
+//                    Track nextTrack = (Track) trackOfAlbum.getItemAtPosition(trackNumber);
+                    nextTrack = Player.getPlayList().previous();
+                } else {
+                    nextTrack = Player.getCurrentTrack();
+                }
+                currentSong = nextTrack.getName();
+                displaySong.setText(currentSong);
+                launchActivity(nextTrack);
+                if (Player.getPlayer().isPlaying()) {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.play, null));
+                } else {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null));
+                }
+            }
+        });
+
+        // Clicking the back button
         backAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -52,47 +212,23 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
-        songName = (Button) findViewById(R.id.songName);
-        pausePlay = (ImageButton) findViewById(R.id.pauseplay);
-        nextButton = (ImageButton) findViewById(R.id.next);
-        previousButton = (ImageButton) findViewById(R.id.previous);
-
-        pausePlay.setOnClickListener(new MyClickListener(this));
 
     }
 
-    private class MyClickListener implements View.OnClickListener {
-
-        private int mBackgroundIndex = 0;
-        private final TypedArray mBackgrounds;
-
-        private MyClickListener(Context context) {
-            mBackgrounds = context.getResources().obtainTypedArray(R.array.backgrounds);
-        }
-
-        // TODO: Update this function for pause and play functionality
-        @Override
-        public void onClick(View v) {
-            // myBackgroundIndex == 0 means pause for pausePlay button
-            // myBackgroundIndex == 1 means play for pausePlay button
-            mBackgroundIndex++;
-            if (mBackgroundIndex >= mBackgrounds.length()) {
-                mBackgroundIndex = 0;
-            }
-            v.setBackgroundResource(mBackgrounds.getResourceId(mBackgroundIndex, 0));
-
-        }
-
-        @Override
-        protected void finalize() throws Throwable {
-            mBackgrounds.recycle();
-            super.finalize();
-        }
+    public void  switchActivity() {
+        Intent intent = new Intent(this, PlayingActivity.class);
+        startActivity(intent);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void launchActivity(Track track) {
         Player.start(track);
     }
+
+    public void setPlaylist(ArrayList<Track> tracks, int index) {
+        playList = new PlayList(tracks, index);
+    }
+
+    public PlayList getPlayList() {return playList;}
 
 }

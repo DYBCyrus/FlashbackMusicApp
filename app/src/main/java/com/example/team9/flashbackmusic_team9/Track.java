@@ -1,27 +1,42 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.res.AssetFileDescriptor;
+import android.location.Location;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by Chutong Yang on 2/5/2018.
  */
 
-public class Track implements Serializable
+public class Track
 {
     private String name;
+    private String artist;
     private AssetFileDescriptor afd;
     private Album album;
-    private int hour;
-    private int date;
-    private int month;
+    private Date date;
+    private Location location;
+    private FavoriteStatus status;
 
-    public Track(String name, Album album, AssetFileDescriptor afd) {
+    public Track(String name, String artist, Album album, AssetFileDescriptor afd) {
         this.name = name;
         this.album = album;
         this.afd = afd;
+        this.artist = artist;
+        this.status = FavoriteStatus.NEUTRAL;
     }
+
+    public enum FavoriteStatus {
+        LIKE,DISLIKE,NEUTRAL;
+    }
+
+    public void setStatus(FavoriteStatus status) {this.status = status;}
+
+    public FavoriteStatus getStatus() {return status;}
+
+    public boolean isPlayable() {return status != FavoriteStatus.DISLIKE;}
 
     public String getName()
     {
@@ -33,6 +48,16 @@ public class Track implements Serializable
         name = n;
     }
 
+    public String getArtist()
+    {
+        return artist;
+    }
+
+    public void setArtist(String n)
+    {
+        artist = n;
+    }
+
     public Album getAlbum() {
         return album;
     }
@@ -40,35 +65,26 @@ public class Track implements Serializable
     public void setAlbum(Album al) {
         album = al;
     }
+
     public AssetFileDescriptor getDescriptor(){
         return afd;
     }
-    public int getHour()
-    {
-        return hour;
-    }
 
-    public void setHour(int h)
-    {
-        hour = h;
-    }
-
-    public int getDate()
+    public Date getDate()
     {
         return date;
     }
 
-    public void setDate(int d)
+    public void setDate(Date d)
     {
         date = d;
     }
 
-    public int getMonth()
-    {
-        return month;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setMonth(int m) {
-        month = m;
+    public void setLocation(Location loc) {
+        location = loc;
     }
 }

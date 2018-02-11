@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Created by Chutong Yang on 2/5/2018.
  */
 
-public class Album implements Serializable
+public class Album
 {
     private ArrayList<Track> tracks;
     private String name;
