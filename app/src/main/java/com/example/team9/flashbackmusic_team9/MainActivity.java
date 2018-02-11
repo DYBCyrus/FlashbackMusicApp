@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -53,9 +54,23 @@ public class MainActivity extends AppCompatActivity {
                 Player.setCurrentTrackLocation(loc);
                 Player.setCurrentTrackTime(Calendar.getInstance().getTime());
                 mediaPlayer.start();
+                PlayerToolBar.updateToolbar();
+            }
+        });
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (!Player.playNext()) {
+                    PlayerToolBar.updateToolbar();
+                }
             }
         });
         Player.setPlayer(player);
+
+
+        PlayerToolBar playerToolBar = new PlayerToolBar((Button)findViewById(R.id.trackName_button),
+                (ImageButton)findViewById(R.id.previous_button), (ImageButton)findViewById(R.id.play_button),
+                (ImageButton)findViewById(R.id.next_button), this);
 
         DataBase.loadFile(this);
         ListAdapter tracksAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, DataBase.getAllTracks());
@@ -66,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapterView.getAdapter().getItem(i);
+                Player.clearPlayList();
+                Player.start(track);
                 launchActivity(track);
             }
         });
@@ -81,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void launchActivity(Track track) {
-        Player.start(track);
         Intent intent = new Intent(this, PlayingActivity.class);
         startActivity(intent);
     }

@@ -28,10 +28,10 @@ public class Track
         this.status = FavoriteStatus.NEUTRAL;
     }
 
+
     public enum FavoriteStatus {
         LIKE,DISLIKE,NEUTRAL;
     }
-
     public void setStatus(FavoriteStatus status) {this.status = status;}
 
     public FavoriteStatus getStatus() {return status;}
