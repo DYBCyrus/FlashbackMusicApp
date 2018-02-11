@@ -1,5 +1,6 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.support.v4.content.res.ResourcesCompat;
@@ -82,6 +83,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 Player.setPlayList(getPlayList());
                 currentSong = track.getName();
                 displaySong.setText(currentSong);
+                switchActivity();
                 launchActivity(track);
 
                 Drawable d = ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null);
@@ -106,6 +108,8 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 } else {
                     pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null));
                 }
+                switchActivity();
+                launchActivity(Player.getCurrentTrack());
             }
         });
 
@@ -209,6 +213,11 @@ public class AlbumTracksActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    public void  switchActivity() {
+        Intent intent = new Intent(this, PlayingActivity.class);
+        startActivity(intent);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

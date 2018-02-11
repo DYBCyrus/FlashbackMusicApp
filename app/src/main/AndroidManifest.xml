@@ -33,6 +33,10 @@
         <activity
             android:name=".AlbumTracksActivity"
             android:label="@string/title_activity_album_tracks"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PlayingActivity"
+            android:label="@string/title_activity_playing"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
