@@ -32,6 +32,8 @@ public class PlayingActivity extends AppCompatActivity {
         TextView title = (TextView)findViewById(R.id.title);
         TextView artist = (TextView)findViewById(R.id.artist);
         TextView album = (TextView)findViewById(R.id.album);
+        TextView location = (TextView)findViewById(R.id.location);
+        TextView time = (TextView)findViewById(R.id.time);
 
         title.setText(Player.getCurrentTrack().getName());
         artist.setText(Player.getCurrentTrack().getArtist());

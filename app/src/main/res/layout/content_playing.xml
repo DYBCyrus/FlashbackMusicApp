@@ -14,11 +14,13 @@
         android:layout_height="wrap_content"
         android:text = "BACK"/>
 
+
+
     <ImageButton
         android:id = "@+id/imageButtonFav"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginLeft = "180dp"
+        android:layout_marginLeft = "240dp"
         android:layout_toRightOf="@id/back"
         android:src = "@drawable/check"
         android:scaleType="fitXY"
@@ -26,8 +28,8 @@
 
     <TextView
         android:id = "@+id/title"
-        android:layout_marginTop = "50dp"
-        android:layout_marginLeft = "140dp"
+        android:layout_marginTop = "20dp"
+        android:layout_centerHorizontal="true"
         android:textSize = "30dp"
         android:layout_below="@id/back"
         android:layout_width="wrap_content"
@@ -39,7 +41,7 @@
         android:layout_below="@id/title"
         android:text = "Artist"
         android:textSize = "30dp"
-        android:layout_marginLeft="135dp"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -49,8 +51,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop = "10dp"
-        android:layout_marginLeft = "130dp"
+        android:layout_centerHorizontal="true"
         android:text = "Album"
+        android:textSize = "30dp"
+        android:layout_below="@id/artist"/>
+
+    <TextView
+        android:id = "@+id/location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop = "100dp"
+        android:layout_centerHorizontal="true"
+        android:text = "Location"
+        android:textSize = "30dp"
+        android:layout_below="@id/artist"/>
+
+    <TextView
+        android:id = "@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop = "150dp"
+        android:layout_centerHorizontal="true"
+        android:text = "Time"
         android:textSize = "30dp"
         android:layout_below="@id/artist"/>
 
@@ -59,8 +81,8 @@
         android:id = "@+id/imageButtonPrev"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_below="@id/album"
-        android:layout_marginTop = "100dp"
+        android:layout_below="@id/location"
+        android:layout_marginTop = "80dp"
         android:scaleType="fitXY"
         android:layout_marginLeft = "15dp"
         android:src="@drawable/previous" />
@@ -70,9 +92,9 @@
         android:layout_toRightOf="@id/imageButtonPrev"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_below = "@id/album"
-        android:layout_marginTop = "100dp"
-        android:layout_marginLeft = "50dp"
+        android:layout_below = "@id/location"
+        android:layout_marginTop = "80dp"
+        android:layout_marginLeft = "60dp"
         android:scaleType="fitXY"
         android:src="@drawable/pause"/>
 
@@ -81,9 +103,9 @@
         android:layout_toRightOf="@id/imageButtonPrause"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_below = "@id/album"
-        android:layout_marginTop = "100dp"
-        android:layout_marginLeft = "50dp"
+        android:layout_below = "@id/location"
+        android:layout_marginTop = "80dp"
+        android:layout_marginLeft = "60dp"
         android:scaleType="fitXY"
         android:src = "@drawable/next"/>
 
