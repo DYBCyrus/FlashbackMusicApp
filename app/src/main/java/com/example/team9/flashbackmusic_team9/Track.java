@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by Chutong Yang on 2/5/2018.
  */
 
-public class Track implements Serializable
+public class Track
 {
     private String name;
     private String artist;
@@ -18,14 +18,25 @@ public class Track implements Serializable
     private Album album;
     private Date date;
     private Location location;
+    private FavoriteStatus status;
 
     public Track(String name, String artist, Album album, AssetFileDescriptor afd) {
         this.name = name;
         this.album = album;
         this.afd = afd;
         this.artist = artist;
+        this.status = FavoriteStatus.NEUTRAL;
     }
 
+    public enum FavoriteStatus {
+        LIKE,DISLIKE,NEUTRAL;
+    }
+
+    public void setStatus(FavoriteStatus status) {this.status = status;}
+
+    public FavoriteStatus getStatus() {return status;}
+
+    public boolean isPlayable() {return status != FavoriteStatus.DISLIKE;}
 
     public String getName()
     {
@@ -54,6 +65,7 @@ public class Track implements Serializable
     public void setAlbum(Album al) {
         album = al;
     }
+
     public AssetFileDescriptor getDescriptor(){
         return afd;
     }
@@ -71,6 +83,7 @@ public class Track implements Serializable
     public Location getLocation() {
         return location;
     }
+
     public void setLocation(Location loc) {
         location = loc;
     }
