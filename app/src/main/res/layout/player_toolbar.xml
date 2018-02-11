@@ -10,7 +10,6 @@
     android:layout_height="match_parent">
     <LinearLayout
         android:background="@color/colorPrimary"
-        android:id="@+id/toolbarmenucontainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -21,7 +20,7 @@
             android:layout_height="50dp"
             android:minHeight="10dp"
             android:layout_marginHorizontal="10dp"
-            android:text="Name of the song"
+            android:text="Select a Track to Play"
             android:textSize="10sp"
             android:background="@color/colorPrimary"
             android:textColor="#ffffff" />

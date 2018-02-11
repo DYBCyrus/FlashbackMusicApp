@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -30,10 +31,16 @@ public class AllAlbumsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
+                PlayerToolBar.popToolbar();
             }
         });
 
         album = DataBase.getAllAlbums();
+
+
+        PlayerToolBar playerToolBar = new PlayerToolBar((Button)findViewById(R.id.trackName_button),
+                (ImageButton)findViewById(R.id.previous_button), (ImageButton)findViewById(R.id.play_button),
+                (ImageButton)findViewById(R.id.next_button), this);
 
         ListAdapter albumsAdapter = new AlbumListAdapter(this, android.R.layout.simple_list_item_1, album);
         ListView albumView = (ListView) findViewById(R.id.album_list);

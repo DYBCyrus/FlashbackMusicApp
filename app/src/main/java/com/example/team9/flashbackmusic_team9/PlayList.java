@@ -15,11 +15,18 @@ public class PlayList implements ListIterator<Track> {
 
     public void setLooping(boolean isLooping) {this.isLooping = isLooping;}
 
-    public PlayList(ArrayList<Track> tracks, int index) {
+    public PlayList(ArrayList<Track> tracks, int index, boolean looping) {
         playingTracks = tracks;
         iter = playingTracks.listIterator(index);
+        isLooping = looping;
+    }
+    public PlayList(ArrayList<Track> tracks, boolean looping) {
+        playingTracks = tracks;
+        iter = playingTracks.listIterator();
+        isLooping = looping;
     }
 
+    @Override
     public boolean hasNext() {
         if (!iter.hasNext() && !isLooping) {
             return false;
@@ -39,18 +46,37 @@ public class PlayList implements ListIterator<Track> {
         return true;
     }
 
+    @Override
     public Track next() {
         return iter.next();
     }
 
     @Override
     public boolean hasPrevious() {
-        return iter.hasPrevious();
+        if (!iter.hasPrevious()) {
+            return false;
+        }
+
+        Track tr = iter.previous();
+        if (iter.hasPrevious()) {
+            tr = iter.previous();
+        }
+        while (!tr.isPlayable()){
+            if (iter.hasPrevious()) {
+                tr = iter.previous();
+            } else {
+                return false;
+            }
+        }
+        iter.next();
+        return true;
     }
 
     @Override
     public Track previous() {
-        return iter.previous();
+        Track tr = iter.previous();
+        iter.next();
+        return tr;
     }
 
     @Override

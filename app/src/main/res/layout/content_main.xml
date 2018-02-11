@@ -45,4 +45,5 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <include android:id="@+id/player_toolbar" layout="@layout/player_toolbar"/>
 </android.support.constraint.ConstraintLayout>
