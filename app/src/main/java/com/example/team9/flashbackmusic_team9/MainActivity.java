@@ -27,11 +27,9 @@ import android.widget.ListView;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
-
+    
     private LocationManager locationManager;
     private Location mLocation;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
