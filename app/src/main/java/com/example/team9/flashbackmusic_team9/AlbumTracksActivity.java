@@ -15,20 +15,22 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 
 public class AlbumTracksActivity extends AppCompatActivity {
 
     private  Button displaySong;
     private MediaPlayer mediaPlayer;
     private String currentSong;
-    private int trackNumber = 0;
-
+    private PlayList playList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_tracks);
 
+        mediaPlayer = Player.getPlayer();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -38,7 +40,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
         final ImageButton pausePlay;
         ImageButton nextButton;
         final ImageButton previousButton;
-        Album album;
+        final Album album;
         final Track track;
 
 
@@ -74,13 +76,16 @@ public class AlbumTracksActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapterView.getAdapter().getItem(i);
+                ArrayList<Track> temp = new ArrayList<Track>();
+                temp.add(track);
+                setPlaylist(temp, 0);
+                Player.setPlayList(getPlayList());
                 currentSong = track.getName();
                 displaySong.setText(currentSong);
                 launchActivity(track);
 
                 Drawable d = ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null);
                 pausePlay.setBackground(d);
-                trackNumber = i;
             }
         });
 
@@ -88,9 +93,34 @@ public class AlbumTracksActivity extends AppCompatActivity {
         playAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                setPlaylist(album.getTracks(), 0);
+                Player.setPlayList(getPlayList());
+                if (Player.getPlayList().hasNext()) {
+                    Track track = Player.getPlayList().next();
+                    Player.start(track);
+                    currentSong = track.getName();
+                    displaySong.setText(currentSong);
+                }
+                if (Player.getPlayer().isPlaying()) {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.play, null));
+                } else {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null));
+                }
             }
         });
+
+        Player.getPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (Player.getPlayList().hasNext()) {
+                    Track track = Player.getPlayList().next();
+                    Player.start(track);
+                    currentSong = track.getName();
+                    displaySong.setText(currentSong);
+                }
+            }
+        });
+
 
         displaySong.setText(currentSong);
 
@@ -100,8 +130,6 @@ public class AlbumTracksActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Drawable d = pausePlay.getBackground();
                 Drawable backGround = ResourcesCompat.getDrawable(getResources(), R.drawable.play, null);
-                mediaPlayer = Player.getPlayer();
-
 
                 if( d.getConstantState().equals(backGround.getConstantState()) &&
                         !currentSong.equals("") ){
@@ -121,16 +149,25 @@ public class AlbumTracksActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                trackNumber++;
+                //trackNumber++;
 
-                if( trackNumber == trackOfAlbum.getAdapter().getCount() ){
-                    trackNumber = trackOfAlbum.getAdapter().getCount() - 1;
+//                if( trackNumber == trackOfAlbum.getAdapter().getCount() ){
+//                    trackNumber = trackOfAlbum.getAdapter().getCount() - 1;
+//                }
+                if (Player.getPlayList().hasNext()) {
+//                    Track nextTrack = (Track) trackOfAlbum.getItemAtPosition(trackNumber);
+                    Track nextTrack = Player.getPlayList().next();
+                    currentSong = nextTrack.getName();
+                    displaySong.setText(currentSong);
+                    launchActivity(nextTrack);
+                } else {
+                    Player.getPlayer().reset();
                 }
-
-                Track nextTrack = (Track) trackOfAlbum.getItemAtPosition(trackNumber);
-                currentSong = nextTrack.getName();
-                displaySong.setText(currentSong);
-                launchActivity(nextTrack);
+                if (Player.getPlayer().isPlaying()) {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.play, null));
+                } else {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null));
+                }
             }
         });
 
@@ -139,16 +176,27 @@ public class AlbumTracksActivity extends AppCompatActivity {
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                trackNumber--;
+                //trackNumber--;
 
-                if( trackNumber < 0 ){
-                    trackNumber = 0;
+//                if( trackNumber < 0 ){
+//                    trackNumber = 0;
+//                }
+                Track nextTrack;
+                if (Player.getPlayList().hasPrevious()) {
+
+//                    Track nextTrack = (Track) trackOfAlbum.getItemAtPosition(trackNumber);
+                    nextTrack = Player.getPlayList().previous();
+                } else {
+                    nextTrack = Player.getCurrentTrack();
                 }
-
-                Track nextTrack = (Track) trackOfAlbum.getItemAtPosition(trackNumber);
                 currentSong = nextTrack.getName();
                 displaySong.setText(currentSong);
                 launchActivity(nextTrack);
+                if (Player.getPlayer().isPlaying()) {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.play, null));
+                } else {
+                    pausePlay.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.pause, null));
+                }
             }
         });
 
@@ -167,5 +215,11 @@ public class AlbumTracksActivity extends AppCompatActivity {
     public void launchActivity(Track track) {
         Player.start(track);
     }
+
+    public void setPlaylist(ArrayList<Track> tracks, int index) {
+        playList = new PlayList(tracks, index);
+    }
+
+    public PlayList getPlayList() {return playList;}
 
 }

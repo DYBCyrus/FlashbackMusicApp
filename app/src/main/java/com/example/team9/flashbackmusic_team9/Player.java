@@ -7,6 +7,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -16,6 +17,7 @@ import java.util.Date;
 public class Player {
     private static MediaPlayer player;
     private static Track currentTrack;
+    private static PlayList playList = new PlayList(new ArrayList<Track>(), 0);
 
     public static void setPlayer(MediaPlayer playerToSet) {
         player = playerToSet;
@@ -42,6 +44,9 @@ public class Player {
 
     public static MediaPlayer getPlayer(){ return player; }
     public static Track getCurrentTrack(){ return currentTrack; }
+
+    public static void setPlayList(PlayList playList1) {playList = playList1;}
+    public static PlayList getPlayList() {return playList;}
 
     public static void pause() {
         player.pause();
