@@ -3,6 +3,7 @@ package com.example.team9.flashbackmusic_team9;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -38,6 +39,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //mode history
+        SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
+        String mode = prefs.getString("lastActivity", "");
+        if (mode.compareTo("flash") == 0) {
+            startActivity(new Intent(this, FlashBackActivity.class));
+        }
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -92,6 +100,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button modeChange = (Button)findViewById(R.id.mode);
+        modeChange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchModeActivity();
+            }
+        });
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -101,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
     }
     public void launchAllAlbumsActivity() {
         Intent intent = new Intent(this, AllAlbumsActivity.class);
+        startActivity(intent);
+    }
+    public void launchModeActivity() {
+        Intent intent = new Intent(this, FlashBackActivity.class);
         startActivity(intent);
     }
 
@@ -148,5 +168,15 @@ public class MainActivity extends AppCompatActivity {
         }
         locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
         return mLocation;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("lastActivity", "normal");
+        editor.apply();
     }
 }

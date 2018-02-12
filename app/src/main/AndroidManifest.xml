@@ -37,7 +37,11 @@
         <activity
             android:name=".PlayingActivity"
             android:label="@string/title_activity_playing"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".FlashBackActivity"
+            android:label="@string/title_activity_flash_back"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
