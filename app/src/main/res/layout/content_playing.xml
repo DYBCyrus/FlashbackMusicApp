@@ -15,16 +15,16 @@
         android:text = "BACK"/>
 
 
-
     <ImageButton
-        android:id = "@+id/imageButtonFav"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft = "240dp"
-        android:layout_toRightOf="@id/back"
-        android:src = "@drawable/check"
+        android:id="@+id/likeButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:scaleType="fitXY"
-        />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:minHeight="10dp"
+        android:minWidth="10dp"
+        android:background="@drawable/plus" />
 
     <TextView
         android:id = "@+id/title"
@@ -108,7 +108,5 @@
         android:layout_marginLeft = "60dp"
         android:scaleType="fitXY"
         android:src = "@drawable/next"/>
-
-
 
 </RelativeLayout>
