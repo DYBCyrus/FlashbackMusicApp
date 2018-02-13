@@ -19,8 +19,6 @@ import android.widget.TextView;
 
 public class PlayingActivity extends AppCompatActivity {
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -51,6 +49,7 @@ public class PlayingActivity extends AppCompatActivity {
         title.setText(Player.getCurrentTrack().getName());
         artist.setText(Player.getCurrentTrack().getArtist());
         album.setText(Player.getCurrentTrack().getAlbum().getName());
+        display();
 
         // Checking track status before launching activity for like_dislike button image
         if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
@@ -96,6 +95,22 @@ public class PlayingActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void display() {
+        TextView location = (TextView)findViewById(R.id.location);
+        TextView time = (TextView)findViewById(R.id.time);
+        Track currentTrack = Player.getCurrentTrack();
+        if (currentTrack.getLocation() != null) {
+            location.setText(currentTrack.getLocation().toString());
+        } else {
+            location.setText("No playing history");
+        }
+        if (currentTrack.getDate() != null) {
+            time.setText(currentTrack.getDate().toString());
+        } else {
+            time.setText("No playing history");
+        }
     }
 
 }

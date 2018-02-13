@@ -4,6 +4,7 @@ import android.content.res.AssetFileDescriptor;
 import android.location.Location;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -16,7 +17,7 @@ public class Track
     private String artist;
     private AssetFileDescriptor afd;
     private Album album;
-    private Date date;
+    private LocalDateTime date;
     private Location location;
     private FavoriteStatus status;
 
@@ -70,12 +71,12 @@ public class Track
         return afd;
     }
 
-    public Date getDate()
+    public LocalDateTime getDate()
     {
         return date;
     }
 
-    public void setDate(Date d)
+    public void setDate(LocalDateTime d)
     {
         date = d;
     }

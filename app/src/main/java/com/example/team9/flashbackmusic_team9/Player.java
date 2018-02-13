@@ -7,6 +7,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Stack;
@@ -20,15 +21,6 @@ public class Player {
     private static Track currentTrack;
     private static PlayList currentPlayList;
 
-    public static void setPlayer(MediaPlayer playerToSet) {
-        player = playerToSet;
-    }
-    public static void setCurrentTrackLocation(Location loc) {
-        currentTrack.setLocation(loc);
-    }
-    public static void setCurrentTrackTime(Date date) {currentTrack.setDate(date);}
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public static void start(Track track) {
         player.reset();
         try {
@@ -59,7 +51,7 @@ public class Player {
         }
         return false;
     }
-    public static void playPlaylList(PlayList playList) {
+    public static void playPlayList(PlayList playList) {
         currentPlayList = playList;
         start(currentPlayList.next());
     }
@@ -90,5 +82,13 @@ public class Player {
     public static void setPlayList(PlayList playList1) {
         currentPlayList = playList1;
     }
+
+    public static void setPlayer(MediaPlayer playerToSet) {
+        player = playerToSet;
+    }
+    public static void setCurrentTrackLocation(Location loc) {
+        currentTrack.setLocation(loc);
+    }
+    public static void setCurrentTrackTime(LocalDateTime dateTime) {currentTrack.setDate(dateTime);}
 
 }

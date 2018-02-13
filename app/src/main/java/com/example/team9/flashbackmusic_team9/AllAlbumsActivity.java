@@ -37,7 +37,6 @@ public class AllAlbumsActivity extends AppCompatActivity {
 
         album = DataBase.getAllAlbums();
 
-
         PlayerToolBar playerToolBar = new PlayerToolBar((Button)findViewById(R.id.trackName_button),
                 (ImageButton)findViewById(R.id.previous_button), (ImageButton)findViewById(R.id.play_button),
                 (ImageButton)findViewById(R.id.next_button), this);
@@ -49,7 +48,6 @@ public class AllAlbumsActivity extends AppCompatActivity {
         albumView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
                 launchActivity(i);
             }
         });
