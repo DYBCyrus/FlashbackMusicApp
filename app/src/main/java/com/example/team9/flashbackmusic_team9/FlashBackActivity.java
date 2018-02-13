@@ -40,7 +40,6 @@ public class FlashBackActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
         SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("lastActivity", "flash");

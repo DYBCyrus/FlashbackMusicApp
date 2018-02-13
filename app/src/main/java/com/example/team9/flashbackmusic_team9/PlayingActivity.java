@@ -12,8 +12,8 @@ import android.widget.TextView;
 
 
 public class PlayingActivity extends AppCompatActivity {
-    @Override
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -39,6 +39,7 @@ public class PlayingActivity extends AppCompatActivity {
         title.setText(Player.getCurrentTrack().getName());
         artist.setText(Player.getCurrentTrack().getArtist());
         album.setText(Player.getCurrentTrack().getAlbum().getName());
+        display();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -48,6 +49,22 @@ public class PlayingActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    public void display() {
+        TextView location = (TextView)findViewById(R.id.location);
+        TextView time = (TextView)findViewById(R.id.time);
+        Track currentTrack = Player.getCurrentTrack();
+        if (currentTrack.getLocation() != null) {
+            location.setText(currentTrack.getLocation().toString());
+        } else {
+            location.setText("No playing history");
+        }
+        if (currentTrack.getDate() != null) {
+            time.setText(currentTrack.getDate().toString());
+        } else {
+            time.setText("No playing history");
+        }
     }
 
 }
