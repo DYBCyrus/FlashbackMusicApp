@@ -23,8 +23,7 @@
         android:layout_marginLeft = "240dp"
         android:layout_toRightOf="@id/back"
         android:src = "@drawable/check"
-        android:scaleType="fitXY"
-        />
+        android:scaleType="fitXY" />
 
     <TextView
         android:id = "@+id/title"

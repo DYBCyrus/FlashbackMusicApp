@@ -15,20 +15,19 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 
 public class AlbumTracksActivity extends AppCompatActivity {
 
-
     private Album album;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_tracks);
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -38,12 +37,12 @@ public class AlbumTracksActivity extends AppCompatActivity {
         int index = getIntent().getExtras().getInt("index");
         album = DataBase.getAlbum(index);
 
-
+        TextView albumName = (TextView)findViewById(R.id.album_name);
+        albumName.setText(album.getName());
 
         PlayerToolBar playerToolBar = new PlayerToolBar((Button)findViewById(R.id.trackName_button),
                 (ImageButton)findViewById(R.id.previous_button), (ImageButton)findViewById(R.id.play_button),
                 (ImageButton)findViewById(R.id.next_button), this);
-
 
         ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, album.getTracks());
         ListView trackOfAlbum = findViewById(R.id.album_track_list);
@@ -55,7 +54,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 Track track = (Track) adapterView.getAdapter().getItem(i);
                 Player.clearPlayList();
                 Player.start(track);
-                launchActivity(track);
+                launchActivity();
             }
         });
 
@@ -64,11 +63,10 @@ public class AlbumTracksActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 PlayList playList = new PlayList(album.getTracks(), false);
-                Player.playPlaylList(playList);
-                launchActivity(Player.getCurrentTrack());
+                Player.playPlayList(playList);
+                launchActivity();
             }
         });
-
 
         backToAlbums.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,8 +77,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void launchActivity(Track track) {
+    public void launchActivity() {
         Intent intent = new Intent(this, PlayingActivity.class);
         startActivity(intent);
     }
