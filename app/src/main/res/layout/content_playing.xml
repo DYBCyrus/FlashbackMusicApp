@@ -14,22 +14,24 @@
         android:layout_height="wrap_content"
         android:text = "BACK"/>
 
-
-
     <ImageButton
-        android:id = "@+id/imageButtonFav"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft = "240dp"
-        android:layout_toRightOf="@id/back"
-        android:src = "@drawable/check"
-        android:scaleType="fitXY" />
+        android:id="@+id/likeButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:minHeight="10dp"
+        android:minWidth="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/plus" />
 
     <TextView
         android:id = "@+id/title"
         android:layout_marginTop = "20dp"
         android:layout_centerHorizontal="true"
-        android:textSize = "30dp"
+        android:textSize = "30sp"
         android:layout_below="@id/back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,7 +41,7 @@
         android:id = "@+id/artist"
         android:layout_below="@id/title"
         android:text = "Artist"
-        android:textSize = "30dp"
+        android:textSize = "30sp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
@@ -52,7 +54,7 @@
         android:layout_marginTop = "10dp"
         android:layout_centerHorizontal="true"
         android:text = "Album"
-        android:textSize = "30dp"
+        android:textSize = "30sp"
         android:layout_below="@id/artist"/>
 
     <TextView
@@ -62,7 +64,7 @@
         android:layout_marginTop = "100dp"
         android:layout_centerHorizontal="true"
         android:text = "Location"
-        android:textSize = "30dp"
+        android:textSize = "30sp"
         android:layout_below="@id/artist"/>
 
     <TextView
@@ -72,12 +74,12 @@
         android:layout_marginTop = "150dp"
         android:layout_centerHorizontal="true"
         android:text = "Time"
-        android:textSize = "30dp"
+        android:textSize = "30sp"
         android:layout_below="@id/artist"/>
 
 
     <ImageButton
-        android:id = "@+id/imageButtonPrev"
+        android:id = "@+id/prevButton"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_below="@id/location"
@@ -87,8 +89,8 @@
         android:src="@drawable/previous" />
 
     <ImageButton
-        android:id = "@+id/imageButtonPrause"
-        android:layout_toRightOf="@id/imageButtonPrev"
+        android:id = "@+id/play_pause_button"
+        android:layout_toRightOf="@id/prevButton"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_below = "@id/location"
@@ -98,8 +100,8 @@
         android:src="@drawable/pause"/>
 
     <ImageButton
-        android:id = "@+id/imageButtonNext"
-        android:layout_toRightOf="@id/imageButtonPrause"
+        android:id = "@+id/nextButton"
+        android:layout_toRightOf="@id/play_pause_button"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_below = "@id/location"
@@ -107,7 +109,5 @@
         android:layout_marginLeft = "60dp"
         android:scaleType="fitXY"
         android:src = "@drawable/next"/>
-
-
 
 </RelativeLayout>
