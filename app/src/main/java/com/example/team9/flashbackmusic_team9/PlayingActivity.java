@@ -1,23 +1,22 @@
 package com.example.team9.flashbackmusic_team9;
 
-import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+public class PlayingActivity extends AppCompatActivity implements Updateable{
 
-public class PlayingActivity extends AppCompatActivity {
+    private TextView title;
+    private TextView artist;
+    private TextView album;
+    private TextView location;
+    private TextView time;
+    private ImageButton fav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,18 +32,17 @@ public class PlayingActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 finish();
+                Updateables.popItem();
+                Updateables.popItem();
             }
         });
 
-
-        final ImageButton fav = findViewById(R.id.likeButton);
-        final ImageButton play_pause = findViewById(R.id.play_pause_button);
-
-        TextView title = findViewById(R.id.title);
-        TextView artist = findViewById(R.id.artist);
-        TextView album = findViewById(R.id.album);
-        TextView location = findViewById(R.id.location);
-        TextView time = findViewById(R.id.time);
+        fav = findViewById(R.id.likeButton);
+        title = findViewById(R.id.title);
+        artist = findViewById(R.id.artist);
+        album = findViewById(R.id.album);
+        location = findViewById(R.id.location);
+        time = findViewById(R.id.time);
 
         title.setText(Player.getCurrentTrack().getName());
         artist.setText(Player.getCurrentTrack().getArtist());
@@ -52,49 +50,35 @@ public class PlayingActivity extends AppCompatActivity {
         display();
 
         // Checking track status before launching activity for like_dislike button image
-        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x, null));
-        }
-        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark, null));
-        }
-        else{
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus, null));
-        }
-
+        checkStatus();
 
         fav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
-                    Player.getCurrentTrack().setStatus(Track.FavoriteStatus.NEUTRAL);
-                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus, null));
-                }
-                else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
-                    Player.getCurrentTrack().setStatus(Track.FavoriteStatus.DISLIKE);
-                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x, null));
-                }
-                else{
-                    Player.getCurrentTrack().setStatus(Track.FavoriteStatus.LIKE);
-                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark, null));
-                }
+            changeStatus();
             }
         });
 
-        play_pause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        PlayerToolBar playerToolBar = new PlayerToolBar(new Button(this),
+                (ImageButton)findViewById(R.id.prevButton),
+                (ImageButton)findViewById(R.id.play_pause_button),
+                (ImageButton)findViewById(R.id.nextButton), this);
+        Updateables.addUpdateable(this);
+    }
 
-                if( Player.isPlaying() ){
-                    Player.pause();
-                    play_pause.setImageResource(R.drawable.play);
-                }
-                else{
-                    Player.resume();
-                    play_pause.setImageResource(R.drawable.pause);
-                }
-            }
-        });
+    public void checkStatus() {
+        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
+                    null));
+        }
+        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
+                    null));
+        }
+        else{
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
+                    null));
+        }
     }
 
     public void display() {
@@ -111,6 +95,36 @@ public class PlayingActivity extends AppCompatActivity {
         } else {
             time.setText("No playing history");
         }
+    }
+
+    public void changeStatus() {
+        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
+            Player.getCurrentTrack().setStatus(Track.FavoriteStatus.NEUTRAL);
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
+                    null));
+        }
+        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
+            Player.getCurrentTrack().setStatus(Track.FavoriteStatus.DISLIKE);
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
+                    null));
+        }
+        else{
+            Player.getCurrentTrack().setStatus(Track.FavoriteStatus.LIKE);
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(),
+                    R.drawable.check_mark, null));
+        }
+    }
+
+    public void update() {
+        Track track = Player.getCurrentTrack();
+        title.setText(track.getName());
+        artist.setText(track.getArtist());
+        album.setText(track.getAlbum().getName());
+        if (track.getLocation() != null || track.getDate() != null) {
+            location.setText(track.getLocation().toString());
+            time.setText(track.getDate().toString());
+        }
+        checkStatus();
     }
 
 }

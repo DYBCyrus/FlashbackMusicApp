@@ -96,8 +96,7 @@
         android:layout_below = "@id/location"
         android:layout_marginTop = "80dp"
         android:layout_marginLeft = "60dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/pause"/>
+        android:scaleType="fitXY" />
 
     <ImageButton
         android:id = "@+id/nextButton"

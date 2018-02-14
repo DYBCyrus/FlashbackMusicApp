@@ -1,6 +1,5 @@
 package com.example.team9.flashbackmusic_team9;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.res.ResourcesCompat;
@@ -14,14 +13,12 @@ import java.util.Stack;
  * Created by Kent on 2/10/2018.
  */
 
-public class PlayerToolBar {
+public class PlayerToolBar implements Updateable{
     private Button trackNameButton;
     private ImageButton previous;
     private ImageButton play;
     private ImageButton next;
     private Context context;
-
-    private static Stack<PlayerToolBar> toolBars = new Stack<>();
 
 
     public PlayerToolBar(Button b1, ImageButton b2, ImageButton b3, ImageButton b4, Context c) {
@@ -33,7 +30,7 @@ public class PlayerToolBar {
 
         update();
         setListener();
-        addListeningToolbar(this);
+        Updateables.addUpdateable(this);
     }
     private void setListener() {
         trackNameButton.setOnClickListener(new View.OnClickListener() {
@@ -100,16 +97,4 @@ public class PlayerToolBar {
             trackNameButton.setText("Select a Track to Play");
         }
     }
-    public static void addListeningToolbar(PlayerToolBar toolBar) {
-        toolBars.add(toolBar);
-    }
-    public static void updateToolbar() {
-        for(PlayerToolBar each : toolBars) {
-            each.update();
-        }
-    }
-    public static void popToolbar() {
-        toolBars.pop();
-    }
-
 }

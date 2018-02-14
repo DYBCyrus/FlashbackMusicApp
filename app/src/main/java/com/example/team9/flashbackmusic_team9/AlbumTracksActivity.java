@@ -72,7 +72,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                PlayerToolBar.popToolbar();
+                Updateables.popItem();
             }
         });
     }

@@ -2,10 +2,7 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.content.res.AssetFileDescriptor;
 import android.location.Location;
-
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * Created by Chutong Yang on 2/5/2018.
