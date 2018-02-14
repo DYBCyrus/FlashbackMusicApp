@@ -23,7 +23,8 @@
         android:minHeight="10dp"
         android:minWidth="10dp"
         android:clickable="false"
-        android:src="@drawable/plus" />
+        android:onClick="changeFavoriteStatus"
+        android:background="@drawable/plus" />
 
 
 </LinearLayout>

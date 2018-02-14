@@ -35,6 +35,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // request getting location
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                100);
+
         // mode history
         SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
         String mode = prefs.getString("lastActivity", "");
@@ -87,25 +92,21 @@ public class MainActivity extends AppCompatActivity {
 
     public void changeFavoriteStatus(View view) {
         final Track track = (Track) view.getTag();
-//        final ImageButton fav = (ImageButton)view.getTag(R.id.change_status);
-//        fav.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (track.getStatus() == Track.FavoriteStatus.DISLIKE) {
-//                    track.setStatus(Track.FavoriteStatus.NEUTRAL);
-//                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
-//                            null));
-//                } else if (track.getStatus() == Track.FavoriteStatus.LIKE) {
-//                    track.setStatus(Track.FavoriteStatus.DISLIKE);
-//                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
-//                            null));
-//                } else {
-//                    track.setStatus(Track.FavoriteStatus.LIKE);
-//                    fav.setBackground(ResourcesCompat.getDrawable(getResources(),
-//                            R.drawable.check_mark, null));
-//                }
-//            }
-//        });
+        final ImageButton fav = (ImageButton)view.getTag(R.id.change_status);
+
+        if (track.getStatus() == Track.FavoriteStatus.DISLIKE) {
+            track.setStatus(Track.FavoriteStatus.NEUTRAL);
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
+                    null));
+        } else if (track.getStatus() == Track.FavoriteStatus.LIKE) {
+            track.setStatus(Track.FavoriteStatus.DISLIKE);
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
+                    null));
+        } else {
+            track.setStatus(Track.FavoriteStatus.LIKE);
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(),
+                    R.drawable.check_mark, null));
+        }
     }
 
     /**
@@ -181,9 +182,6 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_COARSE_LOCATION) !=
                         PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    100);
         }
         locationManager.requestLocationUpdates(locationProvider, 0, 0,
                 locationListener);

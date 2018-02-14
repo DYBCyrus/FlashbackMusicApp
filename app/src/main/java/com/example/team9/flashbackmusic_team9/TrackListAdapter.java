@@ -32,30 +32,19 @@ public class TrackListAdapter extends ArrayAdapter<Track> {
         Track track = getItem(position);
         ((TextView)convertView.findViewById(R.id.track_names)).setText(track.getName());
         ImageButton fav = convertView.findViewById(R.id.change_status);
-        fav.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Track track = getItem(position);
-                System.out.println(position);
-                if( track.getStatus() == Track.FavoriteStatus.DISLIKE ){
-                    track.setStatus(Track.FavoriteStatus.NEUTRAL);
-                    view.findViewById(R.id.change_status).setBackground(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.plus,
-                            null));
+        if( track.getStatus() == Track.FavoriteStatus.DISLIKE ){
+            fav.setBackground(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.x,
+                    null));
+        }
+        else if( track.getStatus() == Track.FavoriteStatus.LIKE ){
+            fav.setBackground(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.check_mark,
+                    null));
+        }
+        else{
+            fav.setBackground(ResourcesCompat.getDrawable(getContext().getResources(),
+                    R.drawable.plus, null));
+        }
 
-                }
-                else if( track.getStatus() == Track.FavoriteStatus.LIKE ){
-                    track.setStatus(Track.FavoriteStatus.DISLIKE);
-                    view.findViewById(R.id.change_status).setBackground(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.x,
-                            null));
-                }
-                else{
-                    track.setStatus(Track.FavoriteStatus.LIKE);
-                    view.findViewById(R.id.change_status).setBackground(ResourcesCompat.getDrawable(getContext().getResources(),
-                            R.drawable.check_mark, null));
-                }
-
-            }
-        });
         fav.setTag(track);
         fav.setTag(R.id.change_status, fav);
         return convertView;
