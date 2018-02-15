@@ -9,12 +9,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -25,8 +22,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     
@@ -39,6 +34,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // request getting location
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                100);
 
         // mode history
         SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 launchPlayingActivity();
             }
         });
+
         Button showAlbums = (Button) findViewById(R.id.all_albums);
         showAlbums.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +88,25 @@ public class MainActivity extends AppCompatActivity {
                 launchModeActivity();
             }
         });
+    }
+
+    public void changeFavoriteStatus(View view) {
+        final Track track = (Track) view.getTag();
+        final ImageButton fav = (ImageButton)view.getTag(R.id.change_status);
+
+        if (track.getStatus() == Track.FavoriteStatus.DISLIKE) {
+            track.setStatus(Track.FavoriteStatus.NEUTRAL);
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
+                    null));
+        } else if (track.getStatus() == Track.FavoriteStatus.LIKE) {
+            track.setStatus(Track.FavoriteStatus.DISLIKE);
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
+                    null));
+        } else {
+            track.setStatus(Track.FavoriteStatus.LIKE);
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(),
+                    R.drawable.check_mark, null));
+        }
     }
 
     /**
@@ -123,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
                 mediaPlayer.start();
-                PlayerToolBar.updateToolbar();
+                Updateables.updateAll();
             }
         });
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -132,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
                 Player.setCurrentTrackLocation(mLocation);
                 Player.setCurrentTrackTime(TrackTime.now());
                 if (!Player.playNext()) {
-                    PlayerToolBar.updateToolbar();
+                    Updateables.updateAll();
                 }
             }
         });
@@ -162,9 +182,6 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_COARSE_LOCATION) !=
                         PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    100);
         }
         locationManager.requestLocationUpdates(locationProvider, 0, 0,
                 locationListener);

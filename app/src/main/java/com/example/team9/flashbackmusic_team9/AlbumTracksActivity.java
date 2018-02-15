@@ -72,7 +72,6 @@ public class AlbumTracksActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                PlayerToolBar.popToolbar();
             }
         });
     }
@@ -82,6 +81,13 @@ public class AlbumTracksActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
+    @Override
+    public void finish() {
+        Updateables.popItem();
+        for (Track each:album.getTracks()) {
+            each.popListeningFavoriteStatusButton();
+        }
+        super.finish();
+    }
 
 }

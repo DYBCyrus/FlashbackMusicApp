@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:descendantFocusability="blocksDescendants">
+
+    <TextView
+        android:id="@+id/track_names"
+        android:layout_width="0sp"
+        android:layout_height="fill_parent"
+        android:layout_weight="2"
+        android:textSize="20dp"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:gravity="center_vertical" />
+
+    <!--<ImageButton-->
+        <!--android:id="@+id/change_status"-->
+        <!--android:layout_width="50dp"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:scaleType="fitXY"-->
+        <!--android:minHeight="10dp"-->
+        <!--android:minWidth="10dp"-->
+        <!--android:clickable="false"-->
+        <!--android:onClick="changeFavoriteStatus"-->
+        <!--android:background="@drawable/plus" />-->
+    <com.example.team9.flashbackmusic_team9.FavoriteStatusButton
+        android:id="@+id/change_status"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:minHeight="10dp"
+        android:minWidth="10dp"
+        android:clickable="false"
+        android:background="@drawable/plus" />
+
+
+</LinearLayout>
