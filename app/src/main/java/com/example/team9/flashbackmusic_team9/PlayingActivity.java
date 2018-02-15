@@ -1,6 +1,17 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
+import android.provider.SyncStateContract;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -8,6 +19,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+
+import static android.location.LocationManager.GPS_PROVIDER;
 
 public class PlayingActivity extends AppCompatActivity implements Updateable{
 
@@ -17,6 +32,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     private TextView location;
     private TextView time;
     private ImageButton fav;
+    private String mAddressOutput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +82,19 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         Updateables.addUpdateable(this);
     }
 
+    protected void startIntentService() {
+        AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
+        Intent intent = new Intent(this, FetchAddressIntentService.class);
+        intent.putExtra("receiver", mResultReceiver);
+        if (Player.getCurrentTrack().getLocation() != null) {
+//            Location loc = new Location(GPS_PROVIDER);
+//            loc.setLatitude(32.8817413);
+//            loc.setLongitude(-117.23356050000001);
+            intent.putExtra("location", Player.getCurrentTrack().getLocation());
+            startService(intent);
+        }
+    }
+
     public void checkStatus() {
         if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
             fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
@@ -82,11 +111,10 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     }
 
     public void display() {
-        TextView location = (TextView)findViewById(R.id.location);
-        TextView time = (TextView)findViewById(R.id.time);
+        System.out.println("display in!");
         Track currentTrack = Player.getCurrentTrack();
         if (currentTrack.getLocation() != null) {
-            location.setText(currentTrack.getLocation().toString());
+            startIntentService();
         } else {
             location.setText("No playing history");
         }
@@ -117,14 +145,31 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
 
     public void update() {
         Track track = Player.getCurrentTrack();
-        title.setText(track.getName());
-        artist.setText(track.getArtist());
-        album.setText(track.getAlbum().getName());
-        if (track.getLocation() != null || track.getDate() != null) {
-            location.setText(track.getLocation().toString());
-            time.setText(track.getDate().toString());
+        if (track != null) {
+            title.setText(track.getName());
+            artist.setText(track.getArtist());
+            album.setText(track.getAlbum().getName());
+            if (track.getLocation() != null || track.getDate() != null) {
+                //location.setText(track.getLocation().toString());
+                time.setText(track.getDate().toString());
+                startIntentService();
+            }
+            checkStatus();
         }
-        checkStatus();
+    }
+
+    class AddressResultReceiver extends ResultReceiver {
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            // Display the address string
+            // or an error message sent from the intent service.
+            mAddressOutput = resultData.getString("result");
+            location.setText(mAddressOutput);
+        }
     }
 
 }
