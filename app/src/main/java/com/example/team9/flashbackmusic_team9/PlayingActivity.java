@@ -1,16 +1,17 @@
 package com.example.team9.flashbackmusic_team9;
 
-import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 import android.os.Bundle;
 import android.os.Handler;
+import android.content.Intent;
 import android.os.ResultReceiver;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.SeekBar;
 
 public class PlayingActivity extends AppCompatActivity implements Updateable{
 
@@ -22,6 +23,10 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     private String mAddressOutput;
 
     private ImageButton fav;
+
+
+    private SeekBar seekbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,56 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         album = findViewById(R.id.album);
         location = findViewById(R.id.location);
         time = findViewById(R.id.time);
+
+        final ImageButton fav = findViewById(R.id.likeButton);
+        final ImageButton play_pause = findViewById(R.id.play_pause_button);
+        seekbar = findViewById(R.id.seekBar);
+
+        TextView title = findViewById(R.id.title);
+        TextView artist = findViewById(R.id.artist);
+        TextView album = findViewById(R.id.album);
+        TextView location = findViewById(R.id.location);
+        TextView time = findViewById(R.id.time);
+
+        title.setText(Player.getCurrentTrack().getName());
+        artist.setText(Player.getCurrentTrack().getArtist());
+        album.setText(Player.getCurrentTrack().getAlbum().getName());
+
+
+        seekbar.setMax(Player.getPlayer().getDuration());
+        seekbar.setProgress(Player.getPlayer().getCurrentPosition());
+
+        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            boolean userTouch;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if( Player.getPlayer().isPlaying() && userTouch ){
+                    Player.getPlayer().seekTo(i);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                userTouch = true;
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                userTouch = false;
+            }
+        });
+
+        // Checking track status before launching activity for like_dislike button image
+        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x, null));
+        }
+        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark, null));
+        }
+        else{
+            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus, null));
+        }
 
         update();
 
@@ -91,6 +146,15 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             startService(intent);
         }
     }
+
+//    public void display() {
+//        TextView location = (TextView) findViewById(R.id.location);
+//        TextView time = (TextView) findViewById(R.id.time);
+//        Track currentTrack = Player.getCurrentTrack();
+//        if (currentTrack.getLocation() != null) {
+//            location.setText(currentTrack.getLocation().toString());
+//        }
+//    }
 
 //    public void checkStatus() {
 //        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
