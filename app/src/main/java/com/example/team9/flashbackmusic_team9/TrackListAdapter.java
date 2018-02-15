@@ -31,22 +31,8 @@ public class TrackListAdapter extends ArrayAdapter<Track> {
 
         Track track = getItem(position);
         ((TextView)convertView.findViewById(R.id.track_names)).setText(track.getName());
-        ImageButton fav = convertView.findViewById(R.id.change_status);
-        if( track.getStatus() == Track.FavoriteStatus.DISLIKE ){
-            fav.setBackground(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.x,
-                    null));
-        }
-        else if( track.getStatus() == Track.FavoriteStatus.LIKE ){
-            fav.setBackground(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.check_mark,
-                    null));
-        }
-        else{
-            fav.setBackground(ResourcesCompat.getDrawable(getContext().getResources(),
-                    R.drawable.plus, null));
-        }
-
-        fav.setTag(track);
-        fav.setTag(R.id.change_status, fav);
+        FavoriteStatusButton fav = convertView.findViewById(R.id.change_status);
+        track.addListeningFavoriteStatusButton(fav);
         return convertView;
     }
 }

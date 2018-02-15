@@ -46,13 +46,7 @@ public class PlayerToolBar implements Updateable{
         previous.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (Player.playPrevious()) {
-                    play.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.pause, null));
-                }
-                else {
-                    play.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.play, null));
-
-                }
+                Player.playPrevious();
             }
         });
         play.setOnClickListener(new View.OnClickListener() {
@@ -60,26 +54,16 @@ public class PlayerToolBar implements Updateable{
             public void onClick(View view) {
                 if (Player.isPlaying()) {
                     Player.pause();
-                    play.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.play, null));
-
                 }
                 else if (Player.getCurrentTrack()!=null) {
                     Player.resume();
-                    play.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.pause, null));
-
                 }
             }
         });
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (Player.playNext()) {
-                    play.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.pause, null));
-
-                }
-                else {
-                    play.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.play, null));
-                }
+                Player.playNext();
             }
         });
     }

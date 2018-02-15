@@ -17,7 +17,17 @@
         android:paddingTop="5dp"
         android:gravity="center_vertical" />
 
-    <ImageButton
+    <!--<ImageButton-->
+        <!--android:id="@+id/change_status"-->
+        <!--android:layout_width="50dp"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:scaleType="fitXY"-->
+        <!--android:minHeight="10dp"-->
+        <!--android:minWidth="10dp"-->
+        <!--android:clickable="false"-->
+        <!--android:onClick="changeFavoriteStatus"-->
+        <!--android:background="@drawable/plus" />-->
+    <com.example.team9.flashbackmusic_team9.FavoriteStatusButton
         android:id="@+id/change_status"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -25,7 +35,6 @@
         android:minHeight="10dp"
         android:minWidth="10dp"
         android:clickable="false"
-        android:onClick="changeFavoriteStatus"
         android:background="@drawable/plus" />
 
 
