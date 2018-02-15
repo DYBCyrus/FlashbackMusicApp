@@ -12,4 +12,18 @@
         android:paddingTop="5dp"
         android:text="track name"/>
 
+    <ImageButton
+        android:id="@+id/atomPay_removePay"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:minHeight="10dp"
+        android:minWidth="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="removeAtomPayOnClickHandler"
+        android:src="@drawable/plus" />
+
 </LinearLayout>

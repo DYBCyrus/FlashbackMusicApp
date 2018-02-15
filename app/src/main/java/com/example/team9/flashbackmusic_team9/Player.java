@@ -3,14 +3,8 @@ package com.example.team9.flashbackmusic_team9;
 import android.content.res.AssetFileDescriptor;
 import android.location.Location;
 import android.media.MediaPlayer;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Stack;
 
 /**
  * Created by Kent on 2/6/2018.
@@ -23,6 +17,10 @@ public class Player {
 
     public static void start(Track track) {
         player.reset();
+//        if (track.getStatus() == Track.FavoriteStatus.DISLIKE) {
+//            playNext();
+//            return;
+//        }
         try {
             AssetFileDescriptor afd = track.getDescriptor();
             player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
@@ -30,8 +28,6 @@ public class Player {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        currentTrack = track;
         player.prepareAsync();
     }
 
@@ -41,6 +37,8 @@ public class Player {
             start(currentPlayList.previous());
             return true;
         }
+        currentTrack = null;
+        Updateables.updateAll();
         return false;
     }
     public static boolean playNext() {
@@ -49,11 +47,13 @@ public class Player {
             start(currentPlayList.next());
             return true;
         }
+        currentTrack = null;
+        Updateables.updateAll();
         return false;
     }
     public static void playPlayList(PlayList playList) {
         currentPlayList = playList;
-        start(currentPlayList.next());
+        playNext();
     }
     public static boolean isPlaying() {
         return player.isPlaying();
@@ -61,10 +61,11 @@ public class Player {
 
     public static void pause() {
         player.pause();
-        PlayerToolBar.updateToolbar();
+        Updateables.updateAll();
     }
     public static void resume() {
         player.start();
+        Updateables.updateAll();
     }
     public static MediaPlayer getPlayer(){
         return player;

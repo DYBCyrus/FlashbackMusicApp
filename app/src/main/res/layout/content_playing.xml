@@ -39,6 +39,8 @@
         android:layout_marginTop = "20dp"
         android:layout_centerHorizontal="true"
         android:textSize = "30sp"
+        android:ellipsize="marquee"
+        android:singleLine="true"
         android:layout_below="@id/back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -49,6 +51,8 @@
         android:layout_below="@id/title"
         android:text = "Artist"
         android:textSize = "30sp"
+        android:ellipsize="marquee"
+        android:singleLine="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
@@ -61,6 +65,8 @@
         android:layout_marginTop = "10dp"
         android:layout_centerHorizontal="true"
         android:text = "Album"
+        android:ellipsize="marquee"
+        android:singleLine="true"
         android:textSize = "30sp"
         android:layout_below="@id/artist"/>
 
@@ -68,9 +74,11 @@
         android:id = "@+id/location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop = "100dp"
+        android:layout_marginTop = "50dp"
         android:layout_centerHorizontal="true"
         android:text = "Location"
+        android:ellipsize="marquee"
+        android:singleLine="true"
         android:textSize = "30sp"
         android:layout_below="@id/artist"/>
 
@@ -78,9 +86,11 @@
         android:id = "@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop = "150dp"
+        android:layout_marginTop = "100dp"
         android:layout_centerHorizontal="true"
         android:text = "Time"
+        android:ellipsize="marquee"
+        android:singleLine="true"
         android:textSize = "30sp"
         android:layout_below="@id/artist"/>
 
@@ -90,10 +100,10 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_below="@id/location"
-        android:layout_marginTop = "80dp"
+        android:layout_marginTop = "120dp"
         android:scaleType="fitXY"
         android:layout_marginLeft = "15dp"
-        android:src="@drawable/previous" />
+        android:background="@drawable/previous" />
 
     <ImageButton
         android:id = "@+id/play_pause_button"
@@ -101,10 +111,10 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_below = "@id/location"
-        android:layout_marginTop = "80dp"
+        android:layout_marginTop = "120dp"
         android:layout_marginLeft = "60dp"
         android:scaleType="fitXY"
-        android:src="@drawable/pause"/>
+        android:background="@drawable/play"/>
 
     <ImageButton
         android:id = "@+id/nextButton"
@@ -112,9 +122,9 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_below = "@id/location"
-        android:layout_marginTop = "80dp"
+        android:layout_marginTop = "120dp"
         android:layout_marginLeft = "60dp"
         android:scaleType="fitXY"
-        android:src = "@drawable/next"/>
+        android:background="@drawable/next"/>
 
 </RelativeLayout>

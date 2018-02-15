@@ -1,9 +1,6 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageButton;
 import android.os.Build;
@@ -16,9 +13,6 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-
 
 public class AlbumTracksActivity extends AppCompatActivity {
 
@@ -53,8 +47,10 @@ public class AlbumTracksActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapterView.getAdapter().getItem(i);
                 Player.clearPlayList();
-                Player.start(track);
-                launchActivity();
+                if (track.getStatus() != Track.FavoriteStatus.DISLIKE) {
+                    Player.start(track);
+                    launchActivity();
+                }
             }
         });
 
@@ -63,8 +59,10 @@ public class AlbumTracksActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 PlayList playList = new PlayList(album.getTracks(), false);
-                Player.playPlayList(playList);
-                launchActivity();
+                if (playList.hasNext()) {
+                    Player.playPlayList(playList);
+                    launchActivity();
+                }
             }
         });
 
@@ -72,7 +70,6 @@ public class AlbumTracksActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                PlayerToolBar.popToolbar();
             }
         });
     }
@@ -82,6 +79,13 @@ public class AlbumTracksActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
+    @Override
+    public void finish() {
+        Updateables.popItem();
+        for (Track each:album.getTracks()) {
+            each.popListeningFavoriteStatusButton();
+        }
+        super.finish();
+    }
 
 }

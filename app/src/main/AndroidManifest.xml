@@ -42,6 +42,10 @@
             android:name=".FlashBackActivity"
             android:label="@string/title_activity_flash_back"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <service
+            android:name=".FetchAddressIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
