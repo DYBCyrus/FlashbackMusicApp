@@ -54,21 +54,21 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             @Override
             public void onClick(View view) {
                 Track tr = Player.getCurrentTrack();
-                if (tr.getStatus() == Track.FavoriteStatus.NEUTRAL) {
-                    tr.setStatus(Track.FavoriteStatus.LIKE);
+                if (tr != null) {
+                    if (tr.getStatus() == Track.FavoriteStatus.NEUTRAL) {
+                        tr.setStatus(Track.FavoriteStatus.LIKE);
 //                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
 //                            null));
-                }
-                else if (tr.getStatus() == Track.FavoriteStatus.LIKE) {
-                    tr.setStatus(Track.FavoriteStatus.DISLIKE);
+                    } else if (tr.getStatus() == Track.FavoriteStatus.LIKE) {
+                        tr.setStatus(Track.FavoriteStatus.DISLIKE);
 //                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
 //                            null));
-                    Player.playNext();
-                }
-                else {
-                    tr.setStatus(Track.FavoriteStatus.NEUTRAL);
+                        Player.playNext();
+                    } else {
+                        tr.setStatus(Track.FavoriteStatus.NEUTRAL);
 //                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
 //                            null));
+                    }
                 }
             }
         });

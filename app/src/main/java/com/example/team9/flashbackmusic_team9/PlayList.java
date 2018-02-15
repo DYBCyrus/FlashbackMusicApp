@@ -61,6 +61,9 @@ public class PlayList implements ListIterator<Track> {
         if (iter.hasPrevious()) {
             tr = iter.previous();
         }
+        else {
+            return false;
+        }
         while (!tr.isPlayable()){
             if (iter.hasPrevious()) {
                 tr = iter.previous();
