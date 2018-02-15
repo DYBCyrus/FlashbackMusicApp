@@ -1,9 +1,6 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageButton;
 import android.os.Build;
@@ -16,9 +13,6 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-
 
 public class AlbumTracksActivity extends AppCompatActivity {
 

@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:text = "BACK"/>
 
-    <com.example.team9.flashbackmusic_team9.FavoriteStatusButton
+    <ImageButton
         android:id="@+id/likeButton"
         android:layout_width="30dp"
         android:layout_height="30dp"

@@ -3,7 +3,6 @@ package com.example.team9.flashbackmusic_team9;
 import android.content.res.AssetFileDescriptor;
 import android.location.Location;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Stack;
 
 /**
@@ -36,6 +35,7 @@ public class Track
     public void setStatus(FavoriteStatus status) {
         this.status = status;
         updateListeningFavoriteStatusButton();
+        Updateables.updateAll();
     }
 
     public FavoriteStatus getStatus() {return status;}
