@@ -36,6 +36,7 @@ public class Player {
             return true;
         }
         currentTrack = null;
+        Updateables.updateAll();
         return false;
     }
     public static boolean playNext() {
@@ -45,6 +46,7 @@ public class Player {
             return true;
         }
         currentTrack = null;
+        Updateables.updateAll();
         return false;
     }
     public static void playPlayList(PlayList playList) {
@@ -61,6 +63,7 @@ public class Player {
     }
     public static void resume() {
         player.start();
+        Updateables.updateAll();
     }
     public static MediaPlayer getPlayer(){
         return player;

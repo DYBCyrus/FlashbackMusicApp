@@ -3,6 +3,8 @@ package com.example.team9.flashbackmusic_team9;
 import android.content.res.AssetFileDescriptor;
 import android.location.Location;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * Created by Chutong Yang on 2/5/2018.
@@ -17,6 +19,7 @@ public class Track
     private LocalDateTime date;
     private Location location;
     private FavoriteStatus status;
+    private Stack<FavoriteStatusButton> fsButtons = new Stack<>();
 
     public Track(String name, String artist, Album album, AssetFileDescriptor afd) {
         this.name = name;
@@ -30,7 +33,10 @@ public class Track
     public enum FavoriteStatus {
         LIKE,DISLIKE,NEUTRAL;
     }
-    public void setStatus(FavoriteStatus status) {this.status = status;}
+    public void setStatus(FavoriteStatus status) {
+        this.status = status;
+        updateListeningFavoriteStatusButton();
+    }
 
     public FavoriteStatus getStatus() {return status;}
 
@@ -84,5 +90,18 @@ public class Track
 
     public void setLocation(Location loc) {
         location = loc;
+    }
+
+    public void addListeningFavoriteStatusButton(FavoriteStatusButton button) {
+        button.bindTrack(this);
+        fsButtons.add(button);
+    }
+    public void popListeningFavoriteStatusButton() {
+        fsButtons.pop();
+    }
+    public void updateListeningFavoriteStatusButton() {
+        for (FavoriteStatusButton each : fsButtons) {
+            each.updateImage();
+        }
     }
 }

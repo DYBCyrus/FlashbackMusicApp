@@ -16,7 +16,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     private TextView album;
     private TextView location;
     private TextView time;
-    private ImageButton fav;
+    private FavoriteStatusButton fav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +32,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             public void onClick(View v)
             {
                 finish();
-                Updateables.popItem();
-                Updateables.popItem();
+
             }
         });
 
@@ -44,20 +43,12 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         location = findViewById(R.id.location);
         time = findViewById(R.id.time);
 
-        title.setText(Player.getCurrentTrack().getName());
-        artist.setText(Player.getCurrentTrack().getArtist());
-        album.setText(Player.getCurrentTrack().getAlbum().getName());
-        display();
+        update();
 
         // Checking track status before launching activity for like_dislike button image
-        checkStatus();
 
-        fav.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            changeStatus();
-            }
-        });
+        Player.getCurrentTrack().addListeningFavoriteStatusButton(fav);
+
 
         PlayerToolBar playerToolBar = new PlayerToolBar(new Button(this),
                 (ImageButton)findViewById(R.id.prevButton),
@@ -66,65 +57,55 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         Updateables.addUpdateable(this);
     }
 
-    public void checkStatus() {
-        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
-                    null));
-        }
-        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
-                    null));
-        }
-        else{
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
-                    null));
-        }
-    }
 
-    public void display() {
-        TextView location = (TextView)findViewById(R.id.location);
-        TextView time = (TextView)findViewById(R.id.time);
-        Track currentTrack = Player.getCurrentTrack();
-        if (currentTrack.getLocation() != null) {
-            location.setText(currentTrack.getLocation().toString());
+
+//    public void display() {
+//        TextView location = (TextView)findViewById(R.id.location);
+//        TextView time = (TextView)findViewById(R.id.time);
+//        Track currentTrack = Player.getCurrentTrack();
+//        if (currentTrack.getLocation() != null) {
+//            location.setText(currentTrack.getLocation().toString());
+//        } else {
+//            location.setText("No playing history");
+//        }
+//        if (currentTrack.getDate() != null) {
+//            time.setText(currentTrack.getDate().toString());
+//        } else {
+//            time.setText("No playing history");
+//        }
+//    }
+
+
+
+    public void update() {
+        Track track = Player.getCurrentTrack();
+        if (track == null) {
+            finish();
+            return;
+        }
+        title.setText(track.getName());
+        artist.setText(track.getArtist());
+        album.setText(track.getAlbum().getName());
+        if (track.getLocation() != null) {
+            location.setText(track.getLocation().toString());
         } else {
             location.setText("No playing history");
         }
-        if (currentTrack.getDate() != null) {
-            time.setText(currentTrack.getDate().toString());
+        if (track.getDate() != null) {
+            time.setText(track.getDate().toString());
         } else {
             time.setText("No playing history");
         }
     }
-
-    public void changeStatus() {
-        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
-            Player.getCurrentTrack().setStatus(Track.FavoriteStatus.NEUTRAL);
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
-                    null));
-        }
-        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
-            Player.getCurrentTrack().setStatus(Track.FavoriteStatus.DISLIKE);
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
-                    null));
-        }
-        else{
-            Player.getCurrentTrack().setStatus(Track.FavoriteStatus.LIKE);
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(),
-                    R.drawable.check_mark, null));
-        }
-    }
-
-    public void update() {
+    @Override
+    public void finish() {
+        Updateables.popItem();
+        Updateables.popItem();
         Track track = Player.getCurrentTrack();
-        title.setText(track.getName());
-        artist.setText(track.getArtist());
-        album.setText(track.getAlbum().getName());
-        if (track.getLocation() != null || track.getDate() != null) {
-            location.setText(track.getLocation().toString());
-            time.setText(track.getDate().toString());
+        if (track != null) {
+            Player.getCurrentTrack().popListeningFavoriteStatusButton();
         }
-        checkStatus();
+        super.finish();
     }
 
 }
