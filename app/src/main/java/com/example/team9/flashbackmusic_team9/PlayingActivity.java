@@ -62,10 +62,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
 
         update();
 
-        // Checking track status before launching activity for like_dislike button image
-
         Player.getCurrentTrack().addListeningFavoriteStatusButton(fav);
-
 
         PlayerToolBar playerToolBar = new PlayerToolBar(new Button(this),
                 (ImageButton)findViewById(R.id.prevButton),
@@ -84,20 +81,20 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         }
     }
 
-    public void checkStatus() {
-        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
-                    null));
-        }
-        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
-                    null));
-        }
-        else{
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
-                    null));
-        }
-    }
+//    public void checkStatus() {
+//        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
+//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
+//                    null));
+//        }
+//        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
+//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
+//                    null));
+//        }
+//        else{
+//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
+//                    null));
+//        }
+//    }
 
 //    public void display() {
 //        TextView location = (TextView)findViewById(R.id.location);

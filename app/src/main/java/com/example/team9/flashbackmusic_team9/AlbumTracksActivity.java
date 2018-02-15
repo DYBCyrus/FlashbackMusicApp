@@ -53,8 +53,10 @@ public class AlbumTracksActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapterView.getAdapter().getItem(i);
                 Player.clearPlayList();
-                Player.start(track);
-                launchActivity();
+                if (track.getStatus() != Track.FavoriteStatus.DISLIKE) {
+                    Player.start(track);
+                    launchActivity();
+                }
             }
         });
 
@@ -63,8 +65,10 @@ public class AlbumTracksActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 PlayList playList = new PlayList(album.getTracks(), false);
-                Player.playPlayList(playList);
-                launchActivity();
+                if (playList.hasNext()) {
+                    Player.playPlayList(playList);
+                    launchActivity();
+                }
             }
         });
 
