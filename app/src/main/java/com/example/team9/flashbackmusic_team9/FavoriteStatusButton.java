@@ -15,7 +15,7 @@ public class FavoriteStatusButton extends ImageButton {
     public FavoriteStatusButton(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-    public void bindTrack(Track track) {
+    public void bindTrack(final Track track) {
         bindedTrack = track;
         updateImage();
         super.setOnClickListener(new OnClickListener() {
@@ -26,6 +26,9 @@ public class FavoriteStatusButton extends ImageButton {
                 }
                 else if (bindedTrack.getStatus() == Track.FavoriteStatus.LIKE) {
                     bindedTrack.setStatus(Track.FavoriteStatus.DISLIKE);
+                    if (Player.getCurrentTrack() != null && Player.getCurrentTrack() == track) {
+                        Player.playNext();
+                    }
                 }
                 else {
                     bindedTrack.setStatus(Track.FavoriteStatus.NEUTRAL);

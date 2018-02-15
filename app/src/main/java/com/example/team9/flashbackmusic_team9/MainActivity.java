@@ -69,8 +69,10 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapterView.getAdapter().getItem(i);
                 Player.clearPlayList();
-                Player.start(track);
-                launchPlayingActivity();
+                if (track.getStatus() != Track.FavoriteStatus.DISLIKE) {
+                    Player.start(track);
+                    launchPlayingActivity();
+                }
             }
         });
 
@@ -90,24 +92,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void changeFavoriteStatus(View view) {
-        final Track track = (Track) view.getTag();
-        final ImageButton fav = (ImageButton)view.getTag(R.id.change_status);
-
-        if (track.getStatus() == Track.FavoriteStatus.DISLIKE) {
-            track.setStatus(Track.FavoriteStatus.NEUTRAL);
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
-                    null));
-        } else if (track.getStatus() == Track.FavoriteStatus.LIKE) {
-            track.setStatus(Track.FavoriteStatus.DISLIKE);
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
-                    null));
-        } else {
-            track.setStatus(Track.FavoriteStatus.LIKE);
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(),
-                    R.drawable.check_mark, null));
-        }
-    }
+//    public void changeFavoriteStatus(View view) {
+//        final Track track = (Track) view.getTag();
+//        final ImageButton fav = (ImageButton)view.getTag(R.id.change_status);
+//
+//        if (track.getStatus() == Track.FavoriteStatus.DISLIKE) {
+//            track.setStatus(Track.FavoriteStatus.NEUTRAL);
+//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
+//                    null));
+//        } else if (track.getStatus() == Track.FavoriteStatus.LIKE) {
+//            track.setStatus(Track.FavoriteStatus.DISLIKE);
+//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
+//                    null));
+//        } else {
+//            track.setStatus(Track.FavoriteStatus.LIKE);
+//            fav.setBackground(ResourcesCompat.getDrawable(getResources(),
+//                    R.drawable.check_mark, null));
+//        }
+//    }
 
     /**
      * Switch to playing view when starting to play a track
@@ -167,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLocationChanged(Location location) {
                 mLocation = location;
+                System.out.println(location);
             }
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {}

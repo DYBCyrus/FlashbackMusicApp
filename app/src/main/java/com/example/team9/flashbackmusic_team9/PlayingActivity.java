@@ -1,17 +1,9 @@
 package com.example.team9.flashbackmusic_team9;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.provider.SyncStateContract;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,10 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-
-import static android.location.LocationManager.GPS_PROVIDER;
 
 public class PlayingActivity extends AppCompatActivity implements Updateable{
 
@@ -33,7 +21,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     private TextView time;
     private String mAddressOutput;
 
-    private FavoriteStatusButton fav;
+    private ImageButton fav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +50,30 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
 
         update();
 
-        // Checking track status before launching activity for like_dislike button image
+        fav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Track tr = Player.getCurrentTrack();
+                if (tr != null) {
+                    if (tr.getStatus() == Track.FavoriteStatus.NEUTRAL) {
+                        tr.setStatus(Track.FavoriteStatus.LIKE);
+//                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
+//                            null));
+                    } else if (tr.getStatus() == Track.FavoriteStatus.LIKE) {
+                        tr.setStatus(Track.FavoriteStatus.DISLIKE);
+//                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
+//                            null));
+                        Player.playNext();
+                    } else {
+                        tr.setStatus(Track.FavoriteStatus.NEUTRAL);
+//                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
+//                            null));
+                    }
+                }
+            }
+        });
 
-        Player.getCurrentTrack().addListeningFavoriteStatusButton(fav);
-
+//        Player.getCurrentTrack().addListeningFavoriteStatusButton(fav);
 
         PlayerToolBar playerToolBar = new PlayerToolBar(new Button(this),
                 (ImageButton)findViewById(R.id.prevButton),
@@ -84,20 +92,20 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         }
     }
 
-    public void checkStatus() {
-        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
-                    null));
-        }
-        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
-                    null));
-        }
-        else{
-            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
-                    null));
-        }
-    }
+//    public void checkStatus() {
+//        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
+//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
+//                    null));
+//        }
+//        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
+//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
+//                    null));
+//        }
+//        else{
+//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
+//                    null));
+//        }
+//    }
 
 //    public void display() {
 //        TextView location = (TextView)findViewById(R.id.location);
@@ -134,15 +142,25 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         } else {
             time.setText("No playing history");
         }
+        System.out.println(track.getStatus());
+        switch (track.getStatus()) {
+            case LIKE:
+                fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
+                        null));
+                break;
+            case NEUTRAL:
+                fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
+                        null));
+                break;
+            case DISLIKE:
+                fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
+                        null));
+        }
     }
     @Override
     public void finish() {
         Updateables.popItem();
         Updateables.popItem();
-        Track track = Player.getCurrentTrack();
-        if (track != null) {
-            Player.getCurrentTrack().popListeningFavoriteStatusButton();
-        }
         super.finish();
     }
 

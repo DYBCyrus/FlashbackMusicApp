@@ -17,6 +17,10 @@ public class Player {
 
     public static void start(Track track) {
         player.reset();
+//        if (track.getStatus() == Track.FavoriteStatus.DISLIKE) {
+//            playNext();
+//            return;
+//        }
         try {
             AssetFileDescriptor afd = track.getDescriptor();
             player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
@@ -24,8 +28,6 @@ public class Player {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        currentTrack = track;
         player.prepareAsync();
     }
 
@@ -51,7 +53,7 @@ public class Player {
     }
     public static void playPlayList(PlayList playList) {
         currentPlayList = playList;
-        start(currentPlayList.next());
+        playNext();
     }
     public static boolean isPlaying() {
         return player.isPlaying();
