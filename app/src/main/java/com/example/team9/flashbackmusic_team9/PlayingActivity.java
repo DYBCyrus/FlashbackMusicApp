@@ -3,7 +3,12 @@ package com.example.team9.flashbackmusic_team9;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.media.MediaMetadata;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
@@ -14,10 +19,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 
 public class PlayingActivity extends AppCompatActivity {
+
+
+    private SeekBar seekbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +49,7 @@ public class PlayingActivity extends AppCompatActivity {
 
         final ImageButton fav = findViewById(R.id.likeButton);
         final ImageButton play_pause = findViewById(R.id.play_pause_button);
+        seekbar = findViewById(R.id.seekBar);
 
         TextView title = findViewById(R.id.title);
         TextView artist = findViewById(R.id.artist);
@@ -50,6 +61,70 @@ public class PlayingActivity extends AppCompatActivity {
         artist.setText(Player.getCurrentTrack().getArtist());
         album.setText(Player.getCurrentTrack().getAlbum().getName());
         display();
+
+
+        seekbar.setMax(Player.getPlayer().getDuration());
+        seekbar.setProgress(Player.getPlayer().getCurrentPosition());
+
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                int currentPosition  = 0;
+//                int total = Player.getPlayer().getDuration();
+//                seekbar.setMax(total);
+//                while (Player.getPlayer() != null && currentPosition < total ){
+//                    try{
+//                        Thread.sleep(1000);
+//                        currentPosition = Player.getPlayer().getCurrentPosition();
+//                    }
+//                    catch (InterruptedException e){
+//                        return;
+//                    }
+//                    seekbar.setProgress(currentPosition);
+//                }
+//            }
+//        });
+
+//        Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                int currentPosition  = 0;
+//                int total = Player.getPlayer().getDuration();
+//                seekbar.setMax(total);
+//                while (Player.getPlayer() != null && currentPosition < total ){
+//                    try{
+//                        Thread.sleep(1000);
+//                        currentPosition = Player.getPlayer().getCurrentPosition();
+//                    }
+//                    catch (InterruptedException e){
+//                        return;
+//                    }
+//                    seekbar.setProgress(currentPosition);
+//                }
+//            }
+//        };
+
+        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            boolean userTouch;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if( Player.getPlayer().isPlaying() && userTouch ){
+                    Player.getPlayer().seekTo(i);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                userTouch = true;
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                userTouch = false;
+            }
+        });
 
         // Checking track status before launching activity for like_dislike button image
         if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
@@ -96,6 +171,24 @@ public class PlayingActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
+//    public void run(){
+//        int currentPosition  = 0;
+//        int total = Player.getPlayer().getDuration();
+//        seekbar.setMax(total);
+//        while (Player.getPlayer() != null && currentPosition < total ){
+//            try{
+//                Thread.sleep(1000);
+//                currentPosition = Player.getPlayer().getCurrentPosition();
+//            }
+//            catch (InterruptedException e){
+//                return;
+//            }
+//            seekbar.setProgress(currentPosition);
+//        }
+//    }
 
     public void display() {
         TextView location = (TextView)findViewById(R.id.location);
