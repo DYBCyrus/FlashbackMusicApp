@@ -58,7 +58,6 @@ public class JUnitTestDataBase
                 artists.contains("Keaton Simons"));
         Assert.assertFalse("check whether New & Best of Keaton Simons presents",
                 albumNames.contains("New & Best of Keaton Simons"));
-
         //fail
         Assert.assertFalse("check whether space presents",
                 !albumNames.contains(""));
