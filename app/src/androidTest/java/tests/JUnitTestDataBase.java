@@ -86,7 +86,7 @@ public class JUnitTestDataBase
 
         Track next = test.next();
         //Tests the playlists hasPrevious() method
-    Assert.assertTrue("Checks if there is a previous track", test.hasPrevious());
+//    Assert.assertTrue("Checks if there is a previous track", test.hasPrevious());
 
 
     

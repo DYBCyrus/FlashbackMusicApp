@@ -2,6 +2,8 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.content.res.AssetFileDescriptor;
 import android.location.Location;
+import android.support.annotation.NonNull;
+
 import java.time.LocalDateTime;
 import java.util.Stack;
 
@@ -9,7 +11,7 @@ import java.util.Stack;
  * Created by Chutong Yang on 2/5/2018.
  */
 
-public class Track
+public class Track implements Comparable<Track>
 {
     private String name;
     private String artist;
@@ -19,6 +21,9 @@ public class Track
     private Location location;
     private FavoriteStatus status;
     private Stack<FavoriteStatusButton> fsButtons = new Stack<>();
+    public enum FavoriteStatus {
+        LIKE,DISLIKE,NEUTRAL
+    }
 
     public Track(String name, String artist, Album album, AssetFileDescriptor afd) {
         this.name = name;
@@ -29,9 +34,6 @@ public class Track
     }
 
 
-    public enum FavoriteStatus {
-        LIKE,DISLIKE,NEUTRAL;
-    }
     public void setStatus(FavoriteStatus status) {
         this.status = status;
         updateListeningFavoriteStatusButton();
@@ -104,4 +106,76 @@ public class Track
             each.updateImage();
         }
     }
+    public boolean hasPlayHistory() {
+        return date != null;
+    }
+    @Override
+    public int compareTo(@NonNull Track track) {
+        int thisScore = 0;
+        int trackScore = 0;
+
+        if (this.getLocation() != null &&
+                this.getLocation().distanceTo(MainActivity.getmLocation()) < 305) {
+            thisScore++;
+        }
+        if (track.getLocation() != null &&
+                track.getLocation().distanceTo(MainActivity.getmLocation()) < 305) {
+            trackScore++;
+        }
+
+        if (this.getDate() == null && track.getDate() == null) {return 0;}
+
+        int first = 5;
+        int second = 11;
+        int third = 17;
+        int currentHour = LocalDateTime.now().getHour();
+        int thisHour = -1;
+        int trackHour = -1;
+        if (this.getDate() != null) {
+            thisHour = this.getDate().getHour();
+        }
+        if (track.getDate() != null) {
+            trackHour = track.getDate().getHour();
+        }
+
+        if (first < currentHour && currentHour < second) {
+            if (thisHour != -1 && first < thisHour && thisHour < second) {
+                thisScore++;
+            }
+            if (trackHour != -1 && first < trackHour && trackHour < second) {
+                trackScore++;
+            }
+        } else if (second < currentHour && currentHour < third) {
+            if (thisHour != -1 &&second < thisHour && thisHour < third) {
+                thisScore++;
+            }
+            if (trackHour != -1 && second < trackHour && trackHour < third) {
+                trackScore++;
+            }
+        } else {
+            if (thisHour != -1 && first > thisHour || thisHour > third) {
+                thisScore++;
+            }
+            if (trackHour != -1 && first > trackHour || trackHour > third) {
+                trackScore++;
+            }
+        }
+        if (thisScore != trackScore) {
+            return trackScore - thisScore;
+        }
+        if (this.getStatus() == FavoriteStatus.LIKE && track.getStatus() != FavoriteStatus.LIKE) {
+            return -1;
+        } else if (this.getStatus() != FavoriteStatus.LIKE && track.getStatus() == FavoriteStatus.LIKE) {
+            return 1;
+        }
+        if (this.getDate() == null) {return 1;}
+        if (track.getDate() == null) {return -1;}
+        if (this.getDate().isAfter(track.getDate())) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+
+
 }

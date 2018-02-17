@@ -7,7 +7,12 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.team9.flashbackmusic_team9.PlayingActivity"
     tools:showIn="@layout/activity_playing">
-
+    <Button
+        android:id="@+id/viewPlaylist"
+        android:layout_marginLeft="120dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Playlist" />
     <Button
         android:id = "@+id/back"
         android:layout_width="wrap_content"

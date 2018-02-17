@@ -21,12 +21,9 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     private TextView location;
     private TextView time;
     private String mAddressOutput;
-
     private ImageButton fav;
-
-
     private SeekBar seekbar;
-
+    public Button back;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +32,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         setContentView(R.layout.activity_playing);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Button back = findViewById(R.id.back);
+        back = findViewById(R.id.back);
         back.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -54,19 +51,15 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         time = findViewById(R.id.time);
 
         final ImageButton fav = findViewById(R.id.likeButton);
-        final ImageButton play_pause = findViewById(R.id.play_pause_button);
         seekbar = findViewById(R.id.seekBar);
 
         TextView title = findViewById(R.id.title);
         TextView artist = findViewById(R.id.artist);
         TextView album = findViewById(R.id.album);
-        TextView location = findViewById(R.id.location);
-        TextView time = findViewById(R.id.time);
 
         title.setText(Player.getCurrentTrack().getName());
         artist.setText(Player.getCurrentTrack().getArtist());
         album.setText(Player.getCurrentTrack().getAlbum().getName());
-
 
         seekbar.setMax(Player.getPlayer().getDuration());
         seekbar.setProgress(Player.getPlayer().getCurrentPosition());
@@ -93,16 +86,13 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         });
 
         // Checking track status before launching activity for like_dislike button image
-        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
+        if (Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE) {
             fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x, null));
-        }
-        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
+        } else if (Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE) {
             fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark, null));
-        }
-        else{
+        } else {
             fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus, null));
         }
-
         update();
 
         fav.setOnClickListener(new View.OnClickListener() {
@@ -112,23 +102,15 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
                 if (tr != null) {
                     if (tr.getStatus() == Track.FavoriteStatus.NEUTRAL) {
                         tr.setStatus(Track.FavoriteStatus.LIKE);
-//                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
-//                            null));
                     } else if (tr.getStatus() == Track.FavoriteStatus.LIKE) {
                         tr.setStatus(Track.FavoriteStatus.DISLIKE);
-//                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
-//                            null));
                         Player.playNext();
                     } else {
                         tr.setStatus(Track.FavoriteStatus.NEUTRAL);
-//                    fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
-//                            null));
                     }
                 }
             }
         });
-
-//        Player.getCurrentTrack().addListeningFavoriteStatusButton(fav);
 
         PlayerToolBar playerToolBar = new PlayerToolBar(new Button(this),
                 (ImageButton)findViewById(R.id.prevButton),
@@ -136,6 +118,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
                 (ImageButton)findViewById(R.id.nextButton), this);
         Updateables.addUpdateable(this);
     }
+
 
     protected void startIntentService() {
         AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
@@ -146,46 +129,6 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             startService(intent);
         }
     }
-
-//    public void display() {
-//        TextView location = (TextView) findViewById(R.id.location);
-//        TextView time = (TextView) findViewById(R.id.time);
-//        Track currentTrack = Player.getCurrentTrack();
-//        if (currentTrack.getLocation() != null) {
-//            location.setText(currentTrack.getLocation().toString());
-//        }
-//    }
-
-//    public void checkStatus() {
-//        if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE ){
-//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
-//                    null));
-//        }
-//        else if( Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.LIKE ){
-//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
-//                    null));
-//        }
-//        else{
-//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
-//                    null));
-//        }
-//    }
-
-//    public void display() {
-//        TextView location = (TextView)findViewById(R.id.location);
-//        TextView time = (TextView)findViewById(R.id.time);
-//        Track currentTrack = Player.getCurrentTrack();
-//        if (currentTrack.getLocation() != null) {
-//            location.setText(currentTrack.getLocation().toString());
-//        } else {
-//            location.setText("No playing history");
-//        }
-//        if (currentTrack.getDate() != null) {
-//            time.setText(currentTrack.getDate().toString());
-//        } else {
-//            time.setText("No playing history");
-//        }
-//    }
 
     public void update() {
         Track track = Player.getCurrentTrack();
@@ -206,7 +149,6 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         } else {
             time.setText("No playing history");
         }
-        System.out.println(track.getStatus());
         switch (track.getStatus()) {
             case LIKE:
                 fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,

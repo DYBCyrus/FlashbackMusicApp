@@ -2,6 +2,7 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -11,7 +12,7 @@ import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -22,11 +23,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
-    
+
     private LocationManager locationManager;
-    private Location mLocation;
+    private static Location mLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +47,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
         String mode = prefs.getString("lastActivity", "");
         if (mode.compareTo("flash") == 0) {
-            startActivity(new Intent(this, FlashBackActivity.class));
+            launchModeActivity();
         }
-        // request getting location permission
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        setLocationManager();
 
         // set static player
         playerAction();
@@ -92,25 +92,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//    public void changeFavoriteStatus(View view) {
-//        final Track track = (Track) view.getTag();
-//        final ImageButton fav = (ImageButton)view.getTag(R.id.change_status);
-//
-//        if (track.getStatus() == Track.FavoriteStatus.DISLIKE) {
-//            track.setStatus(Track.FavoriteStatus.NEUTRAL);
-//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.plus,
-//                    null));
-//        } else if (track.getStatus() == Track.FavoriteStatus.LIKE) {
-//            track.setStatus(Track.FavoriteStatus.DISLIKE);
-//            fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
-//                    null));
-//        } else {
-//            track.setStatus(Track.FavoriteStatus.LIKE);
-//            fav.setBackground(ResourcesCompat.getDrawable(getResources(),
-//                    R.drawable.check_mark, null));
-//        }
-//    }
-
     /**
      * Switch to playing view when starting to play a track
      */
@@ -131,8 +112,40 @@ public class MainActivity extends AppCompatActivity {
      * Switch to flashback mode view
      */
     public void launchModeActivity() {
-        Intent intent = new Intent(this, FlashBackActivity.class);
-        startActivity(intent);
+        ArrayList<Track> list = new ArrayList<>();
+        for (Track each:DataBase.getAllTracks()) {
+            if (each.hasPlayHistory()) {
+                list.add(each);
+            }
+        }
+        Collections.sort(list);
+        for(Track each:list) {
+            System.out.println(each.getName());
+        }
+
+
+        PlayList flashbackList = new PlayList(list, true);
+        if (flashbackList.hasNext()) {
+            Intent intent = new Intent(this, FlashBackActivity.class);
+            Player.playPlayList(flashbackList);
+            startActivity(intent);
+        }
+        else {
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+            builder1.setMessage("No track available for flashback");
+            builder1.setCancelable(true);
+
+            builder1.setPositiveButton(
+                    "Got it",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
+        }
     }
 
     /**
@@ -151,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
+//                hasTrackToPlay = true;
                 Player.setCurrentTrackLocation(mLocation);
                 Player.setCurrentTrackTime(TrackTime.now());
                 if (!Player.playNext()) {
@@ -169,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLocationChanged(Location location) {
                 mLocation = location;
-                System.out.println(location);
             }
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {}
@@ -211,6 +224,33 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 100: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+                    setLocationManager();
+                } else {
+                    finish();
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
+    }
+
+    public static Location getmLocation() {return mLocation;}
 
     /**
      * Record the mode when exit the app
