@@ -50,16 +50,16 @@ public class JUnitTestDataBase
         {
             albumNames.add(allTracks.get(i).getName());
         }
+
+        // success
         Assert.assertFalse("check whether beautifulpain is loaded correctly",
                 trackNames.contains("beautifalpain"));
         Assert.assertFalse("check whether artist of beautifulpain is loaded correctly",
                 artists.contains("Keaton Simons"));
         Assert.assertFalse("check whether New & Best of Keaton Simons presents",
                 albumNames.contains("New & Best of Keaton Simons"));
+        //fail
+        Assert.assertFalse("check whether space presents",
+                !albumNames.contains(""));
     }
-
-
-
-
-
 }
