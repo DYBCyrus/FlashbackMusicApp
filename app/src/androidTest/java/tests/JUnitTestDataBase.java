@@ -50,53 +50,17 @@ public class JUnitTestDataBase
         {
             albumNames.add(allTracks.get(i).getName());
         }
+
+        // success
         Assert.assertFalse("check whether beautifulpain is loaded correctly",
                 trackNames.contains("beautifalpain"));
         Assert.assertFalse("check whether artist of beautifulpain is loaded correctly",
                 artists.contains("Keaton Simons"));
         Assert.assertFalse("check whether New & Best of Keaton Simons presents",
                 albumNames.contains("New & Best of Keaton Simons"));
+        //fail
+        Assert.assertFalse("check whether space presents",
+                !albumNames.contains(""));
     }
 
-
-
-
-    @Test
-    public void testPlayList(){
-        //Tests add() and hasNext() methods
-        //If assertTrue returns true both methods work because the playlist is
-        //intially empty
-
-
-
-        Album album1 = new Album("GenerationZ");
-        Track track1 = new Track("Faded", "ZHU", album1, null);
-        Track track2 = new Track("Automatic", "ZHU", album1, null);
-        Track track3 = new Track("GoodLife", "ZHU", album1, null);
-        ArrayList<Track> testTracks = new ArrayList<Track>();
-        PlayList test = new PlayList(testTracks, true);
-
-        testTracks.add(track1);
-        testTracks.add(track2);
-        testTracks.add(track3);
-
-
-    Assert.assertTrue("Checks if the playlist has a next track", test.hasNext());
-
-
-        Track next = test.next();
-        //Tests the playlists hasPrevious() method
-//    Assert.assertTrue("Checks if there is a previous track", test.hasPrevious());
-
-
-    
-
-    //Test the nextIndex() method
-    Assert.assertTrue("Checks if the nextIndex() method works", test.nextIndex() == 1);
-
-    //Test the previousIndex() method
-    Assert.assertTrue("Checks if the previousIndex() method works", test.previousIndex() == 0);
-
-
-}
 }
