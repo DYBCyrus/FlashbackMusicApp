@@ -62,4 +62,5 @@ public class JUnitTestDataBase
         Assert.assertFalse("check whether space presents",
                 !albumNames.contains(""));
     }
+
 }

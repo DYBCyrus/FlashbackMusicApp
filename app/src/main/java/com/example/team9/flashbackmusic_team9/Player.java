@@ -42,8 +42,10 @@ public class Player {
         return false;
     }
     public static boolean playNext() {
+
         player.reset();
         if (currentPlayList != null && currentPlayList.hasNext()) {
+
             start(currentPlayList.next());
             return true;
         }
@@ -73,6 +75,7 @@ public class Player {
     public static Track getCurrentTrack(){
         return currentTrack;
     }
+    public static void setCurrentTrack(Track track) {currentTrack = track;}
 
     public static void clearPlayList() {
         currentPlayList = null;
@@ -91,5 +94,11 @@ public class Player {
         currentTrack.setLocation(loc);
     }
     public static void setCurrentTrackTime(LocalDateTime dateTime) {currentTrack.setDate(dateTime);}
+    public static void reset() {
+        player.reset();
+        currentTrack = null;
+        currentPlayList = null;
+        Updateables.updateAll();
+    }
 
 }
