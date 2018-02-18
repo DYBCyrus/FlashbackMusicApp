@@ -45,7 +45,12 @@
 
         <service
             android:name=".FetchAddressIntentService"
-            android:exported="false"></service>
+            android:exported="false" />
+
+        <activity
+            android:name=".ViewPlaylistActivity"
+            android:label="@string/title_activity_view_playlist"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

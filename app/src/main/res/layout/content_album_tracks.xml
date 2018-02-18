@@ -41,9 +41,24 @@
         android:layout_marginLeft="150dp"
         android:text="Play All"
         android:textColor="#ff0000"
-        android:textSize="25dp"
+        android:textSize="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.285" />
+
+    <Button
+        android:id="@+id/flash_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="450dp"
+        android:layout_marginLeft="100dp"
+        android:text="Flashback"
+        android:textColor="#ff0000"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -52,13 +67,12 @@
     <ListView
         android:id="@+id/album_track_list"
         android:layout_width="368dp"
-        android:layout_height="437dp"
-        android:layout_marginTop="80dp"
+        android:layout_height="400dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <include android:id="@+id/player_toolbar" layout="@layout/player_toolbar"/>
 </android.support.constraint.ConstraintLayout>

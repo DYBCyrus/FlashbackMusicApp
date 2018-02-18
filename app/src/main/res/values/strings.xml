@@ -5,4 +5,5 @@
     <string name="title_activity_album_tracks">AlbumTracksActivity</string>
     <string name="title_activity_playing">PlayingActivity</string>
     <string name="title_activity_flash_back">FlashBackActivity</string>
+    <string name="title_activity_view_playlist">ViewPlaylistActivity</string>
 </resources>
