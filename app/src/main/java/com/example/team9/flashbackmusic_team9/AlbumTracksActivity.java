@@ -45,7 +45,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 (ImageButton)findViewById(R.id.previous_button), (ImageButton)findViewById(R.id.play_button),
                 (ImageButton)findViewById(R.id.next_button), this);
 
-        ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, android.R.layout.simple_list_item_1, album.getTracks());
+        ListAdapter trackOfAlbumAdapter = new TrackListAdapter(this, R.layout.list_item, album.getTracks());
         ListView trackOfAlbum = findViewById(R.id.album_track_list);
         trackOfAlbum.setAdapter(trackOfAlbumAdapter);
         trackOfAlbum.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -134,7 +134,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
     public void finish() {
         Updateables.popItem();
         for (Track each:album.getTracks()) {
-            each.popListeningFavoriteStatusButton();
+            each.popListeningFavoriteStatusButton(this);
         }
         super.finish();
     }

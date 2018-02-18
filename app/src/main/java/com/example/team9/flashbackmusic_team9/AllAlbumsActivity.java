@@ -23,7 +23,7 @@ import java.util.Collections;
 public class AllAlbumsActivity extends AppCompatActivity {
 
     private ArrayList<Album> album;
-
+    private Button showTracks;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,12 +31,13 @@ public class AllAlbumsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Button showTracks = (Button) findViewById(R.id.all_tracks);
+        showTracks = (Button) findViewById(R.id.all_tracks);
         showTracks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
                 Updateables.popItem();
+                showTracks.setEnabled(false);
             }
         });
 
@@ -46,7 +47,7 @@ public class AllAlbumsActivity extends AppCompatActivity {
                 (ImageButton)findViewById(R.id.previous_button), (ImageButton)findViewById(R.id.play_button),
                 (ImageButton)findViewById(R.id.next_button), this);
 
-        ListAdapter albumsAdapter = new AlbumListAdapter(this, android.R.layout.simple_list_item_1, album);
+        ListAdapter albumsAdapter = new AlbumListAdapter(this, R.layout.album_item, album);
         ListView albumView = (ListView) findViewById(R.id.album_list);
         albumView.setAdapter(albumsAdapter);
 
