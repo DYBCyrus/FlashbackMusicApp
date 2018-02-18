@@ -35,4 +35,5 @@ public class TrackListAdapter extends ArrayAdapter<Track> {
         track.addListeningFavoriteStatusButton(fav);
         return convertView;
     }
+
 }

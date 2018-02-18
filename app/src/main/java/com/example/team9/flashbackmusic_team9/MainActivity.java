@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         Button showAlbums = (Button) findViewById(R.id.all_albums);
         showAlbums.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,10 +120,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         Collections.sort(list);
-        for(Track each:list) {
-            System.out.println(each.getName());
-        }
-
 
         PlayList flashbackList = new PlayList(list, true);
         if (flashbackList.hasNext()) {

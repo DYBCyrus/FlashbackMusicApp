@@ -1,6 +1,8 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageButton;
 import android.os.Build;
@@ -13,6 +15,9 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class AlbumTracksActivity extends AppCompatActivity {
 
@@ -54,6 +59,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
 
+
         // Clicking play all songs button
         playAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,6 +78,49 @@ public class AlbumTracksActivity extends AppCompatActivity {
                 finish();
             }
         });
+        Button modeChange = (Button)findViewById(R.id.flash_mode);
+        modeChange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchModeActivity();
+            }
+        });
+    }
+
+    /**
+     * Switch to flashback mode view
+     */
+    public void launchModeActivity() {
+        ArrayList<Track> list = new ArrayList<>();
+        for (Track each:DataBase.getAllTracks()) {
+            if (each.hasPlayHistory()) {
+                list.add(each);
+            }
+        }
+        Collections.sort(list);
+
+        PlayList flashbackList = new PlayList(list, true);
+        if (flashbackList.hasNext()) {
+            Intent intent = new Intent(this, FlashBackActivity.class);
+            Player.playPlayList(flashbackList);
+            startActivity(intent);
+        }
+        else {
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+            builder1.setMessage("No track available for flashback");
+            builder1.setCancelable(true);
+
+            builder1.setPositiveButton(
+                    "Got it",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
+        }
     }
 
     public void launchActivity() {
