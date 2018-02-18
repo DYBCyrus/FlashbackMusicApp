@@ -1,5 +1,6 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -96,10 +97,15 @@ public class Track implements Comparable<Track>
 
     public void addListeningFavoriteStatusButton(FavoriteStatusButton button) {
         button.bindTrack(this);
-        fsButtons.add(button);
+        if (!fsButtons.empty() && fsButtons.peek().getContext() == button.getContext()) {
+            fsButtons.pop();
+        }
+        fsButtons.push(button);
     }
-    public void popListeningFavoriteStatusButton() {
-        fsButtons.pop();
+    public void popListeningFavoriteStatusButton(Context context) {
+        if (!fsButtons.empty() && fsButtons.peek().getContext() == context) {
+            fsButtons.pop();
+        }
     }
     public void updateListeningFavoriteStatusButton() {
         for (FavoriteStatusButton each : fsButtons) {

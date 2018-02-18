@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 (ImageButton)findViewById(R.id.play_button),
                 (ImageButton)findViewById(R.id.next_button), this);
         ListAdapter tracksAdapter = new TrackListAdapter(this,
-                android.R.layout.simple_list_item_1, DataBase.getAllTracks());
+                R.layout.list_item, DataBase.getAllTracks());
         ListView trackView = (ListView) findViewById(R.id.track_list);
         trackView.setAdapter(tracksAdapter);
         trackView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
