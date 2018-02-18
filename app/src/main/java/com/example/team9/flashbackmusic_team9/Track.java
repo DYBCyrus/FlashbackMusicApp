@@ -2,8 +2,8 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.content.res.AssetFileDescriptor;
 import android.location.Location;
+import android.os.Parcel;
 import android.support.annotation.NonNull;
-
 import java.time.LocalDateTime;
 import java.util.Stack;
 
@@ -13,6 +13,8 @@ import java.util.Stack;
 
 public class Track implements Comparable<Track>
 {
+    private MockTrack mockTrack;
+
     private String name;
     private String artist;
     private AssetFileDescriptor afd;
@@ -21,6 +23,7 @@ public class Track implements Comparable<Track>
     private Location location;
     private FavoriteStatus status;
     private Stack<FavoriteStatusButton> fsButtons = new Stack<>();
+
     public enum FavoriteStatus {
         LIKE,DISLIKE,NEUTRAL
     }
@@ -31,11 +34,13 @@ public class Track implements Comparable<Track>
         this.afd = afd;
         this.artist = artist;
         this.status = FavoriteStatus.NEUTRAL;
+        mockTrack = new MockTrack(getStatus());
     }
-
+    public MockTrack getMockTrack() {return mockTrack;}
 
     public void setStatus(FavoriteStatus status) {
         this.status = status;
+        mockTrack.setStatus(status);
         updateListeningFavoriteStatusButton();
         Updateables.updateAll();
     }
@@ -84,6 +89,7 @@ public class Track implements Comparable<Track>
     public void setDate(LocalDateTime d)
     {
         date = d;
+        mockTrack.setDate(d);
     }
 
     public Location getLocation() {
@@ -92,6 +98,14 @@ public class Track implements Comparable<Track>
 
     public void setLocation(Location loc) {
         location = loc;
+        mockTrack.setLocation(loc);
+    }
+
+    public void setLocation(double longitude, double latitude) {
+        location = new Location("");
+        location.setLongitude(longitude);
+        location.setLatitude(latitude);
+        mockTrack.setLocation(location);
     }
 
     public void addListeningFavoriteStatusButton(FavoriteStatusButton button) {
@@ -107,7 +121,7 @@ public class Track implements Comparable<Track>
         }
     }
     public boolean hasPlayHistory() {
-        return date != null;
+        return date != null && status != FavoriteStatus.DISLIKE;
     }
     @Override
     public int compareTo(@NonNull Track track) {

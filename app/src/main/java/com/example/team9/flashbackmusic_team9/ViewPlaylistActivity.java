@@ -1,5 +1,6 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ViewPlaylistActivity extends AppCompatActivity {
@@ -40,6 +42,25 @@ public class ViewPlaylistActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        ArrayList<MockTrack> mockTracks = new ArrayList<>();
+        for (Track each : DataBase.getAllTracks()) {
+            mockTracks.add(each.getMockTrack());
+        }
+        try {
+            editor.putString("tracks", ObjectSerializer.serialize(mockTracks));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        editor.putString("lastActivity", "flash");
+        editor.apply();
     }
 
 }

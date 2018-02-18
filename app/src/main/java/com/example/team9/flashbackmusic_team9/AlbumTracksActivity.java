@@ -2,6 +2,7 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageButton;
@@ -16,6 +17,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -135,6 +137,25 @@ public class AlbumTracksActivity extends AppCompatActivity {
             each.popListeningFavoriteStatusButton();
         }
         super.finish();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        ArrayList<MockTrack> mockTracks = new ArrayList<>();
+        for (Track each : DataBase.getAllTracks()) {
+            mockTracks.add(each.getMockTrack());
+        }
+        try {
+            editor.putString("tracks", ObjectSerializer.serialize(mockTracks));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        editor.putString("lastActivity", "normal");
+        editor.apply();
     }
 
 }

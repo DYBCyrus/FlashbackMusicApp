@@ -75,6 +75,7 @@ public class Player {
     public static Track getCurrentTrack(){
         return currentTrack;
     }
+    public static void setCurrentTrack(Track track) {currentTrack = track;}
 
     public static void clearPlayList() {
         currentPlayList = null;

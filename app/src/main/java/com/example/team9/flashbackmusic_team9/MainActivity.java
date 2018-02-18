@@ -23,6 +23,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -30,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
     private static Location mLocation;
+    private SharedPreferences prefs;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,16 +53,70 @@ public class MainActivity extends AppCompatActivity {
                 100);
 
         // mode history
-        SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
+        prefs = getSharedPreferences("mode", MODE_PRIVATE);
         String mode = prefs.getString("lastActivity", "");
+
         if (mode.compareTo("flash") == 0) {
-            launchModeActivity();
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this,
+                            Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                            PackageManager.PERMISSION_GRANTED) {
+            }
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                // Logic to handle location object
+                                mLocation = location;
+                                launchModeActivity();
+                            }
+                        }
+                    });
+        }
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED) {
+            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            setLocationManager();
+        }
+        // load music files
+        DataBase.loadFile(this);
+
+        ArrayList<MockTrack> currentTasks = new ArrayList<>();
+        try {
+            currentTasks = (ArrayList<MockTrack>) ObjectSerializer.deserialize(
+                    prefs.getString("tracks", ObjectSerializer.serialize(new ArrayList<MockTrack>())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        ArrayList<Track> allTracks = DataBase.getAllTracks();
+        if (currentTasks.size() == allTracks.size()) {
+            for (int i = 0; i < allTracks.size(); i++) {
+                MockTrack current = currentTasks.get(i);
+                allTracks.get(i).setStatus(current.getStatus());
+                if (current.getYear() != -1) {
+                    allTracks.get(i).setDate(LocalDateTime.of(current.getYear(), current.getMonth(),
+                            current.getDay(), current.getHour(), current.getMinute(),
+                            current.getSecond()));
+                }
+                if (current.getLongitude() != 9999) {
+                    allTracks.get(i).setLocation(current.getLongitude(), current.getLatitude());
+                }
+            }
         }
 
         // set static player
         playerAction();
-        // load music files
-        DataBase.loadFile(this);
 
         // all UI things
         PlayerToolBar playerToolBar = new PlayerToolBar((Button)findViewById(R.id.trackName_button),
@@ -61,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 (ImageButton)findViewById(R.id.play_button),
                 (ImageButton)findViewById(R.id.next_button), this);
         ListAdapter tracksAdapter = new TrackListAdapter(this,
-                android.R.layout.simple_list_item_1, DataBase.getAllTracks());
+                R.layout.list_item, DataBase.getAllTracks());
         ListView trackView = (ListView) findViewById(R.id.track_list);
         trackView.setAdapter(tracksAdapter);
         trackView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -117,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         for (Track each:DataBase.getAllTracks()) {
             if (each.hasPlayHistory()) {
                 list.add(each);
+
             }
         }
         Collections.sort(list);
@@ -124,6 +188,9 @@ public class MainActivity extends AppCompatActivity {
         PlayList flashbackList = new PlayList(list, true);
         if (flashbackList.hasNext()) {
             Intent intent = new Intent(this, FlashBackActivity.class);
+//            Player.setPlayList(flashbackList);
+//            Player.setCurrentTrack(new Track("Waiting", "Waiting", new Album("Waiting"), null));
+//            Collections.sort(list);
             Player.playPlayList(flashbackList);
             startActivity(intent);
         }
@@ -179,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                System.out.println(location);
                 mLocation = location;
             }
             @Override
@@ -230,7 +298,6 @@ public class MainActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -258,6 +325,15 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
+        ArrayList<MockTrack> mockTracks = new ArrayList<>();
+        for (Track each : DataBase.getAllTracks()) {
+            mockTracks.add(each.getMockTrack());
+        }
+        try {
+            editor.putString("tracks", ObjectSerializer.serialize(mockTracks));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         editor.putString("lastActivity", "normal");
         editor.apply();
     }
