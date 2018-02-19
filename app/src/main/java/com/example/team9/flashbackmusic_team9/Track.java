@@ -24,7 +24,8 @@ public class Track implements Comparable<Track>
     private Location location;
     private FavoriteStatus status;
     private Stack<FavoriteStatusButton> fsButtons = new Stack<>();
-    private int mockhour = -1;
+    private int mockHour = -1;
+    private int mockDate = -1;
 
     public enum FavoriteStatus {
         LIKE,DISLIKE,NEUTRAL
@@ -152,16 +153,17 @@ public class Track implements Comparable<Track>
         int second = 11;
         int third = 17;
 
-        if(mockhour == -1) {
-            currentHour = LocalDateTime.now().getHour();
-        }
-        else
-        {
-            currentHour = mockhour;
-        }
 
         int currentHour = LocalDateTime.now().getHour();
         int currentDay = LocalDateTime.now().getDayOfWeek().getValue();
+
+        if(mockHour != -1) {
+            currentHour = mockHour;
+        }
+
+        if(mockDate != -1) {
+            currentDay = mockDate;
+        }
 
         int thisHour = -1;
         int trackHour = -1;
@@ -222,9 +224,14 @@ public class Track implements Comparable<Track>
         }
     }
 
-    public void setMockhour(int hour)
+    public void setMockHour(int hour)
     {
-        mockhour = hour;
+        mockHour = hour;
+    }
+
+    public void setMockDate(int date)
+    {
+        mockDate = date;
     }
 
 }

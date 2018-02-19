@@ -185,21 +185,115 @@ public class JUnitTestTrack {
     @Test
     public void testCompareTo()
     {
+        // same time, different location, same day, same like
         Location location = new Location("");
+        LocalDateTime dateTime = LocalDateTime.of(2018, 3, 3,10, 5);
         location.setLatitude(116.4074);
         location.setLongitude(39.9042);
-        MainActivity.setmLocation();
+        MainActivity.setmLocation(location);
+
         Album album1 = new Album("album1");
         Track track1 = new Track("Track1","Tony", album1, null);
         track1.setLocation(location);
+        track1.setDate(dateTime);
+
+        Track track2 = new Track("Track2","Tony", album1, null);
 
         Location location1 = new Location("");
-        track1.setLocation(location);
-        Track track2 = new Track("Track2","Tony", album1, null);
-        location1.setLatitude(118.4074);
-        location1.setLongitude(35.9042);
+        location1.setLatitude(97.4074);
+        location1.setLongitude(37.9042);
         track2.setLocation(location1);
-        track1.setMockhour(10);
-        track1.compareTo(track2);
+        track2.setDate(dateTime);
+
+        track1.setMockHour(10);
+        track1.setMockDate(3);
+        Assert.assertTrue(track1.compareTo(track2) < 0);
+
+        // different time, same location, same day, same like
+
+        LocalDateTime dateTime2 = LocalDateTime.of(2018, 3, 3,3, 5);
+        location.setLatitude(116.4074);
+        location.setLongitude(39.9042);
+        MainActivity.setmLocation(location);
+
+        track1.setLocation(location);
+        track1.setDate(dateTime2);
+
+        LocalDateTime dateTime3 = LocalDateTime.of(2018, 3, 3,7, 5);
+
+        track2.setLocation(location);
+        track2.setDate(dateTime3);
+
+        track1.setMockHour(7);
+        track1.setMockDate(3);
+        Assert.assertTrue(track1.compareTo(track2) > 0);
+
+        // same time, same location, different day, same like
+        dateTime2 = LocalDateTime.of(2018, 3, 5,3, 5);
+        location.setLatitude(116.4074);
+        location.setLongitude(39.9042);
+        MainActivity.setmLocation(location);
+
+        track1.setLocation(location);
+        track1.setDate(dateTime2);
+
+        dateTime3 = LocalDateTime.of(2018, 3, 3,3, 5);
+
+        track2.setLocation(location);
+        track2.setDate(dateTime3);
+
+        track1.setMockHour(7);
+        track1.setMockDate(6);
+        Assert.assertTrue(track1.compareTo(track2) > 0);
+
+        // same time, same location, same day, different like
+        location.setLatitude(116.4074);
+        location.setLongitude(39.9042);
+        MainActivity.setmLocation(location);
+
+        track1.setLocation(location);
+        track1.setDate(dateTime);
+        track1.setStatus(Track.FavoriteStatus.NEUTRAL);
+
+        track2.setLocation(location);
+        track2.setDate(dateTime);
+        track2.setStatus(Track.FavoriteStatus.LIKE);
+
+        track1.setMockHour(7);
+        track1.setMockDate(6);
+
+        Assert.assertTrue(track1.compareTo(track2) > 0);
+
+        // score same status same
+        dateTime2 = LocalDateTime.of(2018, 3, 3,6, 5);
+        dateTime3 = LocalDateTime.of(2018, 3, 3,7, 5);
+        MainActivity.setmLocation(location);
+
+
+        track1.setLocation(location);
+        track1.setDate(dateTime2);
+        track1.setStatus(Track.FavoriteStatus.LIKE);
+
+        track2.setLocation(location);
+        track2.setDate(dateTime3);
+        track2.setStatus(Track.FavoriteStatus.LIKE);
+
+        track1.setMockHour(7);
+        track1.setMockDate(6);
+
+        Assert.assertTrue(track1.compareTo(track2) > 0);
+
+        // location time both null
+        MainActivity.setmLocation(location);
+
+
+        track1 = new Track("Track1","Tony", album1, null);
+
+        track2 = new Track("Track1","Tony", album1, null);
+
+        track1.setMockHour(7);
+        track1.setMockDate(6);
+
+        Assert.assertTrue(track1.compareTo(track2) == 0);
     }
 }
