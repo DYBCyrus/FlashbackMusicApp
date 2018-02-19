@@ -16,8 +16,11 @@ import android.widget.SeekBar;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class PlayingActivity extends AppCompatActivity implements Updateable{
+
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     private TextView title;
     private TextView artist;
@@ -186,6 +189,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             // or an error message sent from the intent service.
             mAddressOutput = resultData.getString("result");
             location.setText(mAddressOutput);
+            LOGGER.info(mAddressOutput);
         }
 
     }
