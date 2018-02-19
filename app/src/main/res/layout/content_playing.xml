@@ -38,7 +38,7 @@
 
     <SeekBar
         android:id="@+id/seekBar"
-        android:layout_width="200sp"
+        android:layout_width="400sp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/back"
         android:layout_centerHorizontal="true" />

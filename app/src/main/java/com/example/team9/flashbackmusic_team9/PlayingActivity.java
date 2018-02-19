@@ -97,6 +97,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             @Override
             public void run() {
                 if(Player.getPlayer().isPlaying()){
+                    System.out.println("!!!!!");
                     seekbar.setMax(Player.getPlayer().getDuration());
                     seekbar.setProgress(Player.getPlayer().getCurrentPosition());
                     h.postDelayed(this, 500);
@@ -188,6 +189,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
                 fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x,
                         null));
         }
+        seekbar.setProgress(Player.getPlayer().getCurrentPosition());
     }
     @Override
     public void finish() {
