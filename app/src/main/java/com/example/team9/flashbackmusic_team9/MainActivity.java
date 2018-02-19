@@ -32,8 +32,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity {
+
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     private LocationManager locationManager;
     private static Location mLocation;
@@ -111,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if (current.getLongitude() != 9999) {
                     allTracks.get(i).setLocation(current.getLongitude(), current.getLatitude());
+                    LOGGER.info(current.getLongitude()+", "+ current.getLatitude());
+
                 }
             }
         }
