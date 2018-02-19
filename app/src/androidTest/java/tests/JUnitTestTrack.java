@@ -185,13 +185,21 @@ public class JUnitTestTrack {
     @Test
     public void testCompareTo()
     {
-        Album album1 = new Album("album1");
-        Track track1 = new Track("Track1","Tony", album1, null);
         Location location = new Location("");
         location.setLatitude(116.4074);
         location.setLongitude(39.9042);
+        MainActivity.setmLocation();
+        Album album1 = new Album("album1");
+        Track track1 = new Track("Track1","Tony", album1, null);
+        track1.setLocation(location);
+
+        Location location1 = new Location("");
         track1.setLocation(location);
         Track track2 = new Track("Track2","Tony", album1, null);
+        location1.setLatitude(118.4074);
+        location1.setLongitude(35.9042);
+        track2.setLocation(location1);
+        track1.setMockhour(10);
         track1.compareTo(track2);
     }
 }
