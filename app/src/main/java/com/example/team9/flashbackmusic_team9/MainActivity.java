@@ -337,4 +337,13 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("lastActivity", "normal");
         editor.apply();
     }
+
+    /**
+     * setter for current location
+     * @param loc
+     */
+    public static void setmLocation(Location loc)
+    {
+        mLocation = loc;
+    }
 }
