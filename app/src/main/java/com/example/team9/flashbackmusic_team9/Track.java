@@ -143,19 +143,33 @@ public class Track implements Comparable<Track>
             trackScore++;
         }
 
-        if (this.getDate() == null && track.getDate() == null) {return 0;}
+        if (this.getDate() == null && track.getDate() == null) {
+            return 0;
+        }
 
         int first = 5;
         int second = 11;
         int third = 17;
         int currentHour = LocalDateTime.now().getHour();
+        int currentDay = LocalDateTime.now().getDayOfWeek().getValue();
         int thisHour = -1;
         int trackHour = -1;
+        int thisDay = -1;
+        int trackDay = -1;
         if (this.getDate() != null) {
             thisHour = this.getDate().getHour();
+            thisDay = this.getDate().getDayOfWeek().getValue();
         }
         if (track.getDate() != null) {
             trackHour = track.getDate().getHour();
+            trackDay = track.getDate().getDayOfWeek().getValue();
+        }
+
+        if (thisDay == currentDay) {
+            thisScore++;
+        }
+        if (trackDay == currentDay) {
+            trackScore++;
         }
 
         if (first < currentHour && currentHour < second) {
@@ -196,6 +210,5 @@ public class Track implements Comparable<Track>
             return 1;
         }
     }
-
 
 }
