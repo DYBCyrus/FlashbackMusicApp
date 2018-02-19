@@ -13,11 +13,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="View Playlist" />
+
+
     <Button
         android:id = "@+id/back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text = "BACK"/>
+
 
     <ImageButton
         android:id="@+id/likeButton"
@@ -32,12 +35,14 @@
         android:focusable="true"
         android:background="@drawable/plus" />
 
+
     <SeekBar
         android:id="@+id/seekBar"
         android:layout_width="200sp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/back"
         android:layout_centerHorizontal="true" />
+
 
     <TextView
         android:id = "@+id/title"
@@ -51,6 +56,7 @@
         android:layout_height="wrap_content"
         android:text = "Title"/>
 
+
     <TextView
         android:id = "@+id/artist"
         android:layout_below="@id/title"
@@ -62,6 +68,7 @@
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
 
     <TextView
         android:id = "@+id/album"
@@ -75,6 +82,7 @@
         android:textSize = "30sp"
         android:layout_below="@id/artist"/>
 
+
     <TextView
         android:id = "@+id/location"
         android:layout_width="wrap_content"
@@ -86,6 +94,7 @@
         android:singleLine="true"
         android:textSize = "30sp"
         android:layout_below="@id/artist"/>
+
 
     <TextView
         android:id = "@+id/time"
@@ -110,6 +119,7 @@
         android:layout_marginLeft = "15dp"
         android:background="@drawable/previous" />
 
+
     <ImageButton
         android:id = "@+id/play_pause_button"
         android:layout_toRightOf="@id/prevButton"
@@ -120,6 +130,7 @@
         android:layout_marginLeft = "60dp"
         android:scaleType="fitXY"
         android:background="@drawable/play"/>
+
 
     <ImageButton
         android:id = "@+id/nextButton"

@@ -29,6 +29,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     private SeekBar seekbar;
     public Button back;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -90,6 +91,22 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             }
         });
 
+        final Handler h = new Handler();
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                if(Player.getPlayer().isPlaying()){
+                    seekbar.setMax(Player.getPlayer().getDuration());
+                    seekbar.setProgress(Player.getPlayer().getCurrentPosition());
+                    h.postDelayed(this, 500);
+                }
+            }
+        };
+
+        h.removeCallbacks(r);
+        h.postDelayed(r, 500);
+
         // Checking track status before launching activity for like_dislike button image
         if (Player.getCurrentTrack().getStatus() == Track.FavoriteStatus.DISLIKE) {
             fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.x, null));
@@ -122,6 +139,10 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
                 (ImageButton)findViewById(R.id.play_pause_button),
                 (ImageButton)findViewById(R.id.nextButton), this);
         Updateables.addUpdateable(this);
+
+
+
+
     }
 
 
