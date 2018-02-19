@@ -45,6 +45,7 @@ public class DataBase {
         try {
             HashMap<String, Album> map = new HashMap<>();
             for (Field each : fields) {
+                System.out.println(each.toString());
                 int id = each.getInt(each);
                 AssetFileDescriptor afd = main.getResources().openRawResourceFd(id);
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
