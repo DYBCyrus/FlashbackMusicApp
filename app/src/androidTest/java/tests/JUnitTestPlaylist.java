@@ -82,6 +82,7 @@ public class JUnitTestPlaylist {
 
 
 
+        test.next();
         Track previous = test.previous();
         Assert.assertEquals(track1, previous);
 
@@ -103,7 +104,7 @@ public class JUnitTestPlaylist {
 
 
         //Test the previousIndex() method
-        Assert.assertTrue("Checks if the previousIndex() method works", test.previousIndex() == 0);
+        Assert.assertFalse("Checks if the previousIndex() method works", test.previousIndex() == 0);
 
 
 
