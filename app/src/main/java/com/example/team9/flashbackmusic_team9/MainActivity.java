@@ -27,6 +27,10 @@ import android.widget.ListView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -42,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private static Location mLocation;
     private SharedPreferences prefs;
     private FusedLocationProviderClient mFusedLocationClient;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +55,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        FirebaseOptions options = new FirebaseOptions.Builder()
+                .setApplicationId("1:78013321666:android:3709eeeca5bbd4b0")
+                .setDatabaseUrl("https://cse-110-team-project-team-9.firebaseio.com/")
+                .build();
+
+        database = FirebaseDatabase.getInstance(FirebaseApp.initializeApp(this, options, "secondary"));
+        myRef = database.getReferenceFromUrl("https://cse-110-team-project-team-9.firebaseio.com/");
 
         // request getting location
         ActivityCompat.requestPermissions(this,
@@ -233,9 +247,15 @@ public class MainActivity extends AppCompatActivity {
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-//                hasTrackToPlay = true;
                 Player.setCurrentTrackLocation(mLocation);
                 Player.setCurrentTrackTime(TrackTime.now());
+
+                Track currentTrack = Player.getCurrentTrack();
+                String titleAndAuthor = Player.getCurrentTrack().getName() + "@" +
+                        Player.getCurrentTrack().getArtist();
+                DatabaseReference rf = myRef.child(titleAndAuthor);
+                rf.setValue(currentTrack.getMockTrack());
+
                 if (!Player.playNext()) {
                     Updateables.updateAll();
                 }
@@ -251,7 +271,6 @@ public class MainActivity extends AppCompatActivity {
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                System.out.println(location);
                 mLocation = location;
             }
             @Override
