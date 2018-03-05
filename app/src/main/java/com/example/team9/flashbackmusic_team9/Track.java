@@ -51,7 +51,7 @@ public class Track implements Comparable<Track>
     }
 
 
-
+     //Setter for URL
     public void setURL(String url){
         this.URL = url;
     }
