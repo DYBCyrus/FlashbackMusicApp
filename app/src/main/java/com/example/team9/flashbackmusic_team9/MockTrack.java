@@ -1,6 +1,7 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.location.Location;
+import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
  * Created by cyrusdeng on 18/02/2018.
  */
 
-public class MockTrack implements Serializable {
+public class MockTrack implements Serializable, Comparable<MockTrack> {
     private int year = -1;
     private int month;
     private int day;
@@ -20,6 +21,9 @@ public class MockTrack implements Serializable {
     private double longitude = 9999;
     private double latitude;
     private Track.FavoriteStatus status;
+
+    private Location location;
+    private LocalDateTime dateTime;
 
     public MockTrack(Track.FavoriteStatus status) {
         this.status = status;
@@ -50,6 +54,8 @@ public class MockTrack implements Serializable {
     public double getLatitude() {
         return latitude;
     }
+    public Location getLocation() {return location;}
+    public LocalDateTime getDateTime() {return dateTime;}
 
     public Track.FavoriteStatus getStatus() {return status;}
 
@@ -60,10 +66,56 @@ public class MockTrack implements Serializable {
         this.hour = date.getHour();
         this.minute = date.getMinute();
         this.second = date.getSecond();
+        this.dateTime = date;
     }
     public void setLocation(Location location) {
         this.longitude = location.getLongitude();
         this.latitude = location.getLatitude();
+        this.location = location;
     }
     public void setStatus(Track.FavoriteStatus status) {this.status = status;}
+
+    @Override
+    public int compareTo(@NonNull MockTrack MockTrack) {
+        int thisScore = 0;
+        int trackScore = 0;
+        int thisTieScore = 0;
+        int trackTieScore = 0;
+
+        // location compare
+        if (this.getLocation().distanceTo(MainActivity.getmLocation()) < 305) {
+            thisScore++;
+            thisTieScore += 3;
+        }
+        if (MockTrack.getLocation().distanceTo(MainActivity.getmLocation()) < 305) {
+            trackScore++;
+            trackTieScore += 3;
+        }
+
+        // time compare
+        if (this.getDateTime().isAfter(LocalDateTime.now().minusWeeks(1))) {
+            thisScore++;
+            thisTieScore += 2;
+        }
+        if (MockTrack.getDateTime().isAfter(LocalDateTime.now().minusWeeks(1))) {
+            trackScore++;
+            trackTieScore += 2;
+        }
+
+        // google+ friends compare
+
+
+        // score compare
+        if (thisScore != trackScore) {
+            return trackScore - thisScore;
+        } else if (thisTieScore != trackTieScore) {
+            return trackTieScore - thisTieScore;
+        }
+
+        if (this.getDateTime().isAfter(MockTrack.getDateTime())) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
 }

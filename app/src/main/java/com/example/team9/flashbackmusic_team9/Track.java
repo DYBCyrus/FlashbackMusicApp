@@ -49,8 +49,6 @@ public class Track implements Comparable<Track>
         Updateables.updateAll();
     }
 
-
-     //Setter for URL
     public void setURL(String url){
         this.URL = url;
     }
@@ -59,11 +57,7 @@ public class Track implements Comparable<Track>
         return URL;
     }
 
-
-    public void setUserName(String name){
-        this.userName = name;
-
-    }
+    public void setUserName(String name){ this.userName = name; }
 
     public String getUserName(){
         return userName;
