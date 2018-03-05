@@ -1,6 +1,7 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,11 +16,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences prefs;
     private FusedLocationProviderClient mFusedLocationClient;
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,21 +56,23 @@ public class MainActivity extends AppCompatActivity {
 
         // request getting location
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 100);
 
+        while (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+        }
         // mode history
         prefs = getSharedPreferences("mode", MODE_PRIVATE);
         String mode = prefs.getString("lastActivity", "");
 
         if (mode.compareTo("flash") == 0) {
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-            if (ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    ActivityCompat.checkSelfPermission(this,
-                            Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                            PackageManager.PERMISSION_GRANTED) {
-            }
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
@@ -81,14 +87,16 @@ public class MainActivity extends AppCompatActivity {
                     });
         }
 
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED) {
-            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            setLocationManager();
-        }
+//        if (ActivityCompat.checkSelfPermission(this,
+//                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+//                ActivityCompat.checkSelfPermission(this,
+//                        Manifest.permission.ACCESS_COARSE_LOCATION) ==
+//                        PackageManager.PERMISSION_GRANTED &&
+//                checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                        == PackageManager.PERMISSION_GRANTED) {
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        setLocationManager();
+//        }
         // load music files
         DataBase.loadFile(this);
 
@@ -123,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
         // set static player
         playerAction();
 
+        MusicDownloadManager.setup(this);
         // all UI things
         PlayerToolBar playerToolBar = new PlayerToolBar((Button)findViewById(R.id.trackName_button),
                 (ImageButton)findViewById(R.id.previous_button),
@@ -157,6 +166,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 launchModeActivity();
+            }
+        });
+        Button newDownload = (Button) findViewById(R.id.downloadButton);
+        newDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchNewDownload();
             }
         });
     }
@@ -216,7 +232,33 @@ public class MainActivity extends AppCompatActivity {
             alert11.show();
         }
     }
+//  /storage/emulated/0/Download/wtf
+    public void launchNewDownload() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Please Type Your URL");
 
+// Set up the input
+        final EditText input = new EditText(this);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        builder.setView(input);
+        final Context c = this;
+// Set up the buttons
+        builder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String url = input.getText().toString();
+                MusicDownloadManager.startDownloadTask(url);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
     /**
      * Initialize and set static player, include onPrepare and onCompletion
      * While onCompletion, set current location and time
@@ -247,6 +289,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Set current location manager
      */
+    @SuppressLint("MissingPermission")
     public void setLocationManager() {
         LocationListener locationListener = new LocationListener() {
             @Override
@@ -263,12 +306,12 @@ public class MainActivity extends AppCompatActivity {
         };
 
         String locationProvider = LocationManager.GPS_PROVIDER;
-        while (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED) {
-        }
+//        while (ActivityCompat.checkSelfPermission(this,
+//                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+//                ActivityCompat.checkSelfPermission(this,
+//                        Manifest.permission.ACCESS_COARSE_LOCATION) !=
+//                        PackageManager.PERMISSION_GRANTED) {
+//        }
         locationManager.requestLocationUpdates(locationProvider, 0, 0,
                 locationListener);
     }
@@ -301,12 +344,12 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case 100: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length >= 2
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-                    setLocationManager();
+//                    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+//                    setLocationManager();
                 } else {
                     finish();
                     // permission denied, boo! Disable the
