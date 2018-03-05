@@ -17,6 +17,8 @@ public class Track implements Comparable<Track>
     private MockTrack mockTrack;
 
     private String name;
+    private String URL;
+    private String userName;
     private String artist;
     private AssetFileDescriptor afd;
     private Album album;
@@ -46,6 +48,26 @@ public class Track implements Comparable<Track>
         mockTrack.setStatus(status);
         updateListeningFavoriteStatusButton();
         Updateables.updateAll();
+    }
+
+
+
+    public void setURL(String url){
+        this.URL = url;
+    }
+
+    public String getUrl(){
+        return URL;
+    }
+
+
+    public void setUserName(String name){
+        this.userName = name;
+
+    }
+
+    public String getUserName(){
+        return userName;
     }
 
     public FavoriteStatus getStatus() {return status;}
