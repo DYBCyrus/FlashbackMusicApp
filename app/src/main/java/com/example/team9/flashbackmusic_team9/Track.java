@@ -3,7 +3,6 @@ package com.example.team9.flashbackmusic_team9;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.location.Location;
-import android.os.Parcel;
 import android.support.annotation.NonNull;
 import java.time.LocalDateTime;
 import java.util.Stack;
@@ -50,8 +49,6 @@ public class Track implements Comparable<Track>
         Updateables.updateAll();
     }
 
-
-     //Setter for URL
     public void setURL(String url){
         this.URL = url;
     }
@@ -60,11 +57,7 @@ public class Track implements Comparable<Track>
         return URL;
     }
 
-
-    public void setUserName(String name){
-        this.userName = name;
-
-    }
+    public void setUserName(String name){ this.userName = name; }
 
     public String getUserName(){
         return userName;

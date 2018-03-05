@@ -199,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
         for (Track each:DataBase.getAllTracks()) {
             if (each.hasPlayHistory()) {
                 list.add(each);
-
             }
         }
         Collections.sort(list);
@@ -207,9 +206,6 @@ public class MainActivity extends AppCompatActivity {
         PlayList flashbackList = new PlayList(list, true);
         if (flashbackList.hasNext()) {
             Intent intent = new Intent(this, FlashBackActivity.class);
-//            Player.setPlayList(flashbackList);
-//            Player.setCurrentTrack(new Track("Waiting", "Waiting", new Album("Waiting"), null));
-//            Collections.sort(list);
             Player.playPlayList(flashbackList);
             startActivity(intent);
         }
