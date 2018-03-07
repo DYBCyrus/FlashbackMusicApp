@@ -22,8 +22,7 @@ public class Player {
 //            return;
 //        }
         try {
-            AssetFileDescriptor afd = track.getDescriptor();
-            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            player.setDataSource(track.getPath());
             currentTrack = track;
         } catch (IOException e) {
             e.printStackTrace();
