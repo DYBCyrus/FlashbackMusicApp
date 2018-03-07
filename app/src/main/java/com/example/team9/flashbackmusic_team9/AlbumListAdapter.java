@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * Created by cyrusdeng on 05/02/2018.
  */
 
-public class AlbumListAdapter extends ArrayAdapter<Album> implements Updateable{
+public class AlbumListAdapter extends ArrayAdapter<Album> {
 
     public AlbumListAdapter(Activity activity, int position, ArrayList<Album> albums) {
         super(activity, position, albums);
@@ -32,10 +32,5 @@ public class AlbumListAdapter extends ArrayAdapter<Album> implements Updateable{
         ((TextView)convertView.findViewById(R.id.track_name)).setText(album.getName());
 
         return convertView;
-    }
-
-    @Override
-    public void update() {
-
     }
 }

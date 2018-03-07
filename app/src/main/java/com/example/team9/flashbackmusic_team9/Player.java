@@ -22,7 +22,8 @@ public class Player {
 //            return;
 //        }
         try {
-            player.setDataSource(track.getPath());
+            AssetFileDescriptor afd = track.getDescriptor();
+            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             currentTrack = track;
         } catch (IOException e) {
             e.printStackTrace();

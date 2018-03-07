@@ -18,7 +18,7 @@ public class Track implements Comparable<Track>
 
     private String name;
     private String artist;
-    private String path;
+    private AssetFileDescriptor afd;
     private Album album;
     private LocalDateTime date;
     private Location location;
@@ -31,10 +31,10 @@ public class Track implements Comparable<Track>
         LIKE,DISLIKE,NEUTRAL
     }
 
-    public Track(String name, String artist, Album album, String path) {
+    public Track(String name, String artist, Album album, AssetFileDescriptor afd) {
         this.name = name;
         this.album = album;
-        this.path = path;
+        this.afd = afd;
         this.artist = artist;
         this.status = FavoriteStatus.NEUTRAL;
         mockTrack = new MockTrack(getStatus());
@@ -80,8 +80,8 @@ public class Track implements Comparable<Track>
         album = al;
     }
 
-    public String getPath(){
-        return path;
+    public AssetFileDescriptor getDescriptor(){
+        return afd;
     }
 
     public LocalDateTime getDate()
