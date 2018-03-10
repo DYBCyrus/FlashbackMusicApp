@@ -51,13 +51,17 @@ public class Track implements Comparable<Track>
 
     public void setURL(String url){
         this.URL = url;
+        mockTrack.setURL(url);
     }
 
     public String getUrl(){
         return URL;
     }
 
-    public void setUserName(String name){ this.userName = name; }
+    public void setUserName(String name){
+        this.userName = name;
+        mockTrack.setUser(name);
+    }
 
     public String getUserName(){
         return userName;
