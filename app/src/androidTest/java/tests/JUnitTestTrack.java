@@ -37,7 +37,7 @@ public class JUnitTestTrack {
         afd = null;
         album = new Album("name");
         status = Track.FavoriteStatus.NEUTRAL;
-        track = new Track(name, artist, album,afd);
+        track = new Track(name, artist, album,"");
     }
 
 
@@ -118,12 +118,6 @@ public class JUnitTestTrack {
         track.setAlbum(album1);
         Assert.assertEquals(album1, track.getAlbum());
         Assert.assertNotEquals(album, track.getAlbum());
-    }
-
-    @Test
-    public void testGetDescriptor(){
-        Assert.assertEquals(afd, track.getDescriptor());
-        Assert.assertNull(afd);
     }
 
     @Test
