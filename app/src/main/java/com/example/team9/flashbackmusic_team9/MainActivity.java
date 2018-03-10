@@ -11,12 +11,14 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,9 +29,27 @@ import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleBrowserClientRequestUrl;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.people.v1.PeopleService;
+import com.google.api.services.people.v1.model.EmailAddress;
+import com.google.api.services.people.v1.model.ListConnectionsResponse;
+import com.google.api.services.people.v1.model.Person;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DatabaseReference;
@@ -38,7 +58,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity {
@@ -49,8 +71,22 @@ public class MainActivity extends AppCompatActivity {
     private static Location mLocation;
     private SharedPreferences prefs;
     private FusedLocationProviderClient mFusedLocationClient;
-    FirebaseDatabase database;
-    DatabaseReference myRef;
+    private User currentUser;
+
+    // firebase
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
+
+    // Google Sign In and People API
+    private String authCode;
+    private GoogleSignInClient aGoogleSignInClient;
+    private HttpTransport httpTransport;
+    private JacksonFactory jsonFactory;
+    private String clientId;
+    private String authorizationUrl;
+    private String clientSecret;
+    private String redirectUrl;
+    private Scope aScope = new Scope("https://www.googleapis.com/auth/contacts.readonly");
 
     @SuppressLint("MissingPermission")
     @Override
@@ -60,19 +96,26 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // firebase configuration
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setApplicationId("1:78013321666:android:3709eeeca5bbd4b0")
                 .setDatabaseUrl("https://cse-110-team-project-team-9.firebaseio.com/")
                 .build();
-
         database = FirebaseDatabase.getInstance(FirebaseApp.initializeApp(this, options, "secondary"));
         myRef = database.getReferenceFromUrl("https://cse-110-team-project-team-9.firebaseio.com/");
+
+        // Google Sign In configuration
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestServerAuthCode("78013321666-9j6ancu1s1tr08tjqfe1kb9rtl0qeqhi.apps.googleusercontent.com")
+                .requestScopes(aScope)
+                .requestEmail()
+                .build();
+        aGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         // request getting location
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 100);
-
         while (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                 ActivityCompat.checkSelfPermission(this,
@@ -81,10 +124,10 @@ public class MainActivity extends AppCompatActivity {
                 checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
         }
+
         // mode history
         prefs = getSharedPreferences("mode", MODE_PRIVATE);
         String mode = prefs.getString("lastActivity", "");
-
         if (mode.compareTo("flash") == 0) {
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
             mFusedLocationClient.getLastLocation()
@@ -101,16 +144,8 @@ public class MainActivity extends AppCompatActivity {
                     });
         }
 
-//        if (ActivityCompat.checkSelfPermission(this,
-//                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-//                ActivityCompat.checkSelfPermission(this,
-//                        Manifest.permission.ACCESS_COARSE_LOCATION) ==
-//                        PackageManager.PERMISSION_GRANTED &&
-//                checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                        == PackageManager.PERMISSION_GRANTED) {
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         setLocationManager();
-//        }
         // load music files
         DataBase.loadFile(this);
 
@@ -167,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         Button showAlbums = (Button) findViewById(R.id.all_albums);
         showAlbums.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,6 +223,48 @@ public class MainActivity extends AppCompatActivity {
                 launchNewDownload();
             }
         });
+
+        Button signin = (Button)findViewById(R.id.signin);
+        signin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signIn();
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == 2) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+            try {
+                setUp();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            authCode = account.getServerAuthCode();
+            currentUser = new User(account.getEmail());
+            // Signed in successfully, show authenticated UI.
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w("error!!!!!!!", "signInResult:failed code=" + e.getStatusCode());
+        }
+    }
+
+    private void signIn() {
+        Intent signInIntent = aGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, 2);
     }
 
     /**
@@ -242,17 +318,18 @@ public class MainActivity extends AppCompatActivity {
             alert11.show();
         }
     }
-//  /storage/emulated/0/Download/wtf
+
+    //  /storage/emulated/0/Download/wtf
     public void launchNewDownload() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Please Type Your URL");
 
-// Set up the input
+        // Set up the input
         final EditText input = new EditText(this);
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         builder.setView(input);
         final Context c = this;
-// Set up the buttons
+        // Set up the buttons
         builder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -321,36 +398,8 @@ public class MainActivity extends AppCompatActivity {
         };
 
         String locationProvider = LocationManager.GPS_PROVIDER;
-//        while (ActivityCompat.checkSelfPermission(this,
-//                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-//                ActivityCompat.checkSelfPermission(this,
-//                        Manifest.permission.ACCESS_COARSE_LOCATION) !=
-//                        PackageManager.PERMISSION_GRANTED) {
-//        }
         locationManager.requestLocationUpdates(locationProvider, 0, 0,
                 locationListener);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -361,22 +410,18 @@ public class MainActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length >= 2
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-//                    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-//                    setLocationManager();
                 } else {
                     finish();
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
                 return;
             }
-            // other 'case' lines to check for other
-            // permissions this app might request.
         }
     }
 
+    /**
+     * Get current location
+     * @return current location
+     */
     public static Location getmLocation() {return mLocation;}
 
     /**
@@ -408,5 +453,113 @@ public class MainActivity extends AppCompatActivity {
     public static void setmLocation(Location loc)
     {
         mLocation = loc;
+    }
+
+    /**
+     * set up people api and get a list of google contacts
+     * reference: https://developers.google.com/people/v1/getting-started
+     * https://developers.google.com/people/v1/read-people
+     * https://developers.google.com/identity/sign-in/android/start-integrating
+     * @throws IOException
+     */
+    public void setUp() throws IOException {
+        this.httpTransport = new NetHttpTransport();
+        this.jsonFactory = new JacksonFactory();
+
+        // Go to the Google API Console, open your application's
+        // credentials page, and copy the client ID and client secret.
+        // Then paste them into the following code.
+        this.clientId = "78013321666-9j6ancu1s1tr08tjqfe1kb9rtl0qeqhi.apps.googleusercontent.com";
+        this.clientSecret = "omDZYzPwK1TVBQKcl-CA6VD_";
+
+        // Or your redirect URL for web based applications.
+        this.redirectUrl = "urn:ietf:wg:oauth:2.0:oob";
+        String scope = "https://www.googleapis.com/auth/contacts.readonly";
+
+        // Step 1: Authorize -->
+        this.authorizationUrl =
+                new GoogleBrowserClientRequestUrl(clientId, redirectUrl, Arrays.asList(scope)).build();
+
+        // Point or redirect your user to the authorizationUrl.
+        System.out.println("Go to the following link in your browser:");
+        System.out.println(authorizationUrl);
+
+        // Read the authorization code from the standard input stream.
+        System.out.println("What is the authorization code?");
+        // End of Step 1 <--
+        AsyncTaskRunner runner = new AsyncTaskRunner();
+        runner.execute();
+    }
+
+    /**
+     * AsyncTask for getting google contact list
+     * People API: https://developers.google.com/people/v1/read-people
+     */
+    private class AsyncTaskRunner extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPostExecute(String result) {
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                // Step 2: Exchange -->
+                GoogleTokenResponse tokenResponse =
+                        new GoogleAuthorizationCodeTokenRequest(
+                                httpTransport, jsonFactory, clientId, clientSecret, authCode, "")
+                                .execute();
+                // End of Step 2 <--
+
+                GoogleCredential credential = new GoogleCredential().setAccessToken(tokenResponse.getAccessToken());
+
+                PeopleService peopleService =
+                        new PeopleService.Builder(httpTransport, jsonFactory, credential).build();
+
+                ListConnectionsResponse response = peopleService.people().connections().list("people/me")
+                        .setPersonFields("emailAddresses")
+                        .execute();
+                List<Person> connections = response.getConnections();
+
+                for (Person person : connections) {
+                    for (EmailAddress email : person.getEmailAddresses()) {
+                        currentUser.addFriend(email.getValue());
+//                        System.out.println(email.getValue());
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected void onProgressUpdate(String... text) {
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

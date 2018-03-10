@@ -25,9 +25,17 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
     private Location location;
     private LocalDateTime dateTime;
 
+    private String user;
+    private String URL;
+
     public MockTrack(Track.FavoriteStatus status) {
         this.status = status;
     }
+
+    public void setUser(String user) { this.user = user; }
+    public String getUser() { return user; }
+    public void setURL(String URL) { this.URL = URL; }
+    public String getURL() { return URL; }
 
     public int getYear() {
         return year;
