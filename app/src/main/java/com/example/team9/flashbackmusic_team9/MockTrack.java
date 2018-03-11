@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * Created by cyrusdeng on 18/02/2018.
  */
 
-public class MockTrack implements Serializable, Comparable<MockTrack> {
+public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
     private int year = -1;
     private int month;
     private int day;
@@ -32,6 +32,13 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
         this.status = status;
     }
 
+    public MockTrack(Track t) {
+        this.status = t.getStatus();
+        this.URL = t.getUrl();
+        this.user = t.getUserName();
+        setLocation(t.getLocation());
+        setDate(t.getDate());
+    }
     public void setUser(String user) { this.user = user; }
     public String getUser() { return user; }
     public void setURL(String URL) { this.URL = URL; }
@@ -125,5 +132,20 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
         } else {
             return 1;
         }
+    }
+
+    @Override
+    public boolean isPlayable() {
+        return false;
+    }
+
+    @Override
+    public boolean hasDownloaded() {
+        return false;
+    }
+
+    @Override
+    public Track getTrack() {
+        return null;
     }
 }

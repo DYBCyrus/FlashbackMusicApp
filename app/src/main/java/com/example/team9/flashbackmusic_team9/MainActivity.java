@@ -160,18 +160,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Track> allTracks = DataBase.getAllTracks();
         if (currentTasks.size() == allTracks.size()) {
             for (int i = 0; i < allTracks.size(); i++) {
-                MockTrack current = currentTasks.get(i);
-                allTracks.get(i).setStatus(current.getStatus());
-                if (current.getYear() != -1) {
-                    allTracks.get(i).setDate(LocalDateTime.of(current.getYear(), current.getMonth(),
-                            current.getDay(), current.getHour(), current.getMinute(),
-                            current.getSecond()));
-                }
-                if (current.getLongitude() != 9999) {
-                    allTracks.get(i).setLocation(current.getLongitude(), current.getLatitude());
-                    LOGGER.info(current.getLongitude()+", "+ current.getLatitude());
-
-                }
+                allTracks.get(i).setDataFromMockTrack(currentTasks.get(i));
             }
         }
 
@@ -293,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Collections.sort(list);
 
-        PlayList flashbackList = new PlayList(list, true);
+        PlayList flashbackList = new PlayList<>(list, true);
         if (flashbackList.hasNext()) {
             Intent intent = new Intent(this, FlashBackActivity.class);
             Player.playPlayList(flashbackList);
@@ -442,6 +431,9 @@ public class MainActivity extends AppCompatActivity {
         }
         editor.putString("lastActivity", "normal");
         editor.apply();
+
+        MusicDownloadManager.abortAll();
+
     }
 
     /**
@@ -533,4 +525,5 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

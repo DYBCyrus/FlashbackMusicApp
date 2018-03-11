@@ -69,4 +69,12 @@ public class MusicDownloadManager {
         downloadManager.enqueue(request);
     }
 
+    public static void abortAll() {
+        DownloadManager.Query query = new DownloadManager.Query();
+        query.setFilterByStatus (DownloadManager.STATUS_FAILED|DownloadManager.STATUS_PENDING|DownloadManager.STATUS_RUNNING);
+        Cursor c = downloadManager.query(query);
+        while(c.moveToNext()) {
+            downloadManager.remove(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)));
+        }
+    }
 }
