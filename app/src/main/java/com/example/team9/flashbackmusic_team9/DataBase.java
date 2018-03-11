@@ -3,6 +3,7 @@ package com.example.team9.flashbackmusic_team9;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
+import android.widget.ArrayAdapter;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -14,6 +15,8 @@ import java.util.HashMap;
  */
 
 public class DataBase {
+    private static TrackListAdapter mainTrackListView;
+
     private static ArrayList<Track> allTracks = new ArrayList<>();
     private static ArrayList<Album> allAlbums = new ArrayList<>();
 
@@ -41,6 +44,9 @@ public class DataBase {
         allAlbums = albums;
     }
 
+    public static void setMainTrackListView(TrackListAdapter trackListView) {
+        mainTrackListView = trackListView;
+    }
     public static void addLocalTrack(String path) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 
@@ -62,6 +68,7 @@ public class DataBase {
         for (Album each : allAlbums) {
             if (each.getName().equals(albumName)) {
                 al = each;
+                break;
             }
         }
         if ( al == null) {
@@ -73,7 +80,7 @@ public class DataBase {
         allTracks.add(newTrack);
         System.out.println(allAlbums.size());
         System.out.println(allAlbums);
-
+        mainTrackListView.notifyDataSetChanged();
     }
     public static void loadFile(MainActivity main)
     {

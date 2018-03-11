@@ -25,6 +25,14 @@
         {
           "client_id": "78013321666-9j6ancu1s1tr08tjqfe1kb9rtl0qeqhi.apps.googleusercontent.com",
           "client_type": 3
+        },
+        {
+          "client_id": "78013321666-91tnt713apobv9oc8a0vn6mjf2mk81dn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.team9.flashbackmusic_team9",
+            "certificate_hash": "7234a7566668530298125b78f853959dd9b39185"
+          }
         }
       ],
       "api_key": [
