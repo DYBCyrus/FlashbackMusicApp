@@ -51,10 +51,6 @@
             android:name=".ViewPlaylistActivity"
             android:label="@string/title_activity_view_playlist"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".VibeModePreparationActivity"
-            android:label="@string/title_activity_vibe_mode_preparation"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
