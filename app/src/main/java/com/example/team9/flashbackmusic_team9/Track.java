@@ -17,7 +17,6 @@ public class Track implements Comparable<Track>, ITrack
 
     private String name;
     private String URL;
-    private String userName;
     private String artist;
     private String path;
     private Album album;
@@ -73,14 +72,8 @@ public class Track implements Comparable<Track>, ITrack
         return URL;
     }
 
-    public void setUserName(String name){
-        this.userName = name;
-//        mockTrack.setUser(name);
-    }
 
-    public String getUserName(){
-        return userName;
-    }
+
 
     public FavoriteStatus getStatus() {return status;}
 

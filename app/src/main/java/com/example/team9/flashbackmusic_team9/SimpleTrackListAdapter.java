@@ -1,6 +1,7 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -15,8 +16,8 @@ import java.util.ArrayList;
  * Created by cyrusdeng on 17/02/2018.
  */
 
-public class SimpleTrackListAdapter extends ArrayAdapter<Track> {
-    public SimpleTrackListAdapter(Context context, int resourceId, ArrayList<Track> tracks) {
+public class SimpleTrackListAdapter extends ArrayAdapter< ITrack> {
+    public SimpleTrackListAdapter(Context context, int resourceId, ArrayList<ITrack> tracks) {
         super(context, resourceId, tracks);
     }
     @Override
@@ -25,8 +26,12 @@ public class SimpleTrackListAdapter extends ArrayAdapter<Track> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.track_item, parent, false);
         }
 
-        Track track = getItem(position);
+        ITrack track = getItem(position);
+        System.out.println(track.getName());
         ((TextView)convertView.findViewById(R.id.track_names)).setText(track.getName());
+        if (!track.hasDownloaded()) {
+            ((TextView)convertView.findViewById(R.id.track_names)).setTextColor(Color.GRAY);
+        }
         return convertView;
     }
 }
