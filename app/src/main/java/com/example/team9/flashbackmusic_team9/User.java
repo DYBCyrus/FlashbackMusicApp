@@ -37,6 +37,9 @@ public class User {
         this.email = email;
     }
 
+    public boolean isFriend(String email) {
+        return friends.containsKey(email);
+    }
     public String getEmail() {
         return email;
     }

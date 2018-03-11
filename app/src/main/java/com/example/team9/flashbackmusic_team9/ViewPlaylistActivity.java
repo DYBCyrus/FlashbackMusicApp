@@ -23,9 +23,9 @@ public class ViewPlaylistActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ArrayList<Track> trackList = new ArrayList<>();
-        for (Track each:Player.getPlayList().getPlayingTracks()) {
-            if(each.getStatus()!= Track.FavoriteStatus.DISLIKE) {
+        ArrayList<ITrack> trackList = new ArrayList<>();
+        for ( ITrack each:Player.getPlayList().getPlayingTracks()) {
+            if(each.isPlayable() || !each.hasDownloaded()) {
                 trackList.add(each);
             }
         }

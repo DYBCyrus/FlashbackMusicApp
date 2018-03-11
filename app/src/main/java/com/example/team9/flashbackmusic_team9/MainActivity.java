@@ -79,13 +79,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     //Dropdown menu and its options
     private Spinner spinner;
-    private static final String[]paths = {"title","album","artist","favorite status"}
+    private static final String[]paths = {"title","album","artist","favorite status"};
 
     private LocationManager locationManager;
     private static Location mLocation;
     private SharedPreferences prefs;
     private FusedLocationProviderClient mFusedLocationClient;
     private static User currentUser;
+    private ArrayList<MockTrack> vibemodeTrack;
 
     // Google Sign In and People API
     private String authCode;
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             if (location != null) {
                                 // Logic to handle location object
                                 mLocation = location;
-                                launchModeActivity();
+                                tryVibeMode();
                             }
                         }
                     });
@@ -172,18 +173,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ArrayList<Track> allTracks = DataBase.getAllTracks();
         if (currentTasks.size() == allTracks.size()) {
             for (int i = 0; i < allTracks.size(); i++) {
-                MockTrack current = currentTasks.get(i);
-                allTracks.get(i).setStatus(current.getStatus());
-                if (current.getYear() != -1) {
-                    allTracks.get(i).setDate(LocalDateTime.of(current.getYear(), current.getMonth(),
-                            current.getDay(), current.getHour(), current.getMinute(),
-                            current.getSecond()));
-                }
-                if (current.getLongitude() != 9999) {
-                    allTracks.get(i).setLocation(current.getLongitude(), current.getLatitude());
-                    LOGGER.info(current.getLongitude()+", "+ current.getLatitude());
-
-                }
+                allTracks.get(i).setDataFromMockTrack(currentTasks.get(i));
             }
         }
 
@@ -224,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         modeChange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                launchModeActivity();
+                tryVibeMode();
             }
         });
         Button newDownload = (Button) findViewById(R.id.downloadButton);
@@ -242,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 launchSignInActivity();
             }
         });
+
     }
 
     @Override
@@ -298,6 +289,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
+
     /**
      * Switch to playing view when starting to play a track
      */
@@ -317,68 +313,76 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     /**
      * Switch to flashback mode view
      */
-    public void launchModeActivity() {
-        ArrayList<Track> list = new ArrayList<>();
-//        for (Track each:DataBase.getAllTracks()) {
-//            if (each.hasPlayHistory()) {
-//                list.add(each);
-//            }
-//        }
-//        Collections.sort(list);
-//        FirebaseDatabase database = FirebaseDatabase.getInstance();
-//        final DatabaseReference myRef = database.getReference();
-//
-//        myRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                Query query = myRef.orderByKey();
-//                query.addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-//                            System.out.println(dataSnapshot1.getKey());
-//                            for (DataSnapshot data : dataSnapshot1.getChildren()) {
-//                                System.out.println(data.getValue());
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//
-//                    }
-//                });
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-        Firebase.pullDown();
 
-        PlayList flashbackList = new PlayList(list, true);
-        if (flashbackList.hasNext()) {
-            Intent intent = new Intent(this, FlashBackActivity.class);
-            Player.playPlayList(flashbackList);
-            startActivity(intent);
+    public void tryVibeMode() {
+        Firebase.pullDown(this);
+    }
+
+    public void processDownload(ArrayList<MockTrack> toDownload) {
+
+        vibemodeTrack = toDownload;
+        System.out.println("aaaaaaaaa");
+        if (toDownload.isEmpty()) {
+            Toast toast = Toast.makeText(this, "No Vibe Mode Tracks Available", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        boolean processToVibeMode = false;
+        for (MockTrack each : toDownload) {
+            if (DataBase.contain(each)) {
+                if (each.isPlayable()){
+                    processToVibeMode = true;
+                }
+            }
+        }
+        if (processToVibeMode) {
+            MusicDownloadManager.downloadAll(toDownload, true);
+            launchModeActivity();
         }
         else {
-            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-            builder1.setMessage("No track available for flashback");
-            builder1.setCancelable(true);
-
-            builder1.setPositiveButton(
-                    "Got it",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-
-            AlertDialog alert11 = builder1.create();
-            alert11.show();
+            if (MusicDownloadManager.downloadAll(toDownload, false)){
+                Toast toast = Toast.makeText(this, "Please Wait Until the First Download is Complete", Toast.LENGTH_LONG);
+                toast.show();
+            }
         }
+    }
+    public void launchModeActivity() {
+
+
+        PlayList vibemodeList = new PlayList(vibemodeTrack, true);
+        if (vibemodeList.hasNext()) {
+            Intent intent = new Intent(this, FlashBackActivity.class);
+            System.out.println("ddddddddd");
+
+            Player.playPlayList(vibemodeList);
+            startActivity(intent);
+        }
+
+//        ArrayList<Track> list = new ArrayList<>();
+//
+//
+//
+//        PlayList flashbackList = new PlayList(list, true);
+//        if (flashbackList.hasNext()) {
+//            Intent intent = new Intent(this, FlashBackActivity.class);
+//            Player.playPlayList(flashbackList);
+//            startActivity(intent);
+//        }
+//        else {
+//            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+//            builder1.setMessage("No track available for flashback");
+//            builder1.setCancelable(true);
+//
+//            builder1.setPositiveButton(
+//                    "Got it",
+//                    new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//                            dialog.cancel();
+//                        }
+//                    });
+//
+//            AlertDialog alert11 = builder1.create();
+//            alert11.show();
+//        }
     }
 
     //  /storage/emulated/0/Download/wtf
@@ -427,10 +431,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Player.setCurrentTrackLocation(mLocation);
                 Player.setCurrentTrackTime(TrackTime.now());
 
-                Track currentTrack = Player.getCurrentTrack();
-                String titleAndAuthor = Player.getCurrentTrack().getName() + "@" +
-                        Player.getCurrentTrack().getArtist();
-                Firebase.upload(titleAndAuthor, currentTrack);
+                MockTrack currentTrack = new MockTrack(Player.getCurrentTrack(), currentUser);
+                Firebase.upload(currentTrack);
 //                DatabaseReference rf = myRef.child(titleAndAuthor);
 //                rf.setValue(currentTrack.getMockTrack());
                 if (!Player.playNext()) {
@@ -518,6 +520,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         editor.putString("lastActivity", "normal");
         editor.apply();
+
+        MusicDownloadManager.abortAll();
+
     }
 
     /**
@@ -609,4 +614,5 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         return super.onOptionsItemSelected(item);
     }
+
 }

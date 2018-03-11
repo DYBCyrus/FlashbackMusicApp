@@ -47,7 +47,7 @@ public class DataBase {
     public static void setMainTrackListView(TrackListAdapter trackListView) {
         mainTrackListView = trackListView;
     }
-    public static void addLocalTrack(String path) {
+    public static Track addDownloadedTrack(String path, String URL) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 
         System.out.println(path);
@@ -76,11 +76,13 @@ public class DataBase {
             allAlbums.add(al);
         }
         Track newTrack = new Track(trackName, artistName, al, path);
+        newTrack.setURL(URL);
         al.addTrack(newTrack);
         allTracks.add(newTrack);
         System.out.println(allAlbums.size());
         System.out.println(allAlbums);
         mainTrackListView.notifyDataSetChanged();
+        return newTrack;
     }
     public static void loadFile(MainActivity main)
     {
@@ -121,5 +123,16 @@ public class DataBase {
             allTracks.add(newTrack);
         }
 
+    }
+
+    public static boolean contain(MockTrack m) {
+        for (Track each : allTracks) {
+            if (m.getURL().equals(each.getUrl())) {
+                System.out.println(each.getUrl());
+                m.setTrack(each);
+                return true;
+            }
+        }
+        return false;
     }
 }

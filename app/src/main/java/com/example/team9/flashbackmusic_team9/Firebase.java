@@ -1,6 +1,7 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.Context;
+import android.location.Location;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -10,6 +11,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Created by cyrusdeng on 10/03/2018.
@@ -29,37 +35,45 @@ public class Firebase {
         myRef = database.getReferenceFromUrl("https://cse-110-team-project-team-9.firebaseio.com/");
     }
 
-    public static void upload(String titleAndAuthor, Track currentTrack) {
-        DatabaseReference rf = myRef.child(titleAndAuthor);
-        rf.setValue(currentTrack.getMockTrack());
+    public static void upload(MockTrack currentTrack) {
+
+        myRef.child(currentTrack.getURL().replace("/", "").replace(".", "")).setValue(currentTrack);
     }
 
-    public static void pullDown() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference myRef = database.getReference();
-
-        myRef.addValueEventListener(new ValueEventListener() {
+    public static void pullDown(final MainActivity activity) {
+        Query query = myRef.orderByKey();
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Query query = myRef.orderByKey();
-                query.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                            System.out.println(dataSnapshot1.getKey());
-                            for (DataSnapshot data : dataSnapshot1.getChildren()) {
-                                System.out.println(data.getValue());
-                            }
-                        }
-                    }
+                ArrayList<MockTrack> toDownload = new ArrayList<>();
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                for (DataSnapshot trackData : dataSnapshot.getChildren()) {
+                    System.out.println(trackData.getKey());
+                    Location loc = new Location("");
+                    loc.setLatitude((double)trackData.child("latitude").getValue());
+                    loc.setLatitude((double)trackData.child("longitude").getValue());
 
-                    }
-                });
+                    LocalDateTime time = LocalDateTime.of(
+                            ((Long)trackData.child("year").getValue()).intValue(),
+                            ((Long)trackData.child("month").getValue()).intValue(),
+                            ((Long)trackData.child("day").getValue()).intValue(),
+                            ((Long)trackData.child("hour").getValue()).intValue(),
+                            ((Long)trackData.child("minute").getValue()).intValue(),
+                            ((Long)trackData.child("second").getValue()).intValue()
+                    );
+                    User user = new User((String)trackData.child("user").child("email").getValue(),
+                            (String)trackData.child("user").child("name").getValue());
+                    String url = (String)trackData.child("url").getValue();
+                    MockTrack newTrack = new MockTrack(loc, time, user, url);
+                    toDownload.add(newTrack);
+                }
+                Collections.sort(toDownload);
+                for (MockTrack each : toDownload) {
+                    System.out.println(each.getURL());
+                }
+                activity.processDownload(toDownload);
+
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 

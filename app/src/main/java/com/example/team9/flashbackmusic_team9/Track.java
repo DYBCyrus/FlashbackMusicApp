@@ -11,13 +11,12 @@ import java.util.Stack;
  * Created by Chutong Yang on 2/5/2018.
  */
 
-public class Track implements Comparable<Track>
+public class Track implements Comparable<Track>, ITrack
 {
-    private MockTrack mockTrack;
+//    private MockTrack mockTrack;
 
     private String name;
     private String URL;
-    private String userName;
     private String artist;
     private String path;
     private Album album;
@@ -38,38 +37,57 @@ public class Track implements Comparable<Track>
         this.path = path;
         this.artist = artist;
         this.status = FavoriteStatus.NEUTRAL;
-        mockTrack = new MockTrack(getStatus());
+//        mockTrack = new MockTrack(getStatus());
     }
-    public MockTrack getMockTrack() {return mockTrack;}
+    public MockTrack getMockTrack() {
+//        return mockTrack;
+        return new MockTrack(this);
+    }
+    public void setDataFromMockTrack(MockTrack m) {
+        setStatus(m.getStatus());
+        if (m.getYear() != -1) {
+            setDate(LocalDateTime.of(m.getYear(), m.getMonth(),
+                    m.getDay(), m.getHour(), m.getMinute(),
+                    m.getSecond()));
+        }
+        if (m.getLongitude() != 9999) {
+            setLocation(m.getLongitude(), m.getLatitude());
+//            LOGGER.info(current.getLongitude()+", "+ current.getLatitude());
+        }
+    }
 
     public void setStatus(FavoriteStatus status) {
         this.status = status;
-        mockTrack.setStatus(status);
+//        mockTrack.setStatus(status);
         updateListeningFavoriteStatusButton();
         Updateables.updateAll();
     }
 
     public void setURL(String url){
         this.URL = url;
-        mockTrack.setURL(url);
+//        mockTrack.setURL(url);
     }
 
     public String getUrl(){
         return URL;
     }
 
-    public void setUserName(String name){
-        this.userName = name;
-        mockTrack.setUser(name);
-    }
 
-    public String getUserName(){
-        return userName;
-    }
+
 
     public FavoriteStatus getStatus() {return status;}
 
     public boolean isPlayable() {return status != FavoriteStatus.DISLIKE;}
+
+    @Override
+    public boolean hasDownloaded() {
+        return true;
+    }
+
+    @Override
+    public Track getTrack() {
+        return this;
+    }
 
     public String getName()
     {
@@ -111,7 +129,7 @@ public class Track implements Comparable<Track>
     public void setDate(LocalDateTime d)
     {
         date = d;
-        mockTrack.setDate(d);
+//        mockTrack.setDate(d);
     }
 
     public Location getLocation() {
@@ -120,14 +138,14 @@ public class Track implements Comparable<Track>
 
     public void setLocation(Location loc) {
         location = loc;
-        mockTrack.setLocation(loc);
+//        mockTrack.setLocation(loc);
     }
 
     public void setLocation(double longitude, double latitude) {
         location = new Location("");
         location.setLongitude(longitude);
         location.setLatitude(latitude);
-        mockTrack.setLocation(location);
+//        mockTrack.setLocation(location);
     }
 
     public void addListeningFavoriteStatusButton(FavoriteStatusButton button) {

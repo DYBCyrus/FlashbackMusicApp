@@ -50,7 +50,7 @@
         <activity
             android:name=".ViewPlaylistActivity"
             android:label="@string/title_activity_view_playlist"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
