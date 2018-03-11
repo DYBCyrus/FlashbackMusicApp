@@ -11,5 +11,8 @@ public interface ILocation
     double getLatitude();
     double getLongitude();
 
+    void setLatitude( double latitude );
+    void setLongitude( double longitude );
+
     float distanceTo(ILocation location);
 }

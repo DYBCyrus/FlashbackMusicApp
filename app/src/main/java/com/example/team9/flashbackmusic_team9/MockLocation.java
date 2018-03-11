@@ -19,14 +19,17 @@ public class MockLocation implements ILocation
     {
         return longitude;
     }
+
     public void setLatitude(double lat)
     {
         latitude = lat;
     }
+
     public void setLongitude(double lon)
     {
         longitude = lon;
     }
+
     public float distanceTo(ILocation loc)
     {
         Location location1 = new Location("");

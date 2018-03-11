@@ -22,7 +22,7 @@ public class Track implements Comparable<Track>
     private String path;
     private Album album;
     private LocalDateTime date;
-    private Location location;
+    private ILocation location;
     private FavoriteStatus status;
     private Stack<FavoriteStatusButton> fsButtons = new Stack<>();
     private int mockHour = -1;
@@ -114,17 +114,17 @@ public class Track implements Comparable<Track>
         mockTrack.setDate(d);
     }
 
-    public Location getLocation() {
+    public ILocation getLocation() {
         return location;
     }
 
-    public void setLocation(Location loc) {
+    public void setLocation(ILocation loc) {
         location = loc;
         mockTrack.setLocation(loc);
     }
 
     public void setLocation(double longitude, double latitude) {
-        location = new Location("");
+        location = new LocationAdapter(new Location(""));
         location.setLongitude(longitude);
         location.setLatitude(latitude);
         mockTrack.setLocation(location);
@@ -156,11 +156,11 @@ public class Track implements Comparable<Track>
         int trackScore = 0;
 
         if (this.getLocation() != null &&
-                this.getLocation().distanceTo(MainActivity.getmLocation()) < 305) {
+                this.getLocation().distanceTo(new LocationAdapter(MainActivity.getmLocation())) < 305) {
             thisScore++;
         }
         if (track.getLocation() != null &&
-                track.getLocation().distanceTo(MainActivity.getmLocation()) < 305) {
+                track.getLocation().distanceTo(new LocationAdapter(MainActivity.getmLocation())) < 305) {
             trackScore++;
         }
 

@@ -9,6 +9,7 @@ import android.location.Location;
 public class LocationAdapter implements ILocation
 {
     Location location;
+
     public LocationAdapter(Location loc)
     {
         location = loc;
@@ -20,6 +21,17 @@ public class LocationAdapter implements ILocation
     public double getLongitude()
     {
         return location.getLongitude();
+    }
+
+    @Override
+    public void setLatitude(double latitude) {
+        location.setLatitude(latitude);
+    }
+
+    @Override
+    public void setLongitude(double longitude)
+    {
+        location.setLongitude(longitude);
     }
 
     @Override

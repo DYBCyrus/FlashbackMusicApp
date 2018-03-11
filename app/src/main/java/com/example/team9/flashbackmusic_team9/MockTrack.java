@@ -22,7 +22,7 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
     private double latitude;
     private Track.FavoriteStatus status;
 
-    private Location location;
+    private ILocation location;
     private LocalDateTime dateTime;
 
     private String user;
@@ -62,7 +62,7 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
     public double getLatitude() {
         return latitude;
     }
-    public Location getLocation() {return location;}
+    public ILocation getLocation() {return location;}
     public LocalDateTime getDateTime() {return dateTime;}
 
     public Track.FavoriteStatus getStatus() {return status;}
@@ -76,7 +76,7 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
         this.second = date.getSecond();
         this.dateTime = date;
     }
-    public void setLocation(Location location) {
+    public void setLocation(ILocation location) {
         this.longitude = location.getLongitude();
         this.latitude = location.getLatitude();
         this.location = location;
@@ -91,21 +91,21 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
         int trackTieScore = 0;
 
         // location compare
-        if (this.getLocation().distanceTo(MainActivity.getmLocation()) < 305) {
+        if (this.getLocation().distanceTo(new LocationAdapter(MainActivity.getmLocation())) < 305) {
             thisScore++;
             thisTieScore += 3;
         }
-        if (MockTrack.getLocation().distanceTo(MainActivity.getmLocation()) < 305) {
+        if (MockTrack.getLocation().distanceTo(new LocationAdapter(MainActivity.getmLocation())) < 305) {
             trackScore++;
             trackTieScore += 3;
         }
 
         // time compare
-        if (this.getDateTime().isAfter(LocalDateTime.now().minusWeeks(1))) {
+        if (this.getDateTime().isAfter(MockTrackTime.now().minusWeeks(1))) {
             thisScore++;
             thisTieScore += 2;
         }
-        if (MockTrack.getDateTime().isAfter(LocalDateTime.now().minusWeeks(1))) {
+        if (MockTrack.getDateTime().isAfter(MockTrackTime.now().minusWeeks(1))) {
             trackScore++;
             trackTieScore += 2;
         }

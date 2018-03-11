@@ -1,6 +1,7 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.os.Bundle;
@@ -155,7 +156,10 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         Intent intent = new Intent(this, FetchAddressIntentService.class);
         intent.putExtra("receiver", mResultReceiver);
         if (Player.getCurrentTrack().getLocation() != null) {
-            intent.putExtra("location", Player.getCurrentTrack().getLocation());
+            Location loc = new Location("");
+            loc.setLongitude(Player.getCurrentTrack().getLocation().getLongitude());
+            loc.setLatitude(Player.getCurrentTrack().getLocation().getLatitude());
+            intent.putExtra("location", loc);
             startService(intent);
         }
     }

@@ -89,7 +89,7 @@ public class Player {
     public static void setPlayer(MediaPlayer playerToSet) {
         player = playerToSet;
     }
-    public static void setCurrentTrackLocation(Location loc) {
+    public static void setCurrentTrackLocation(ILocation loc) {
         currentTrack.setLocation(loc);
     }
     public static void setCurrentTrackTime(LocalDateTime dateTime) {currentTrack.setDate(dateTime);}

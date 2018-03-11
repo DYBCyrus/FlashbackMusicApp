@@ -9,7 +9,7 @@ import java.time.temporal.ChronoUnit;
  * Created by cyrusdeng on 13/02/2018.
  */
 
-public class TrackTime {
+public class MockTrackTime implements ILocalDateTime{
 
     private static Clock clock = Clock.systemDefaultZone();
     private static ZoneId zoneId = ZoneId.of("UTC-08:00");
@@ -28,5 +28,35 @@ public class TrackTime {
 
     private static Clock getClock() {
         return clock ;
+    }
+
+    public int getYear()
+    {
+        return this.now().getYear();
+    }
+    public int getMonthValue()
+    {
+        return this.now().getMonthValue();
+    }
+    public int getDayOfMonth()
+    {
+        return this.now().getDayOfMonth();
+    }
+    public int getHour()
+    {
+        return this.now().getHour();
+    }
+    public int getMinute()
+    {
+        return this.now().getMinute();
+    }
+    public int getSecond()
+    {
+        return this.now().getSecond();
+    }
+
+    public boolean isAfter(LocalDateTime time)
+    {
+        return true;
     }
 }

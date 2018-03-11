@@ -4,8 +4,11 @@ import android.location.Location;
 import android.support.test.rule.ActivityTestRule;
 
 import com.example.team9.flashbackmusic_team9.Album;
+import com.example.team9.flashbackmusic_team9.LocationAdapter;
 import com.example.team9.flashbackmusic_team9.MainActivity;
+import com.example.team9.flashbackmusic_team9.MockLocation;
 import com.example.team9.flashbackmusic_team9.MockTrack;
+import com.example.team9.flashbackmusic_team9.MockTrackTime;
 import com.example.team9.flashbackmusic_team9.Track;
 
 import org.junit.Assert;
@@ -36,19 +39,26 @@ public class JUnitTestMockTrack
     @Test
     public void testCompareTo()
     {
+        LocalDateTime dateTime = LocalDateTime.of(2018, 3, 3,12, 5);
+        MockTrackTime.useFixedClockAt(dateTime);
+
         // same time, different location, same day, same like
-        Location location = new Location("");
-        LocalDateTime dateTime = LocalDateTime.of(2018, 3, 3,10, 5);
+        MockLocation location = new MockLocation();
+        dateTime = LocalDateTime.of(2018, 3, 3,10, 5);
         location.setLatitude(116.4074);
         location.setLongitude(39.9042);
-        MainActivity.setmLocation(location);
+
+        Location loc = new Location("");
+        loc.setLatitude(116.4074);
+        loc.setLongitude(39.9042);
+        MainActivity.setmLocation(loc);
 
 
         track1.setLocation(location);
         track1.setDate(dateTime);
 
 
-        Location location1 = new Location("");
+        MockLocation location1 = new MockLocation();
         location1.setLatitude(97.4074);
         location1.setLongitude(37.9042);
         track2.setLocation(location1);
@@ -59,10 +69,9 @@ public class JUnitTestMockTrack
 
         // different time, same location, same day, same like
 
-        LocalDateTime dateTime2 = LocalDateTime.of(2018, 3, 3,3, 5);
-        location.setLatitude(116.4074);
+        LocalDateTime dateTime2 = LocalDateTime.of(2018, 3, 1,3, 5);
+        location.setLatitude(113.4074);
         location.setLongitude(39.9042);
-        MainActivity.setmLocation(location);
 
         track1.setLocation(location);
         track1.setDate(dateTime2);
@@ -76,25 +85,19 @@ public class JUnitTestMockTrack
 
 
         // same time, same location, different day in same range, same like
-        dateTime2 = LocalDateTime.of(2018, 3, 5,3, 5);
-        location.setLatitude(116.4074);
-        location.setLongitude(39.9042);
-        MainActivity.setmLocation(location);
+        dateTime2 = LocalDateTime.of(2018, 2, 27,3, 5);
 
         track1.setLocation(location);
         track1.setDate(dateTime2);
 
-        dateTime3 = LocalDateTime.of(2018, 3, 3,3, 5);
+        dateTime3 = LocalDateTime.of(2018, 2, 28,3, 5);
 
         track2.setLocation(location);
         track2.setDate(dateTime3);
 
-         Assert.assertTrue(track1.compareTo(track2) < 0);
+         Assert.assertTrue(track1.compareTo(track2) > 0);
 
         // same time, same location, same day, different like
-        location.setLatitude(116.4074);
-        location.setLongitude(39.9042);
-        MainActivity.setmLocation(location);
 
         track1.setLocation(location);
         track1.setDate(dateTime);
@@ -111,7 +114,6 @@ public class JUnitTestMockTrack
         // score same status same
         dateTime2 = LocalDateTime.of(2018, 3, 3,6, 5);
         dateTime3 = LocalDateTime.of(2018, 3, 3,7, 5);
-        MainActivity.setmLocation(location);
 
 
         track1.setLocation(location);
