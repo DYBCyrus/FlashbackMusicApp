@@ -83,12 +83,10 @@ public class MainActivity extends AppCompatActivity {
     // Google Sign In and People API
     private String authCode;
     private GoogleSignInClient aGoogleSignInClient;
-    private HttpTransport httpTransport;
-    private JacksonFactory jsonFactory;
-    private String clientId;
-    private String authorizationUrl;
-    private String clientSecret;
-    private String redirectUrl;
+    private HttpTransport httpTransport = new NetHttpTransport();
+    private JacksonFactory jsonFactory = new JacksonFactory();
+    private String clientId = "78013321666-9j6ancu1s1tr08tjqfe1kb9rtl0qeqhi.apps.googleusercontent.com";
+    private String clientSecret = "omDZYzPwK1TVBQKcl-CA6VD_";
     private Scope aScope = new Scope("https://www.googleapis.com/auth/contacts.readonly");
 
     @SuppressLint("MissingPermission")
@@ -185,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
                 (ImageButton)findViewById(R.id.next_button), this);
         ListAdapter tracksAdapter = new TrackListAdapter(this,
                 R.layout.list_item, DataBase.getAllTracks());
+        DataBase.setMainTrackListView((TrackListAdapter)tracksAdapter);
         ListView trackView = (ListView) findViewById(R.id.track_list);
         trackView.setAdapter(tracksAdapter);
         trackView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -225,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                signIn();
+                launchSignInActivity();
             }
         });
     }
@@ -237,29 +236,26 @@ public class MainActivity extends AppCompatActivity {
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == 2) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
             try {
-                setUp();
-            } catch (IOException e) {
-                e.printStackTrace();
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                if(!GoogleSignIn.hasPermissions(account, aScope)) {
+                    System.out.println("not permitted");
+                    GoogleSignIn.requestPermissions(this, requestCode, account, aScope);
+                }
+
+                authCode = account.getServerAuthCode();
+                currentUser = new User(account.getEmail(), account.getDisplayName());
+                // Signed in successfully, show authenticated UI.
+                new GetFriendsTaskRunner().execute();
+            } catch (ApiException e) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                Log.w("error!!!!!!!", "signInResult:failed code=" + e.getStatusCode());
             }
         }
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            authCode = account.getServerAuthCode();
-            currentUser = new User(account.getEmail(), account.getDisplayName());
-            // Signed in successfully, show authenticated UI.
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w("error!!!!!!!", "signInResult:failed code=" + e.getStatusCode());
-        }
-    }
-
-    private void signIn() {
+    private void launchSignInActivity() {
         Intent signInIntent = aGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, 2);
     }
@@ -502,40 +498,13 @@ public class MainActivity extends AppCompatActivity {
      * https://developers.google.com/identity/sign-in/android/start-integrating
      * @throws IOException
      */
-    public void setUp() throws IOException {
-        this.httpTransport = new NetHttpTransport();
-        this.jsonFactory = new JacksonFactory();
 
-        // Go to the Google API Console, open your application's
-        // credentials page, and copy the client ID and client secret.
-        // Then paste them into the following code.
-        this.clientId = "78013321666-9j6ancu1s1tr08tjqfe1kb9rtl0qeqhi.apps.googleusercontent.com";
-        this.clientSecret = "omDZYzPwK1TVBQKcl-CA6VD_";
-
-        // Or your redirect URL for web based applications.
-        this.redirectUrl = "urn:ietf:wg:oauth:2.0:oob";
-        String scope = "https://www.googleapis.com/auth/contacts.readonly";
-
-        // Step 1: Authorize -->
-        this.authorizationUrl =
-                new GoogleBrowserClientRequestUrl(clientId, redirectUrl, Arrays.asList(scope)).build();
-
-        // Point or redirect your user to the authorizationUrl.
-        System.out.println("Go to the following link in your browser:");
-        System.out.println(authorizationUrl);
-
-        // Read the authorization code from the standard input stream.
-        System.out.println("What is the authorization code?");
-        // End of Step 1 <--
-        AsyncTaskRunner runner = new AsyncTaskRunner();
-        runner.execute();
-    }
 
     /**
      * AsyncTask for getting google contact list
      * People API: https://developers.google.com/people/v1/read-people
      */
-    private class AsyncTaskRunner extends AsyncTask<String, String, String> {
+    private class GetFriendsTaskRunner extends AsyncTask<String, String, String> {
 
         @Override
         protected void onPostExecute(String result) {
@@ -560,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPersonFields("names,emailAddresses")
                         .execute();
                 List<Person> connections = response.getConnections();
-
+                System.out.println(connections.size());
                 for (Person person : connections) {
                         currentUser.addFriend(person.getEmailAddresses().get(0).getValue(),
                                 person.getNames().get(0).getDisplayName());
