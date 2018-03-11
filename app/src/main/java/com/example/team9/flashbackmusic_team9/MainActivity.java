@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 (ImageButton)findViewById(R.id.next_button), this);
         ListAdapter tracksAdapter = new TrackListAdapter(this,
                 R.layout.list_item, DataBase.getAllTracks());
+        DataBase.setMainTrackListView((TrackListAdapter)tracksAdapter);
         ListView trackView = (ListView) findViewById(R.id.track_list);
         trackView.setAdapter(tracksAdapter);
         trackView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
