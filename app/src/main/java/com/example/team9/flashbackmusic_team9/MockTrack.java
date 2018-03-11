@@ -28,6 +28,7 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
     private String user;
     private String URL;
 
+    public MockTrack(){}
     public MockTrack(Track.FavoriteStatus status) {
         this.status = status;
     }
@@ -118,7 +119,14 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
         }
 
         // google+ friends compare
-
+        if (MainActivity.getUser().getFriends().containsKey(this.getUser())) {
+            thisScore++;
+            thisTieScore++;
+        }
+        if (MainActivity.getUser().getFriends().containsKey(MockTrack.getUser())) {
+            trackScore++;
+            trackTieScore++;
+        }
 
         // score compare
         if (thisScore != trackScore) {
