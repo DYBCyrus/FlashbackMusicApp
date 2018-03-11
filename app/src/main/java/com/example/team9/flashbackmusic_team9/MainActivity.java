@@ -23,11 +23,13 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -70,9 +72,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+
+    //Dropdown menu and its options
+    private Spinner spinner;
+    private static final String[]paths = {"title","album","artist","favorite status"}
 
     private LocationManager locationManager;
     private static Location mLocation;
@@ -94,6 +101,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Creates DropDown menu
+        spinner = (Spinner)findViewById(R.id.spinner);
+        ArrayAdapter<String>adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, paths);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -258,6 +273,29 @@ public class MainActivity extends AppCompatActivity {
     private void launchSignInActivity() {
         Intent signInIntent = aGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, 2);
+    }
+
+    //Function that takes care of the dropdown menu functionality
+    public void onItemSelected(AdapterView<?>parent, View v, int position, long id){
+
+        switch(position){
+            case 0:
+                //Implement for title
+                break;
+
+            case 1:
+                //Implement for album
+                break;
+
+            case 2:
+                //Implement for artist
+                break;
+
+            case 3:
+                //Implement for favorite status
+                break;
+
+        }
     }
 
     /**
