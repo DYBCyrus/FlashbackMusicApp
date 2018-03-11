@@ -28,6 +28,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -49,17 +50,23 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.ListConnectionsResponse;
+import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -71,11 +78,7 @@ public class MainActivity extends AppCompatActivity {
     private static Location mLocation;
     private SharedPreferences prefs;
     private FusedLocationProviderClient mFusedLocationClient;
-    private User currentUser;
-
-    // firebase
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
+    private static User currentUser;
 
     // Google Sign In and People API
     private String authCode;
@@ -96,13 +99,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // firebase configuration
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setApplicationId("1:78013321666:android:3709eeeca5bbd4b0")
-                .setDatabaseUrl("https://cse-110-team-project-team-9.firebaseio.com/")
-                .build();
-        database = FirebaseDatabase.getInstance(FirebaseApp.initializeApp(this, options, "secondary"));
-        myRef = database.getReferenceFromUrl("https://cse-110-team-project-team-9.firebaseio.com/");
+        Firebase.configFirebase(this);
 
         // Google Sign In configuration
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -253,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             authCode = account.getServerAuthCode();
-            currentUser = new User(account.getEmail());
+            currentUser = new User(account.getEmail(), account.getDisplayName());
             // Signed in successfully, show authenticated UI.
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
@@ -288,12 +285,43 @@ public class MainActivity extends AppCompatActivity {
      */
     public void launchModeActivity() {
         ArrayList<Track> list = new ArrayList<>();
-        for (Track each:DataBase.getAllTracks()) {
-            if (each.hasPlayHistory()) {
-                list.add(each);
-            }
-        }
-        Collections.sort(list);
+//        for (Track each:DataBase.getAllTracks()) {
+//            if (each.hasPlayHistory()) {
+//                list.add(each);
+//            }
+//        }
+//        Collections.sort(list);
+//        FirebaseDatabase database = FirebaseDatabase.getInstance();
+//        final DatabaseReference myRef = database.getReference();
+//
+//        myRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                Query query = myRef.orderByKey();
+//                query.addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+//                            System.out.println(dataSnapshot1.getKey());
+//                            for (DataSnapshot data : dataSnapshot1.getChildren()) {
+//                                System.out.println(data.getValue());
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+        Firebase.pullDown();
 
         PlayList flashbackList = new PlayList(list, true);
         if (flashbackList.hasNext()) {
@@ -368,9 +396,9 @@ public class MainActivity extends AppCompatActivity {
                 Track currentTrack = Player.getCurrentTrack();
                 String titleAndAuthor = Player.getCurrentTrack().getName() + "@" +
                         Player.getCurrentTrack().getArtist();
-                DatabaseReference rf = myRef.child(titleAndAuthor);
-                rf.setValue(currentTrack.getMockTrack());
-
+                Firebase.upload(titleAndAuthor, currentTrack);
+//                DatabaseReference rf = myRef.child(titleAndAuthor);
+//                rf.setValue(currentTrack.getMockTrack());
                 if (!Player.playNext()) {
                     Updateables.updateAll();
                 }
@@ -423,6 +451,18 @@ public class MainActivity extends AppCompatActivity {
      * @return current location
      */
     public static Location getmLocation() {return mLocation;}
+
+    /**
+     * Get current user
+     * @return current user
+     */
+    public static User getUser() {return currentUser;}
+
+    /**
+     * set current user
+     * @param user is the user to be set(used for mock object)
+     */
+    public static void setCurrentUser(User user) {currentUser = user;}
 
     /**
      * Record the mode when exit the app
@@ -517,15 +557,15 @@ public class MainActivity extends AppCompatActivity {
                         new PeopleService.Builder(httpTransport, jsonFactory, credential).build();
 
                 ListConnectionsResponse response = peopleService.people().connections().list("people/me")
-                        .setPersonFields("emailAddresses")
+                        .setPersonFields("names,emailAddresses")
                         .execute();
                 List<Person> connections = response.getConnections();
 
                 for (Person person : connections) {
-                    for (EmailAddress email : person.getEmailAddresses()) {
-                        currentUser.addFriend(email.getValue());
-//                        System.out.println(email.getValue());
-                    }
+                        currentUser.addFriend(person.getEmailAddresses().get(0).getValue(),
+                                person.getNames().get(0).getDisplayName());
+                        System.out.println(person.getEmailAddresses().get(0).getValue());
+                        System.out.println(person.getNames().get(0).getDisplayName());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
