@@ -25,9 +25,18 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
     private Location location;
     private LocalDateTime dateTime;
 
+    private String user;
+    private String URL;
+
+    public MockTrack(){}
     public MockTrack(Track.FavoriteStatus status) {
         this.status = status;
     }
+
+    public void setUser(String user) { this.user = user; }
+    public String getUser() { return user; }
+    public void setURL(String URL) { this.URL = URL; }
+    public String getURL() { return URL; }
 
     public int getYear() {
         return year;
@@ -103,7 +112,14 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
         }
 
         // google+ friends compare
-
+        if (MainActivity.getUser().getFriends().containsKey(this.getUser())) {
+            thisScore++;
+            thisTieScore++;
+        }
+        if (MainActivity.getUser().getFriends().containsKey(MockTrack.getUser())) {
+            trackScore++;
+            trackTieScore++;
+        }
 
         // score compare
         if (thisScore != trackScore) {

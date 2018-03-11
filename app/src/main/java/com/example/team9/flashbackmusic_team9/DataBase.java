@@ -2,7 +2,10 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaMetadataRetriever;
+import android.os.Environment;
+import android.widget.ArrayAdapter;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +15,8 @@ import java.util.HashMap;
  */
 
 public class DataBase {
+    private static TrackListAdapter mainTrackListView;
+
     private static ArrayList<Track> allTracks = new ArrayList<>();
     private static ArrayList<Album> allAlbums = new ArrayList<>();
 
@@ -39,33 +44,82 @@ public class DataBase {
         allAlbums = albums;
     }
 
+    public static void setMainTrackListView(TrackListAdapter trackListView) {
+        mainTrackListView = trackListView;
+    }
+    public static void addLocalTrack(String path) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+
+        System.out.println(path);
+        retriever.setDataSource(path);
+        String albumName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+        String trackName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        String artistName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+        if (albumName == null) {
+            albumName = "Unknown";
+        }
+        if (trackName == null) {
+            trackName = "Unknown";
+        }
+        if (artistName == null) {
+            artistName = "Unknown";
+        }
+        Album al = null;
+        for (Album each : allAlbums) {
+            if (each.getName().equals(albumName)) {
+                al = each;
+                break;
+            }
+        }
+        if ( al == null) {
+            al = new Album(albumName);
+            allAlbums.add(al);
+        }
+        Track newTrack = new Track(trackName, artistName, al, path);
+        al.addTrack(newTrack);
+        allTracks.add(newTrack);
+        System.out.println(allAlbums.size());
+        System.out.println(allAlbums);
+        mainTrackListView.notifyDataSetChanged();
+    }
     public static void loadFile(MainActivity main)
     {
-        Field[] fields = R.raw.class.getFields();
-        try {
-            HashMap<String, Album> map = new HashMap<>();
-            for (Field each : fields) {
-                System.out.println(each.toString());
-                int id = each.getInt(each);
-                AssetFileDescriptor afd = main.getResources().openRawResourceFd(id);
-                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                retriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-                String albumName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-                String trackName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-                String artistName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+        File downloadDir= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File[] musicFiles = new File[]{};
+             if (downloadDir.listFiles() != null) {
+                 musicFiles=downloadDir.listFiles();
+             }
 
-                if (map.get(albumName) == null) {
-                    Album newAlbum = new Album(albumName);
-                    allAlbums.add(newAlbum);
-                    map.put(albumName, newAlbum);
-                }
-                Album al = map.get(albumName);
-                Track newTrack = new Track(trackName, artistName, al, afd);
-                al.addTrack(newTrack);
-                allTracks.add(newTrack);
+
+        HashMap<String, Album> map = new HashMap<>();
+        for (File each : musicFiles) {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            String path = each.getAbsolutePath();
+            System.out.println(path);
+
+            retriever.setDataSource(path);
+            String albumName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+            String trackName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+            String artistName = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            if (albumName == null) {
+                albumName = "Unknown";
             }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            if (trackName == null) {
+                trackName = "Unknown";
+            }
+            if (artistName == null) {
+                artistName = "Unknown";
+            }
+            if (map.get(albumName) == null) {
+                Album newAlbum = new Album(albumName);
+                allAlbums.add(newAlbum);
+                map.put(albumName, newAlbum);
+            }
+            Album al = map.get(albumName);
+            Track newTrack = new Track(trackName, artistName, al, path);
+            al.addTrack(newTrack);
+            allTracks.add(newTrack);
         }
+
     }
 }
