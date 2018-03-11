@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     //Dropdown menu and its options
     private Spinner spinner;
-    private static final String[]paths = {"title","album","artist","favorite status"}
+    private static final String[]paths = {"title","album","artist","favorite status"};
 
     private LocationManager locationManager;
     private static Location mLocation;
@@ -287,6 +287,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
 
         }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 
     /**
