@@ -22,7 +22,7 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
     private double latitude;
     private Track.FavoriteStatus status;
 
-    private Location location;
+    private ILocation location;
     private LocalDateTime dateTime;
 
     private String userEmail;
@@ -54,7 +54,7 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
         setLocation(t.getLocation());
         setDate(t.getDate());
     }
-    public MockTrack(Location loc, LocalDateTime time, User lastUser, String Url) {
+    public MockTrack(ILocation loc, LocalDateTime time, User lastUser, String Url) {
         setLocation(loc);
         setDate(time);
         setUser(lastUser);
@@ -96,7 +96,7 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
     public double getLatitude() {
         return latitude;
     }
-    public Location getLocation() {return location;}
+    public ILocation getLocation() {return location;}
     public LocalDateTime getDateTime() {return dateTime;}
 
     public void setTrack(Track t) {
@@ -126,12 +126,11 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
         }
         this.dateTime = date;
     }
-    public void setLocation(Location location) {
+    public void setLocation(ILocation location) {
         if (location != null) {
             this.longitude = location.getLongitude();
             this.latitude = location.getLatitude();
         }
-        this.location = location;
     }
     public void setStatus(Track.FavoriteStatus status) {this.status = status;}
 
@@ -143,21 +142,21 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
         int trackTieScore = 0;
 
         // location compare
-        if (this.getLocation().distanceTo(MainActivity.getmLocation()) < 305) {
+        if (this.getLocation().distanceTo(new LocationAdapter(MainActivity.getmLocation())) < 305) {
             thisScore++;
             thisTieScore += 3;
         }
-        if (MockTrack.getLocation().distanceTo(MainActivity.getmLocation()) < 305) {
+        if (MockTrack.getLocation().distanceTo(new LocationAdapter(MainActivity.getmLocation())) < 305) {
             trackScore++;
             trackTieScore += 3;
         }
 
         // time compare
-        if (this.getDateTime().isAfter(LocalDateTime.now().minusWeeks(1))) {
+        if (this.getDateTime().isAfter(MockTrackTime.now().minusWeeks(1))) {
             thisScore++;
             thisTieScore += 2;
         }
-        if (MockTrack.getDateTime().isAfter(LocalDateTime.now().minusWeeks(1))) {
+        if (MockTrack.getDateTime().isAfter(MockTrackTime.now().minusWeeks(1))) {
             trackScore++;
             trackTieScore += 2;
         }

@@ -3,6 +3,9 @@ package tests;
 import android.content.res.AssetFileDescriptor;
 import android.location.Location;
 import android.support.test.rule.ActivityTestRule;
+
+import com.example.team9.flashbackmusic_team9.ILocation;
+import com.example.team9.flashbackmusic_team9.LocationAdapter;
 import com.example.team9.flashbackmusic_team9.MainActivity;
 import com.example.team9.flashbackmusic_team9.Track;
 import com.example.team9.flashbackmusic_team9.Album;
@@ -37,7 +40,7 @@ public class JUnitTestTrack {
         afd = null;
         album = new Album("name");
         status = Track.FavoriteStatus.NEUTRAL;
-        track = new Track(name, artist, album,afd);
+        track = new Track(name, artist, album,"");
     }
 
 
@@ -121,12 +124,6 @@ public class JUnitTestTrack {
     }
 
     @Test
-    public void testGetDescriptor(){
-        Assert.assertEquals(afd, track.getDescriptor());
-        Assert.assertNull(afd);
-    }
-
-    @Test
     public void testGetDate(){
         LocalDateTime date = LocalDateTime.MAX;
         LocalDateTime date1 = LocalDateTime.MIN;
@@ -154,8 +151,8 @@ public class JUnitTestTrack {
 
     @Test
     public void testGetLocation(){
-        Location location = new Location("location");
-        Location location1 = new Location("location1");
+        ILocation location = new LocationAdapter(new Location("location"));
+        ILocation location1 = new LocationAdapter(new Location("location1"));
 
         track.setLocation(location);
         Assert.assertEquals(location, track.getLocation());
@@ -169,8 +166,8 @@ public class JUnitTestTrack {
     @Test
     public void testSetLocation(){
 
-        Location location = new Location("location");
-        Location location1 = new Location("location1");
+        ILocation location = new LocationAdapter(new Location("location"));
+        ILocation location1 = new LocationAdapter(new Location("location1"));
 
         track.setLocation(location);
         Assert.assertEquals(location, track.getLocation());
@@ -194,7 +191,7 @@ public class JUnitTestTrack {
 
         Album album1 = new Album("album1");
         Track track1 = new Track("Track1","Tony", album1, null);
-        track1.setLocation(location);
+        track1.setLocation(new LocationAdapter(location));
         track1.setDate(dateTime);
 
         Track track2 = new Track("Track2","Tony", album1, null);
@@ -202,7 +199,7 @@ public class JUnitTestTrack {
         Location location1 = new Location("");
         location1.setLatitude(97.4074);
         location1.setLongitude(37.9042);
-        track2.setLocation(location1);
+        track2.setLocation(new LocationAdapter(location1));
         track2.setDate(dateTime);
 
         track1.setMockHour(10);
@@ -216,12 +213,12 @@ public class JUnitTestTrack {
         location.setLongitude(39.9042);
         MainActivity.setmLocation(location);
 
-        track1.setLocation(location);
+        track1.setLocation(new LocationAdapter(location));
         track1.setDate(dateTime2);
 
         LocalDateTime dateTime3 = LocalDateTime.of(2018, 3, 3,7, 5);
 
-        track2.setLocation(location);
+        track2.setLocation(new LocationAdapter(location));
         track2.setDate(dateTime3);
 
         track1.setMockHour(7);
@@ -234,12 +231,12 @@ public class JUnitTestTrack {
         location.setLongitude(39.9042);
         MainActivity.setmLocation(location);
 
-        track1.setLocation(location);
+        track1.setLocation(new LocationAdapter(location));
         track1.setDate(dateTime2);
 
         dateTime3 = LocalDateTime.of(2018, 3, 3,3, 5);
 
-        track2.setLocation(location);
+        track2.setLocation(new LocationAdapter(location));
         track2.setDate(dateTime3);
 
         track1.setMockHour(7);
@@ -251,11 +248,11 @@ public class JUnitTestTrack {
         location.setLongitude(39.9042);
         MainActivity.setmLocation(location);
 
-        track1.setLocation(location);
+        track1.setLocation(new LocationAdapter(location));
         track1.setDate(dateTime);
         track1.setStatus(Track.FavoriteStatus.NEUTRAL);
 
-        track2.setLocation(location);
+        track2.setLocation(new LocationAdapter(location));
         track2.setDate(dateTime);
         track2.setStatus(Track.FavoriteStatus.LIKE);
 
@@ -270,11 +267,11 @@ public class JUnitTestTrack {
         MainActivity.setmLocation(location);
 
 
-        track1.setLocation(location);
+        track1.setLocation(new LocationAdapter(location));
         track1.setDate(dateTime2);
         track1.setStatus(Track.FavoriteStatus.LIKE);
 
-        track2.setLocation(location);
+        track2.setLocation(new LocationAdapter(location));
         track2.setDate(dateTime3);
         track2.setStatus(Track.FavoriteStatus.LIKE);
 

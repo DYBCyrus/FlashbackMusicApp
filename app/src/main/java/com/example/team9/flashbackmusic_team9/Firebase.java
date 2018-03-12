@@ -49,7 +49,7 @@ public class Firebase {
 
                 for (DataSnapshot trackData : dataSnapshot.getChildren()) {
                     System.out.println(trackData.getKey());
-                    Location loc = new Location("");
+                    ILocation loc = new LocationAdapter(new Location(""));
                     loc.setLatitude((double)trackData.child("latitude").getValue());
                     loc.setLatitude((double)trackData.child("longitude").getValue());
 

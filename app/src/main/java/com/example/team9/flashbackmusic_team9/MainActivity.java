@@ -17,7 +17,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -428,8 +427,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                Player.setCurrentTrackLocation(mLocation);
-                Player.setCurrentTrackTime(TrackTime.now());
+                Player.setCurrentTrackLocation(new LocationAdapter(mLocation));
+                Player.setCurrentTrackTime(MockTrackTime.now());
 
                 MockTrack currentTrack = new MockTrack(Player.getCurrentTrack(), currentUser);
                 Firebase.upload(currentTrack);
