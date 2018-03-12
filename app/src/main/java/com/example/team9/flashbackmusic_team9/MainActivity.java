@@ -22,11 +22,14 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -48,43 +51,49 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.ListConnectionsResponse;
+import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+
+    //Dropdown menu and its options
+    private Spinner spinner;
+    private static final String[]paths = {"title","album","artist","favorite status"};
 
     private LocationManager locationManager;
     private static Location mLocation;
     private SharedPreferences prefs;
     private FusedLocationProviderClient mFusedLocationClient;
-    private User currentUser;
-
-    // firebase
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
+    private static User currentUser;
+    private ArrayList<MockTrack> vibemodeTrack;
 
     // Google Sign In and People API
     private String authCode;
     private GoogleSignInClient aGoogleSignInClient;
-    private HttpTransport httpTransport;
-    private JacksonFactory jsonFactory;
-    private String clientId;
-    private String authorizationUrl;
-    private String clientSecret;
-    private String redirectUrl;
+    private HttpTransport httpTransport = new NetHttpTransport();
+    private JacksonFactory jsonFactory = new JacksonFactory();
+    private String clientId = "78013321666-9j6ancu1s1tr08tjqfe1kb9rtl0qeqhi.apps.googleusercontent.com";
+    private String clientSecret = "omDZYzPwK1TVBQKcl-CA6VD_";
     private Scope aScope = new Scope("https://www.googleapis.com/auth/contacts.readonly");
 
     @SuppressLint("MissingPermission")
@@ -92,16 +101,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Creates DropDown menu
+        spinner = (Spinner)findViewById(R.id.spinner);
+        ArrayAdapter<String>adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, paths);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // firebase configuration
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setApplicationId("1:78013321666:android:3709eeeca5bbd4b0")
-                .setDatabaseUrl("https://cse-110-team-project-team-9.firebaseio.com/")
-                .build();
-        database = FirebaseDatabase.getInstance(FirebaseApp.initializeApp(this, options, "secondary"));
-        myRef = database.getReferenceFromUrl("https://cse-110-team-project-team-9.firebaseio.com/");
+        Firebase.configFirebase(this);
 
         // Google Sign In configuration
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -137,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                             if (location != null) {
                                 // Logic to handle location object
                                 mLocation = location;
-                                launchModeActivity();
+                                tryVibeMode();
                             }
                         }
                     });
@@ -161,18 +172,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Track> allTracks = DataBase.getAllTracks();
         if (currentTasks.size() == allTracks.size()) {
             for (int i = 0; i < allTracks.size(); i++) {
-                MockTrack current = currentTasks.get(i);
-                allTracks.get(i).setStatus(current.getStatus());
-                if (current.getYear() != -1) {
-                    allTracks.get(i).setDate(LocalDateTime.of(current.getYear(), current.getMonth(),
-                            current.getDay(), current.getHour(), current.getMinute(),
-                            current.getSecond()));
-                }
-                if (current.getLongitude() != 9999) {
-                    allTracks.get(i).setLocation(current.getLongitude(), current.getLatitude());
-                    LOGGER.info(current.getLongitude()+", "+ current.getLatitude());
-
-                }
+                allTracks.get(i).setDataFromMockTrack(currentTasks.get(i));
             }
         }
 
@@ -187,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
                 (ImageButton)findViewById(R.id.next_button), this);
         ListAdapter tracksAdapter = new TrackListAdapter(this,
                 R.layout.list_item, DataBase.getAllTracks());
+        DataBase.setMainTrackListView((TrackListAdapter)tracksAdapter);
         ListView trackView = (ListView) findViewById(R.id.track_list);
         trackView.setAdapter(tracksAdapter);
         trackView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -212,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
         modeChange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                launchModeActivity();
+                tryVibeMode();
             }
         });
         Button newDownload = (Button) findViewById(R.id.downloadButton);
@@ -227,9 +228,10 @@ public class MainActivity extends AppCompatActivity {
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                signIn();
+                launchSignInActivity();
             }
         });
+
     }
 
     @Override
@@ -239,31 +241,56 @@ public class MainActivity extends AppCompatActivity {
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == 2) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
             try {
-                setUp();
-            } catch (IOException e) {
-                e.printStackTrace();
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                if(!GoogleSignIn.hasPermissions(account, aScope)) {
+                    System.out.println("not permitted");
+                    GoogleSignIn.requestPermissions(this, requestCode, account, aScope);
+                }
+
+                authCode = account.getServerAuthCode();
+                currentUser = new User(account.getEmail(), account.getDisplayName());
+                // Signed in successfully, show authenticated UI.
+                new GetFriendsTaskRunner().execute();
+            } catch (ApiException e) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                Log.w("error!!!!!!!", "signInResult:failed code=" + e.getStatusCode());
             }
         }
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            authCode = account.getServerAuthCode();
-            currentUser = new User(account.getEmail());
-            // Signed in successfully, show authenticated UI.
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w("error!!!!!!!", "signInResult:failed code=" + e.getStatusCode());
+    private void launchSignInActivity() {
+        Intent signInIntent = aGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, 2);
+    }
+
+    //Function that takes care of the dropdown menu functionality
+    public void onItemSelected(AdapterView<?>parent, View v, int position, long id){
+
+        switch(position){
+            case 0:
+                //Implement for title
+                break;
+
+            case 1:
+                //Implement for album
+                break;
+
+            case 2:
+                //Implement for artist
+                break;
+
+            case 3:
+                //Implement for favorite status
+                break;
+
         }
     }
 
-    private void signIn() {
-        Intent signInIntent = aGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, 2);
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 
     /**
@@ -285,37 +312,76 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Switch to flashback mode view
      */
-    public void launchModeActivity() {
-        ArrayList<Track> list = new ArrayList<>();
-        for (Track each:DataBase.getAllTracks()) {
-            if (each.hasPlayHistory()) {
-                list.add(each);
+
+    public void tryVibeMode() {
+        Firebase.pullDown(this);
+    }
+
+    public void processDownload(ArrayList<MockTrack> toDownload) {
+
+        vibemodeTrack = toDownload;
+        System.out.println("aaaaaaaaa");
+        if (toDownload.isEmpty()) {
+            Toast toast = Toast.makeText(this, "No Vibe Mode Tracks Available", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        boolean processToVibeMode = false;
+        for (MockTrack each : toDownload) {
+            if (DataBase.contain(each)) {
+                if (each.isPlayable()){
+                    processToVibeMode = true;
+                }
             }
         }
-        Collections.sort(list);
-
-        PlayList flashbackList = new PlayList(list, true);
-        if (flashbackList.hasNext()) {
-            Intent intent = new Intent(this, FlashBackActivity.class);
-            Player.playPlayList(flashbackList);
-            startActivity(intent);
+        if (processToVibeMode) {
+            MusicDownloadManager.downloadAll(toDownload, true);
+            launchModeActivity();
         }
         else {
-            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-            builder1.setMessage("No track available for flashback");
-            builder1.setCancelable(true);
-
-            builder1.setPositiveButton(
-                    "Got it",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-
-            AlertDialog alert11 = builder1.create();
-            alert11.show();
+            if (MusicDownloadManager.downloadAll(toDownload, false)){
+                Toast toast = Toast.makeText(this, "Please Wait Until the First Download is Complete", Toast.LENGTH_LONG);
+                toast.show();
+            }
         }
+    }
+    public void launchModeActivity() {
+
+
+        PlayList vibemodeList = new PlayList(vibemodeTrack, true);
+        if (vibemodeList.hasNext()) {
+            Intent intent = new Intent(this, FlashBackActivity.class);
+            System.out.println("ddddddddd");
+
+            Player.playPlayList(vibemodeList);
+            startActivity(intent);
+        }
+
+//        ArrayList<Track> list = new ArrayList<>();
+//
+//
+//
+//        PlayList flashbackList = new PlayList(list, true);
+//        if (flashbackList.hasNext()) {
+//            Intent intent = new Intent(this, FlashBackActivity.class);
+//            Player.playPlayList(flashbackList);
+//            startActivity(intent);
+//        }
+//        else {
+//            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+//            builder1.setMessage("No track available for flashback");
+//            builder1.setCancelable(true);
+//
+//            builder1.setPositiveButton(
+//                    "Got it",
+//                    new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//                            dialog.cancel();
+//                        }
+//                    });
+//
+//            AlertDialog alert11 = builder1.create();
+//            alert11.show();
+//        }
     }
 
     //  /storage/emulated/0/Download/wtf
@@ -364,12 +430,10 @@ public class MainActivity extends AppCompatActivity {
                 Player.setCurrentTrackLocation(new LocationAdapter(mLocation));
                 Player.setCurrentTrackTime(MockTrackTime.now());
 
-                Track currentTrack = Player.getCurrentTrack();
-                String titleAndAuthor = Player.getCurrentTrack().getName() + "@" +
-                        Player.getCurrentTrack().getArtist();
-                DatabaseReference rf = myRef.child(titleAndAuthor);
-                rf.setValue(currentTrack.getMockTrack());
-
+                MockTrack currentTrack = new MockTrack(Player.getCurrentTrack(), currentUser);
+                Firebase.upload(currentTrack);
+//                DatabaseReference rf = myRef.child(titleAndAuthor);
+//                rf.setValue(currentTrack.getMockTrack());
                 if (!Player.playNext()) {
                     Updateables.updateAll();
                 }
@@ -424,6 +488,18 @@ public class MainActivity extends AppCompatActivity {
     public static Location getmLocation() {return mLocation;}
 
     /**
+     * Get current user
+     * @return current user
+     */
+    public static User getUser() {return currentUser;}
+
+    /**
+     * set current user
+     * @param user is the user to be set(used for mock object)
+     */
+    public static void setCurrentUser(User user) {currentUser = user;}
+
+    /**
      * Record the mode when exit the app
      */
     @Override
@@ -443,6 +519,9 @@ public class MainActivity extends AppCompatActivity {
         }
         editor.putString("lastActivity", "normal");
         editor.apply();
+
+        MusicDownloadManager.abortAll();
+
     }
 
     /**
@@ -461,40 +540,13 @@ public class MainActivity extends AppCompatActivity {
      * https://developers.google.com/identity/sign-in/android/start-integrating
      * @throws IOException
      */
-    public void setUp() throws IOException {
-        this.httpTransport = new NetHttpTransport();
-        this.jsonFactory = new JacksonFactory();
 
-        // Go to the Google API Console, open your application's
-        // credentials page, and copy the client ID and client secret.
-        // Then paste them into the following code.
-        this.clientId = "78013321666-9j6ancu1s1tr08tjqfe1kb9rtl0qeqhi.apps.googleusercontent.com";
-        this.clientSecret = "omDZYzPwK1TVBQKcl-CA6VD_";
-
-        // Or your redirect URL for web based applications.
-        this.redirectUrl = "urn:ietf:wg:oauth:2.0:oob";
-        String scope = "https://www.googleapis.com/auth/contacts.readonly";
-
-        // Step 1: Authorize -->
-        this.authorizationUrl =
-                new GoogleBrowserClientRequestUrl(clientId, redirectUrl, Arrays.asList(scope)).build();
-
-        // Point or redirect your user to the authorizationUrl.
-        System.out.println("Go to the following link in your browser:");
-        System.out.println(authorizationUrl);
-
-        // Read the authorization code from the standard input stream.
-        System.out.println("What is the authorization code?");
-        // End of Step 1 <--
-        AsyncTaskRunner runner = new AsyncTaskRunner();
-        runner.execute();
-    }
 
     /**
      * AsyncTask for getting google contact list
      * People API: https://developers.google.com/people/v1/read-people
      */
-    private class AsyncTaskRunner extends AsyncTask<String, String, String> {
+    private class GetFriendsTaskRunner extends AsyncTask<String, String, String> {
 
         @Override
         protected void onPostExecute(String result) {
@@ -516,15 +568,15 @@ public class MainActivity extends AppCompatActivity {
                         new PeopleService.Builder(httpTransport, jsonFactory, credential).build();
 
                 ListConnectionsResponse response = peopleService.people().connections().list("people/me")
-                        .setPersonFields("emailAddresses")
+                        .setPersonFields("names,emailAddresses")
                         .execute();
                 List<Person> connections = response.getConnections();
-
+                System.out.println(connections.size());
                 for (Person person : connections) {
-                    for (EmailAddress email : person.getEmailAddresses()) {
-                        currentUser.addFriend(email.getValue());
-//                        System.out.println(email.getValue());
-                    }
+                        currentUser.addFriend(person.getEmailAddresses().get(0).getValue(),
+                                person.getNames().get(0).getDisplayName());
+                        System.out.println(person.getEmailAddresses().get(0).getValue());
+                        System.out.println(person.getNames().get(0).getDisplayName());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -561,4 +613,5 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

@@ -7,17 +7,17 @@ import java.util.ListIterator;
  * Created by cyrusdeng on 09/02/2018.
  */
 
-public class PlayList implements ListIterator<Track> {
+public class PlayList implements ListIterator<ITrack> {
 
-    private ArrayList<Track> playingTracks;
+    private ArrayList<? extends ITrack> playingTracks;
     private int index;
 //    private ListIterator<Track> iter;
     private boolean isLooping = false;
 
     public void setLooping(boolean isLooping) {this.isLooping = isLooping;}
-    public ArrayList<Track> getPlayingTracks() {return playingTracks;}
+    public ArrayList<? extends ITrack> getPlayingTracks() {return playingTracks;}
 
-    public PlayList(ArrayList<Track> tracks, boolean looping) {
+    public PlayList(ArrayList<? extends ITrack> tracks, boolean looping) {
         playingTracks = tracks;
 //        iter = playingTracks.listIterator();
         index = -1;
@@ -126,7 +126,8 @@ public class PlayList implements ListIterator<Track> {
 
     @Override
     public Track next() {
-        return playingTracks.get(++index);
+
+        return playingTracks.get(++index).getTrack();
     }
 
     @Override
@@ -158,7 +159,7 @@ public class PlayList implements ListIterator<Track> {
 
     @Override
     public Track previous() {
-        return playingTracks.get(--index);
+        return playingTracks.get(--index).getTrack();
     }
 
     @Override
@@ -179,9 +180,9 @@ public class PlayList implements ListIterator<Track> {
     }
 
     @Override
-    public void set(Track track) {}
+    public void set(ITrack track) {}
 
     @Override
-    public void add(Track track) {}
+    public void add(ITrack track) {}
 
 }

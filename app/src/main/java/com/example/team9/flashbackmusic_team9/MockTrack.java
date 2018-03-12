@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * Created by cyrusdeng on 18/02/2018.
  */
 
-public class MockTrack implements Serializable, Comparable<MockTrack> {
+public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
     private int year = -1;
     private int month;
     private int day;
@@ -25,15 +25,49 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
     private ILocation location;
     private LocalDateTime dateTime;
 
-    private String user;
+    private String userEmail;
+    private String userName;
+
     private String URL;
 
+    private String title;
+    private String album;
+
+    private Track localTrack;
+    public MockTrack(){}
     public MockTrack(Track.FavoriteStatus status) {
         this.status = status;
     }
 
-    public void setUser(String user) { this.user = user; }
-    public String getUser() { return user; }
+    public MockTrack(Track t) {
+        this.status = t.getStatus();
+        this.URL = t.getUrl();
+        setLocation(t.getLocation());
+        setDate(t.getDate());
+    }
+
+    public MockTrack(Track t, User user) {
+        this.URL = t.getUrl();
+        setUser(user);
+        this.album = t.getAlbum().getName();
+        this.title = t.getName();
+        setLocation(t.getLocation());
+        setDate(t.getDate());
+    }
+    public MockTrack(ILocation loc, LocalDateTime time, User lastUser, String Url) {
+        setLocation(loc);
+        setDate(time);
+        setUser(lastUser);
+        URL = Url;
+    }
+    public void setUser(User user) {
+        this.userName = user.getName();
+        this.userEmail = user.getEmail();
+    }
+    public String getUserName() { return userName; }
+    public String getUserEmail() {
+        return userEmail;
+    }
     public void setURL(String URL) { this.URL = URL; }
     public String getURL() { return URL; }
 
@@ -65,21 +99,38 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
     public ILocation getLocation() {return location;}
     public LocalDateTime getDateTime() {return dateTime;}
 
+    public void setTrack(Track t) {
+        localTrack = t;
+    }
     public Track.FavoriteStatus getStatus() {return status;}
-
+    public String getName() {
+        if (localTrack != null) {
+            return localTrack.getName();
+        }
+        return title;
+    }
+    public String getAlbum() {
+        if (localTrack != null) {
+            return localTrack.getAlbum().getName();
+        }
+        return album;
+    }
     public void setDate(LocalDateTime date) {
-        this.year = date.getYear();
-        this.month = date.getMonthValue();
-        this.day = date.getDayOfMonth();
-        this.hour = date.getHour();
-        this.minute = date.getMinute();
-        this.second = date.getSecond();
+        if (location != null) {
+            this.year = date.getYear();
+            this.month = date.getMonthValue();
+            this.day = date.getDayOfMonth();
+            this.hour = date.getHour();
+            this.minute = date.getMinute();
+            this.second = date.getSecond();
+        }
         this.dateTime = date;
     }
     public void setLocation(ILocation location) {
-        this.longitude = location.getLongitude();
-        this.latitude = location.getLatitude();
-        this.location = location;
+        if (location != null) {
+            this.longitude = location.getLongitude();
+            this.latitude = location.getLatitude();
+        }
     }
     public void setStatus(Track.FavoriteStatus status) {this.status = status;}
 
@@ -111,7 +162,14 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
         }
 
         // google+ friends compare
-
+        if (MainActivity.getUser().isFriend(userEmail)) {
+            thisScore++;
+            thisTieScore++;
+        }
+        if (MainActivity.getUser().isFriend(MockTrack.getUserEmail())) {
+            trackScore++;
+            trackTieScore++;
+        }
 
         // score compare
         if (thisScore != trackScore) {
@@ -125,5 +183,23 @@ public class MockTrack implements Serializable, Comparable<MockTrack> {
         } else {
             return 1;
         }
+    }
+
+    @Override
+    public boolean isPlayable() {
+        if (localTrack == null) {
+            return false;
+        }
+        return localTrack.isPlayable();
+    }
+
+    @Override
+    public boolean hasDownloaded() {
+        return localTrack!=null;
+    }
+
+    @Override
+    public Track getTrack() {
+        return localTrack;
     }
 }

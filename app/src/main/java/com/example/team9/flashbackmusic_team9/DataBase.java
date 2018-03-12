@@ -3,6 +3,7 @@ package com.example.team9.flashbackmusic_team9;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
+import android.widget.ArrayAdapter;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -14,6 +15,8 @@ import java.util.HashMap;
  */
 
 public class DataBase {
+    private static TrackListAdapter mainTrackListView;
+
     private static ArrayList<Track> allTracks = new ArrayList<>();
     private static ArrayList<Album> allAlbums = new ArrayList<>();
 
@@ -41,7 +44,10 @@ public class DataBase {
         allAlbums = albums;
     }
 
-    public static void addLocalTrack(String path) {
+    public static void setMainTrackListView(TrackListAdapter trackListView) {
+        mainTrackListView = trackListView;
+    }
+    public static Track addDownloadedTrack(String path, String URL) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 
         System.out.println(path);
@@ -62,6 +68,7 @@ public class DataBase {
         for (Album each : allAlbums) {
             if (each.getName().equals(albumName)) {
                 al = each;
+                break;
             }
         }
         if ( al == null) {
@@ -69,11 +76,13 @@ public class DataBase {
             allAlbums.add(al);
         }
         Track newTrack = new Track(trackName, artistName, al, path);
+        newTrack.setURL(URL);
         al.addTrack(newTrack);
         allTracks.add(newTrack);
         System.out.println(allAlbums.size());
         System.out.println(allAlbums);
-
+        mainTrackListView.notifyDataSetChanged();
+        return newTrack;
     }
     public static void loadFile(MainActivity main)
     {
@@ -114,5 +123,16 @@ public class DataBase {
             allTracks.add(newTrack);
         }
 
+    }
+
+    public static boolean contain(MockTrack m) {
+        for (Track each : allTracks) {
+            if (m.getURL().equals(each.getUrl())) {
+                System.out.println(each.getUrl());
+                m.setTrack(each);
+                return true;
+            }
+        }
+        return false;
     }
 }

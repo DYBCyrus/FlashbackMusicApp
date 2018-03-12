@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * Created by cyrusdeng on 05/02/2018.
  */
 
-public class TrackListAdapter extends ArrayAdapter<Track> implements Updateable {
+public class TrackListAdapter extends ArrayAdapter<Track> {
     private int resouceId;
     public TrackListAdapter(Context context, int resourceId, ArrayList<Track> tracks) {
         super(context, resourceId, tracks);
@@ -41,8 +41,5 @@ public class TrackListAdapter extends ArrayAdapter<Track> implements Updateable 
         return convertView;
     }
 
-    @Override
-    public void update() {
 
-    }
 }
