@@ -52,7 +52,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             }
         });
 
-        findViewById(R.id.viewPlaylist).setVisibility(View.INVISIBLE);
+//        findViewById(R.id.viewPlaylist).setVisibility(View.INVISIBLE);
         fav = findViewById(R.id.likeButton);
         title = findViewById(R.id.title);
         artist = findViewById(R.id.artist);

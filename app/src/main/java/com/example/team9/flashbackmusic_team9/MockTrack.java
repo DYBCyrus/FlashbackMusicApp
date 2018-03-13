@@ -116,7 +116,7 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
         return album;
     }
     public void setDate(LocalDateTime date) {
-        if (location != null) {
+        if (date != null) {
             this.year = date.getYear();
             this.month = date.getMonthValue();
             this.day = date.getDayOfMonth();
@@ -131,6 +131,7 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
             this.longitude = location.getLongitude();
             this.latitude = location.getLatitude();
         }
+        this.location = location;
     }
     public void setStatus(Track.FavoriteStatus status) {this.status = status;}
 
