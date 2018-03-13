@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Creates DropDown menu
         spinner = (Spinner)findViewById(R.id.spinner);
-        ArrayAdapter<String>adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, paths);
+        ArrayAdapter<String>adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, paths);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
@@ -428,6 +428,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 Player.setCurrentTrackLocation(new LocationAdapter(mLocation));
+                System.out.println(MockTrackTime.now());
                 Player.setCurrentTrackTime(MockTrackTime.now());
 
                 MockTrack currentTrack = new MockTrack(Player.getCurrentTrack(), currentUser);
