@@ -54,6 +54,7 @@ public class MusicDownloadManager {
                             Track loadedTrack = DataBase.addDownloadedTrack(mFile.getAbsolutePath().substring(6), downloadUri);
                             if (currentDownload != null) {
                                 currentDownload.setTrack(loadedTrack);
+                                loadedTrack.setDataFromMockTrack(currentDownload);
                                 if (!hasDownloadedOne) {
                                     hasDownloadedOne = true;
                                     if (context instanceof MainActivity) {

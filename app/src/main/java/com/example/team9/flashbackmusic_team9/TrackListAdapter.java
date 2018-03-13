@@ -3,13 +3,10 @@ package com.example.team9.flashbackmusic_team9;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -30,9 +27,6 @@ public class TrackListAdapter extends ArrayAdapter<Track> {
         Track track = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(resouceId, parent, false);
-            System.out.println("!!!!!!!!!!!!!!!!");
-
-
         }
 
         ((TextView)convertView.findViewById(R.id.track_names)).setText(track.getName());
