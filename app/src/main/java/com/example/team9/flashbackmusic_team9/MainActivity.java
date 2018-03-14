@@ -131,7 +131,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             if (location != null) {
                                 // Logic to handle location object
                                 mLocation = location;
-                                tryVibeMode();
+                                if (authCode != null) {
+                                    tryVibeMode();
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Please Log In first!", Toast.LENGTH_LONG).show();
+                                }
                             }
                         }
                     });
