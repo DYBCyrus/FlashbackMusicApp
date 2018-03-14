@@ -1,7 +1,11 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.location.Location;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.widget.TextView;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -14,7 +18,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -51,7 +54,7 @@ public class Firebase {
                     System.out.println(trackData.getKey());
                     ILocation loc = new LocationAdapter(new Location(""));
                     loc.setLatitude((double)trackData.child("latitude").getValue());
-                    loc.setLatitude((double)trackData.child("longitude").getValue());
+                    loc.setLongitude((double)trackData.child("longitude").getValue());
 
                     LocalDateTime time = LocalDateTime.of(
                             ((Long)trackData.child("year").getValue()).intValue(),
@@ -64,7 +67,8 @@ public class Firebase {
                     User user = new User((String)trackData.child("user").child("email").getValue(),
                             (String)trackData.child("user").child("name").getValue());
                     String url = (String)trackData.child("url").getValue();
-                    MockTrack newTrack = new MockTrack(loc, time, user, url);
+                    String title = (String)trackData.child("name").getValue();
+                    MockTrack newTrack = new MockTrack(title, loc, time, user, url);
                     toDownload.add(newTrack);
                 }
                 Collections.sort(toDownload);
@@ -80,4 +84,37 @@ public class Firebase {
             }
         });
     }
+
+    private static String name;
+    private static TextView toUpdate;
+
+
+    public static void pullDownUpdatedUser(String url, TextView t) {
+        toUpdate = t;
+        DatabaseReference dref = myRef.child(url.replace("/", "").replace(".", ""));
+        dref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                name = (String)dataSnapshot.child("userName").getValue();
+                if (name == null) {
+                    name = "None";
+                }
+                System.out.println(name);
+                if (name.equals(MainActivity.getUser().getName())) {
+                    SpannableString spanString = new SpannableString("you");
+                    spanString.setSpan(new StyleSpan(Typeface.ITALIC), 0, spanString.length(), 0);
+                    toUpdate.setText(spanString);
+                } else {
+                    toUpdate.setText(name);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public static String getName() {return name;}
 }

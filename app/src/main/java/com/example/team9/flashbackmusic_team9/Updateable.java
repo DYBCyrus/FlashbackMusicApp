@@ -5,5 +5,5 @@ package com.example.team9.flashbackmusic_team9;
  */
 
 public interface Updateable {
-    public void update();
+    void update();
 }

@@ -54,7 +54,8 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
         setLocation(t.getLocation());
         setDate(t.getDate());
     }
-    public MockTrack(ILocation loc, LocalDateTime time, User lastUser, String Url) {
+    public MockTrack(String title, ILocation loc, LocalDateTime time, User lastUser, String Url) {
+        this.title = title;
         setLocation(loc);
         setDate(time);
         setUser(lastUser);
