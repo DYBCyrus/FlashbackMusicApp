@@ -266,10 +266,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         return t1.getName().compareTo(t2.getName());
                     }
                 });
-                System.out.println("title");
-                for (Track t : allTracks) {
-                    System.out.println(t.getName());
-                }
                 break;
 
             case 1:
@@ -283,10 +279,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             return t1.getAlbum().getName().compareTo(t2.getAlbum().getName());
                     }
                 });
-                System.out.println("album");
-                for (Track t : allTracks) {
-                    System.out.println(t.getName());
-                }
                 break;
 
             case 2:
@@ -297,8 +289,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         return t1.getArtist().compareTo(t2.getArtist());
                     }
                 });
-                System.out.println("artist");
-                System.out.println(allTracks);
                 break;
 
             case 3:
@@ -306,27 +296,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Collections.sort(allTracks, new Comparator<Track>() {
                     @Override
                     public int compare(Track t1, Track t2) {
-                        if(t1.getStatus() == t2.getStatus())
+                        if (t1.getStatus() == t2.getStatus()) {
                             return t1.getName().compareTo(t2.getName());
-                        else if(t1.getStatus() == Track.FavoriteStatus.LIKE)
-                            return 1;
-                        else if(t1.getStatus() == Track.FavoriteStatus.NEUTRAL) {
-                            if (t2.getStatus() == Track.FavoriteStatus.LIKE)
-                                return -1;
-                            else
-                                return 1;
-                        }
-                        else
+                        } else if (t1.getStatus() == Track.FavoriteStatus.LIKE) {
                             return -1;
+                        } else if (t1.getStatus() == Track.FavoriteStatus.NEUTRAL) {
+                            if (t2.getStatus() == Track.FavoriteStatus.LIKE)
+                                return 1;
+                            else
+                                return -1;
+                        } else {
+                            return 1;
+                        }
                     }
                 });
-                System.out.println("status");
-                for (Track t : allTracks) {
-                    System.out.println(t.getName());
-                }
                 break;
 
         }
+        ListAdapter tracksAdapter = new TrackListAdapter(this,
+                R.layout.list_item, DataBase.getAllTracks());
+        DataBase.setMainTrackListView((TrackListAdapter)tracksAdapter);
+        ListView trackView = (ListView) findViewById(R.id.track_list);
+        trackView.setAdapter(tracksAdapter);
     }
 
 
