@@ -6,17 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.webkit.URLUtil;
 import android.widget.Toast;
-
-import org.mortbay.jetty.Main;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.ListIterator;

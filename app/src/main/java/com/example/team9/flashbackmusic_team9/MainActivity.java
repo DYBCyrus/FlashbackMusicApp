@@ -278,8 +278,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         tracksAdapter.sort(comparator);
         tracksAdapter.notifyDataSetChanged();
-//        System.out.println(DataBase.getAllTracks().get(0).getName());
-//        System.out.println(DataBase.getAllTracks().get(0).getStatus());
     }
 
 
@@ -352,7 +350,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    //  /storage/emulated/0/Download/wtf
     public void launchNewDownload() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Please Type Your URL");

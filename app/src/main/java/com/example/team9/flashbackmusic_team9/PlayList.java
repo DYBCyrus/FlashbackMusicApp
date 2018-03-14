@@ -11,7 +11,6 @@ public class PlayList implements ListIterator<ITrack> {
 
     private ArrayList<? extends ITrack> playingTracks;
     private int index;
-//    private ListIterator<Track> iter;
     private boolean isLooping = false;
 
     public void setLooping(boolean isLooping) {this.isLooping = isLooping;}
@@ -19,82 +18,9 @@ public class PlayList implements ListIterator<ITrack> {
 
     public PlayList(ArrayList<? extends ITrack> tracks, boolean looping) {
         playingTracks = tracks;
-//        iter = playingTracks.listIterator();
         index = -1;
         isLooping = looping;
     }
-
-//    @Override
-//    public boolean hasNext() {
-//
-//        if (!iter.hasNext() && !isLooping) {
-//            return false;
-//
-//        } else if (!iter.hasNext() && isLooping) {
-//
-//            iter = playingTracks.listIterator();
-//            if (!iter.hasNext()) {return false;}
-//        }
-//
-//        Track tr = iter.next();
-//        while (!tr.isPlayable()){
-//            if (iter.hasNext()) {
-//                tr = iter.next();
-//            } else {
-//
-//                return false;
-//            }
-//        }
-//        iter.previous();
-//        return true;
-//    }
-//
-//    @Override
-//    public Track next() {
-//        Track tr = iter.next();
-//        return tr;
-//    }
-//
-//    @Override
-//    public boolean hasPrevious() {
-//        if (!iter.hasPrevious()) {
-//            return false;
-//        }
-//
-//        Track tr = iter.previous();
-//        if (iter.hasPrevious()) {
-//            tr = iter.previous();
-//        }
-//        else {
-//            return false;
-//        }
-//        while (!tr.isPlayable()){
-//            if (iter.hasPrevious()) {
-//                tr = iter.previous();
-//            } else {
-//                return false;
-//            }
-//        }
-//        iter.next();
-//        return true;
-//    }
-//
-//    @Override
-//    public Track previous() {
-//        Track tr = iter.previous();
-//        iter.next();
-//        return tr;
-//    }
-//
-//    @Override
-//    public int nextIndex() {
-//        return iter.nextIndex();
-//    }
-//
-//    @Override
-//    public int previousIndex() {
-//        return iter.previousIndex();
-//    }
 
     @Override
     public boolean hasNext() {
