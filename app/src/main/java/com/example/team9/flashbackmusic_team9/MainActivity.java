@@ -26,7 +26,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -53,7 +52,6 @@ import com.google.api.services.people.v1.model.Person;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -62,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     //Dropdown menu and its options
     private Spinner spinner;
     private static final String[]paths = {"title","album","artist","favorite status"};
+    private TrackListAdapter tracksAdapter;
 
     private LocationManager locationManager;
     private static Location mLocation;
@@ -172,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 (ImageButton)findViewById(R.id.previous_button),
                 (ImageButton)findViewById(R.id.play_button),
                 (ImageButton)findViewById(R.id.next_button), this);
-        ListAdapter tracksAdapter = new TrackListAdapter(this,
+        tracksAdapter = new TrackListAdapter(this,
                 R.layout.list_item, DataBase.getAllTracks());
         DataBase.setMainTrackListView((TrackListAdapter)tracksAdapter);
         ListView trackView = (ListView) findViewById(R.id.track_list);
@@ -254,70 +253,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     //Function that takes care of the dropdown menu functionality
     public void onItemSelected(AdapterView<?>parent, View v, int position, long id){
-
-        ArrayList<Track> allTracks = DataBase.getAllTracks();
+        Comparator<Track> comparator;
 
         switch(position){
-            case 0:
-                //Implement for title
-                Collections.sort(allTracks, new Comparator<Track>() {
-                    @Override
-                    public int compare(Track t1, Track t2) {
-                        return t1.getName().compareTo(t2.getName());
-                    }
-                });
-                break;
-
             case 1:
                 //Implement for album
-                Collections.sort(allTracks, new Comparator<Track>() {
-                    @Override
-                    public int compare(Track t1, Track t2) {
-                        if(t1.getAlbum().getName().compareTo(t2.getAlbum().getName()) == 0)
-                            return t1.getName().compareTo(t2.getName());
-                        else
-                            return t1.getAlbum().getName().compareTo(t2.getAlbum().getName());
-                    }
-                });
+                comparator = new AlbumComparator();
                 break;
 
             case 2:
                 //Implement for artist
-                Collections.sort(allTracks, new Comparator<Track>() {
-                    @Override
-                    public int compare(Track t1, Track t2) {
-                        return t1.getArtist().compareTo(t2.getArtist());
-                    }
-                });
+                comparator = new ArtistComparator();
                 break;
 
             case 3:
                 //Implement for favorite status
-                Collections.sort(allTracks, new Comparator<Track>() {
-                    @Override
-                    public int compare(Track t1, Track t2) {
-                        if (t1.getStatus() == t2.getStatus()) {
-                            return t1.getName().compareTo(t2.getName());
-                        } else if (t1.getStatus() == Track.FavoriteStatus.LIKE) {
-                            return -1;
-                        } else if (t1.getStatus() == Track.FavoriteStatus.NEUTRAL) {
-                            if (t2.getStatus() == Track.FavoriteStatus.LIKE)
-                                return 1;
-                            else
-                                return -1;
-                        } else {
-                            return 1;
-                        }
-                    }
-                });
+                comparator = new StatusComparator();
                 break;
 
+            default:
+                //Implement for title
+                comparator = new TitleComparator();
+                break;
         }
-        ListAdapter tracksAdapter = new TrackListAdapter(this,
-                R.layout.list_item, DataBase.getAllTracks());
-        DataBase.setMainTrackListView((TrackListAdapter)tracksAdapter);
-        ListView trackView = (ListView) findViewById(R.id.track_list);
-        trackView.setAdapter(tracksAdapter);
+        tracksAdapter.sort(comparator);
+        tracksAdapter.notifyDataSetChanged();
+//        System.out.println(DataBase.getAllTracks().get(0).getName());
+//        System.out.println(DataBase.getAllTracks().get(0).getStatus());
     }
 
 
@@ -511,10 +473,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onPause() {
         super.onPause();
 
+        ArrayList<Track> shareTracks = DataBase.getShareTracks();
+        int i = 0;
+        for (Track t : DataBase.getAllTracks()) {
+            for (i = 0; i < shareTracks.size(); i++) {
+                if (t.getName().equals(shareTracks.get(i).getName()) &&
+                        t.getArtist().equals(shareTracks.get(i).getArtist())) {
+                    break;
+                }
+            }
+            shareTracks.set(i, t);
+        }
+
         SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         ArrayList<MockTrack> mockTracks = new ArrayList<>();
-        for (Track each : DataBase.getAllTracks()) {
+        for (Track each : shareTracks) {
             mockTracks.add(each.getMockTrack());
         }
         try {
