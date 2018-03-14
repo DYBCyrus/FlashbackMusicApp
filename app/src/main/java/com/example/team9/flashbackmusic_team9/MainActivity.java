@@ -53,6 +53,8 @@ import com.google.api.services.people.v1.model.Person;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -249,25 +251,80 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     //Function that takes care of the dropdown menu functionality
     public void onItemSelected(AdapterView<?>parent, View v, int position, long id){
 
+        ArrayList<Track> allTracks = DataBase.getAllTracks();
+
         switch(position){
             case 0:
                 //Implement for title
+                Collections.sort(allTracks, new Comparator<Track>() {
+                    @Override
+                    public int compare(Track t1, Track t2) {
+                        return t1.getName().compareTo(t2.getName());
+                    }
+                });
+                System.out.println("title");
+                for (Track t : allTracks) {
+                    System.out.println(t.getName());
+                }
                 break;
 
             case 1:
                 //Implement for album
+                Collections.sort(allTracks, new Comparator<Track>() {
+                    @Override
+                    public int compare(Track t1, Track t2) {
+                        if(t1.getAlbum().getName().compareTo(t2.getAlbum().getName()) == 0)
+                            return t1.getName().compareTo(t2.getName());
+                        else
+                            return t1.getAlbum().getName().compareTo(t2.getAlbum().getName());
+                    }
+                });
+                System.out.println("album");
+                for (Track t : allTracks) {
+                    System.out.println(t.getName());
+                }
                 break;
 
             case 2:
                 //Implement for artist
+                Collections.sort(allTracks, new Comparator<Track>() {
+                    @Override
+                    public int compare(Track t1, Track t2) {
+                        return t1.getArtist().compareTo(t2.getArtist());
+                    }
+                });
+                System.out.println("artist");
+                System.out.println(allTracks);
                 break;
 
             case 3:
                 //Implement for favorite status
+                Collections.sort(allTracks, new Comparator<Track>() {
+                    @Override
+                    public int compare(Track t1, Track t2) {
+                        if(t1.getStatus() == t2.getStatus())
+                            return t1.getName().compareTo(t2.getName());
+                        else if(t1.getStatus() == Track.FavoriteStatus.LIKE)
+                            return 1;
+                        else if(t1.getStatus() == Track.FavoriteStatus.NEUTRAL) {
+                            if (t2.getStatus() == Track.FavoriteStatus.LIKE)
+                                return -1;
+                            else
+                                return 1;
+                        }
+                        else
+                            return -1;
+                    }
+                });
+                System.out.println("status");
+                for (Track t : allTracks) {
+                    System.out.println(t.getName());
+                }
                 break;
 
         }
     }
+
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
