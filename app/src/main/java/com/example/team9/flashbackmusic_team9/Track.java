@@ -54,8 +54,8 @@ public class Track implements Comparable<Track>, ITrack
         }
         if (m.getLongitude() != 9999) {
             setLocation(m.getLongitude(), m.getLatitude());
-//            LOGGER.info(current.getLongitude()+", "+ current.getLatitude());
         }
+        setURL(m.getURL());
     }
 
     public void setStatus(FavoriteStatus status) {
