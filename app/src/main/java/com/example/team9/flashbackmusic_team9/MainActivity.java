@@ -42,40 +42,22 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleBrowserClientRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.people.v1.PeopleService;
-import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.ListConnectionsResponse;
-import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
-    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
 
     //Dropdown menu and its options
     private Spinner spinner;
@@ -149,7 +131,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             if (location != null) {
                                 // Logic to handle location object
                                 mLocation = location;
-                                tryVibeMode();
+                                if (authCode != null) {
+                                    tryVibeMode();
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Please Log In first!", Toast.LENGTH_LONG).show();
+                                }
                             }
                         }
                     });
@@ -310,23 +296,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Collections.sort(allTracks, new Comparator<Track>() {
                     @Override
                     public int compare(Track t1, Track t2) {
-                        if(t1.getStatus() == t2.getStatus())
+                        if (t1.getStatus() == t2.getStatus()) {
                             return t1.getName().compareTo(t2.getName());
-                        else if(t1.getStatus() == Track.FavoriteStatus.LIKE)
-                            return 1;
-                        else if(t1.getStatus() == Track.FavoriteStatus.NEUTRAL) {
-                            if (t2.getStatus() == Track.FavoriteStatus.LIKE)
-                                return -1;
-                            else
-                                return 1;
-                        }
-                        else
+                        } else if (t1.getStatus() == Track.FavoriteStatus.LIKE) {
                             return -1;
+                        } else if (t1.getStatus() == Track.FavoriteStatus.NEUTRAL) {
+                            if (t2.getStatus() == Track.FavoriteStatus.LIKE)
+                                return 1;
+                            else
+                                return -1;
+                        } else {
+                            return 1;
+                        }
                     }
                 });
                 break;
 
         }
+        ListAdapter tracksAdapter = new TrackListAdapter(this,
+                R.layout.list_item, DataBase.getAllTracks());
+        DataBase.setMainTrackListView((TrackListAdapter)tracksAdapter);
+        ListView trackView = (ListView) findViewById(R.id.track_list);
+        trackView.setAdapter(tracksAdapter);
     }
 
 
@@ -397,33 +388,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Player.playPlayList(vibemodeList);
             startActivity(intent);
         }
-
-//        ArrayList<Track> list = new ArrayList<>();
-//
-//
-//
-//        PlayList flashbackList = new PlayList(list, true);
-//        if (flashbackList.hasNext()) {
-//            Intent intent = new Intent(this, FlashBackActivity.class);
-//            Player.playPlayList(flashbackList);
-//            startActivity(intent);
-//        }
-//        else {
-//            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-//            builder1.setMessage("No track available for flashback");
-//            builder1.setCancelable(true);
-//
-//            builder1.setPositiveButton(
-//                    "Got it",
-//                    new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            dialog.cancel();
-//                        }
-//                    });
-//
-//            AlertDialog alert11 = builder1.create();
-//            alert11.show();
-//        }
     }
 
     //  /storage/emulated/0/Download/wtf
@@ -475,8 +439,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 MockTrack currentTrack = new MockTrack(Player.getCurrentTrack(), currentUser);
                 Firebase.upload(currentTrack);
-//                DatabaseReference rf = myRef.child(titleAndAuthor);
-//                rf.setValue(currentTrack.getMockTrack());
                 if (!Player.playNext()) {
                     Updateables.updateAll();
                 }
@@ -562,9 +524,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         editor.putString("lastActivity", "normal");
         editor.apply();
-
-        MusicDownloadManager.abortAll();
-
     }
 
     /**
@@ -577,17 +536,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     /**
-     * set up people api and get a list of google contacts
+     * AsyncTask for getting google contact list
+     * People API: https://developers.google.com/people/v1/read-people
      * reference: https://developers.google.com/people/v1/getting-started
      * https://developers.google.com/people/v1/read-people
      * https://developers.google.com/identity/sign-in/android/start-integrating
-     * @throws IOException
-     */
-
-
-    /**
-     * AsyncTask for getting google contact list
-     * People API: https://developers.google.com/people/v1/read-people
      */
     private class GetFriendsTaskRunner extends AsyncTask<String, String, String> {
 

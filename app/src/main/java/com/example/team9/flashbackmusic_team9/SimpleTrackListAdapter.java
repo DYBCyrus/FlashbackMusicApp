@@ -30,13 +30,13 @@ public class SimpleTrackListAdapter extends ArrayAdapter< ITrack> {
         System.out.println(track.getName());
         ((TextView)convertView.findViewById(R.id.track_names)).setText(track.getName());
         if (!track.hasDownloaded()) {
-            ((TextView)convertView.findViewById(R.id.track_names)).setTextColor(Color.BLUE);
+            ((TextView)convertView.findViewById(R.id.track_names)).setTextColor(Color.GRAY);
         }
-        if (Player.getCurrentTrack().getName().equals(track.getName()) &&
+        else if (Player.getCurrentTrack().getName().equals(track.getName()) &&
                 Player.getCurrentTrack().getArtist().equals(track.getTrack().getArtist())) {
             ((TextView)convertView.findViewById(R.id.track_names)).setTextColor(Color.RED);
         } else {
-            ((TextView)convertView.findViewById(R.id.track_names)).setTextColor(Color.GRAY);
+            ((TextView)convertView.findViewById(R.id.track_names)).setTextColor(Color.BLACK);
         }
         return convertView;
     }

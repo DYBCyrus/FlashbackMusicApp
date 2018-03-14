@@ -44,7 +44,9 @@ public class Track implements Comparable<Track>, ITrack
         return new MockTrack(this);
     }
     public void setDataFromMockTrack(MockTrack m) {
-        setStatus(m.getStatus());
+        if (m.getStatus() != null) {
+            setStatus(m.getStatus());
+        }
         if (m.getYear() != -1) {
             setDate(LocalDateTime.of(m.getYear(), m.getMonth(),
                     m.getDay(), m.getHour(), m.getMinute(),

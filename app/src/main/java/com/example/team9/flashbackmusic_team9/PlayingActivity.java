@@ -28,6 +28,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     private TextView album;
     private TextView location;
     private TextView time;
+    private TextView username;
     private String mAddressOutput;
     private ImageButton fav;
     private SeekBar seekbar;
@@ -48,31 +49,35 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             public void onClick(View v)
             {
                 finish();
-
             }
         });
 
-//        findViewById(R.id.viewPlaylist).setVisibility(View.INVISIBLE);
+        Button display = (Button) findViewById(R.id.viewPlaylist);
+        if (Player.getPlayList() == null) {
+            display.setVisibility(View.INVISIBLE);
+        }
         fav = findViewById(R.id.likeButton);
         title = findViewById(R.id.title);
         artist = findViewById(R.id.artist);
         album = findViewById(R.id.album);
         location = findViewById(R.id.location);
         time = findViewById(R.id.time);
+        username = findViewById(R.id.username);
 
         final ImageButton fav = findViewById(R.id.likeButton);
         seekbar = findViewById(R.id.seekBar);
 
-        TextView title = findViewById(R.id.title);
-        TextView artist = findViewById(R.id.artist);
-        TextView album = findViewById(R.id.album);
-
-        title.setText(Player.getCurrentTrack().getName());
-        artist.setText(Player.getCurrentTrack().getArtist());
-        album.setText(Player.getCurrentTrack().getAlbum().getName());
+        Firebase.pullDownUpdatedUser(Player.getCurrentTrack().getMockTrack().getURL(), username);
 
         seekbar.setMax(Player.getPlayer().getDuration());
         seekbar.setProgress(Player.getPlayer().getCurrentPosition());
+
+        display.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchViewPlaylistActivity();
+            }
+        });
 
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             boolean userTouch;
@@ -145,11 +150,12 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
                 (ImageButton)findViewById(R.id.nextButton), this);
         Updateables.addUpdateable(this);
 
-
-
-
     }
 
+    public void launchViewPlaylistActivity() {
+        Intent intent = new Intent(this, ViewPlaylistActivity.class);
+        startActivity(intent);
+    }
 
     protected void startIntentService() {
         AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
@@ -173,6 +179,11 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         title.setText(track.getName());
         artist.setText(track.getArtist());
         album.setText(track.getAlbum().getName());
+
+        if (Player.getCurrentTrack() != null) {
+            Firebase.pullDownUpdatedUser(Player.getCurrentTrack().getMockTrack().getURL(), username);
+        }
+
         if (track.getLocation() != null) {
             startIntentService();
         } else {
