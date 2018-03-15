@@ -57,6 +57,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    private PlayList vibemodeList;
+
     //Dropdown menu and its options
     private Spinner spinner;
     private static final String[]paths = {"title","album","artist","favorite status"};
@@ -313,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void processDownload(ArrayList<MockTrack> toDownload) {
 
         vibemodeTrack = toDownload;
+
         System.out.println("aaaaaaaaa");
         if (toDownload.isEmpty()) {
             Toast toast = Toast.makeText(this, "No Vibe Mode Tracks Available", Toast.LENGTH_SHORT);
@@ -320,13 +323,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         boolean processToVibeMode = false;
         for (MockTrack each : toDownload) {
+            System.out.println("toDownload "+each.getName());
             if (DataBase.contain(each)) {
+                System.out.println("contain!");
                 if (each.isPlayable()){
                     processToVibeMode = true;
                 }
             }
         }
+
+        ArrayList<MockTrack> orderTracks = new ArrayList<>();
+        for (MockTrack t : vibemodeTrack) {
+            if (t.hasDownloaded()) {
+                orderTracks.add(t);
+            }
+        }
+        vibemodeList = new PlayList(orderTracks, true);
+        vibemodeList.setViewTracks(vibemodeTrack);
+        MusicDownloadManager.registerPlayingOrderList(vibemodeList);
+
         if (processToVibeMode) {
+            System.out.println("in launch!!!");
             MusicDownloadManager.downloadAll(toDownload, true);
             launchModeActivity();
         }
@@ -339,8 +356,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
     public void launchModeActivity() {
 
-
-        PlayList vibemodeList = new PlayList(vibemodeTrack, true);
         if (vibemodeList.hasNext()) {
             Intent intent = new Intent(this, FlashBackActivity.class);
             System.out.println("ddddddddd");
