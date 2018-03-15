@@ -1,7 +1,9 @@
-package com.example.team9.flashbackmusic_team9;
+package ScenarioTests;
 
 
+import android.support.test.espresso.DataInteraction;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -10,14 +12,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import com.example.team9.flashbackmusic_team9.MainActivity;
+import com.example.team9.flashbackmusic_team9.R;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -26,11 +32,12 @@ import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class MainActivityTest3 {
+public class UserStory1ScenarioTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -44,23 +51,23 @@ public class MainActivityTest3 {
     public GrantPermissionRule permissionRule3 = GrantPermissionRule.grant(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
     @Test
-    public void mainActivityTest3() {
+    public void TestVibeModePlayTrack() {
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         try {
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         ViewInteraction appCompatButton = onView(
-                allOf(withId(R.id.all_albums), withText("All albums"),
+                Matchers.allOf(ViewMatchers.withId(R.id.signin), withText("SignIn"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.support.design.widget.CoordinatorLayout")),
                                         1),
-                                1),
+                                5),
                         isDisplayed()));
         appCompatButton.perform(click());
 
@@ -68,20 +75,33 @@ public class MainActivityTest3 {
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         try {
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        ViewInteraction viewGroup = onView(
-                allOf(withId(R.id.toolbar),
+        onView(withId(R.id.signin)).perform(click());
+
+        ViewInteraction appCompatButton2 = onView(
+                allOf(withId(R.id.mode), withText("FlashBack"),
                         childAtPosition(
                                 childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
-                                        0),
-                                0),
+                                        withClassName(is("android.support.design.widget.CoordinatorLayout")),
+                                        1),
+                                2),
                         isDisplayed()));
-        viewGroup.check(matches(isDisplayed()));
+        appCompatButton2.perform(click());
+
+
+        DataInteraction song = onData(anything()).inAdapterView(withId(R.id.track_list)).atPosition(1);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        DataInteraction song1 = onData(anything()).inAdapterView(withId(R.id.nextButton)).atPosition(1);
+        song1.check(matches(isDisplayed()));
 
     }
 
