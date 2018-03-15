@@ -1,12 +1,8 @@
 package com.example.team9.flashbackmusic_team9;
 
-import android.content.res.AssetFileDescriptor;
 import android.media.MediaMetadataRetriever;
 import android.os.Environment;
-import android.widget.ArrayAdapter;
-
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,11 +13,16 @@ import java.util.HashMap;
 public class DataBase {
     private static TrackListAdapter mainTrackListView;
 
+    private static ArrayList<Track> shareTracks = new ArrayList<>();
     private static ArrayList<Track> allTracks = new ArrayList<>();
     private static ArrayList<Album> allAlbums = new ArrayList<>();
 
     public static ArrayList<Track> getAllTracks() {
         return allTracks;
+    }
+
+    public static ArrayList<Track> getShareTracks() {
+        return shareTracks;
     }
 
     public static ArrayList<Album> getAllAlbums() {
@@ -79,6 +80,7 @@ public class DataBase {
         newTrack.setURL(URL);
         al.addTrack(newTrack);
         allTracks.add(newTrack);
+        shareTracks.add(newTrack);
         System.out.println(allAlbums.size());
         System.out.println(allAlbums);
         mainTrackListView.notifyDataSetChanged();
@@ -121,6 +123,7 @@ public class DataBase {
             Track newTrack = new Track(trackName, artistName, al, path);
             al.addTrack(newTrack);
             allTracks.add(newTrack);
+            shareTracks.add(newTrack);
         }
 
     }

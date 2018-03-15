@@ -24,7 +24,7 @@ public class ViewPlaylistActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ArrayList<ITrack> trackList = new ArrayList<>();
-        for ( ITrack each:Player.getPlayList().getPlayingTracks()) {
+        for ( ITrack each:Player.getPlayList().getViewTracks()) {
             if(each.isPlayable() || !each.hasDownloaded()) {
                 trackList.add(each);
             }
@@ -48,10 +48,22 @@ public class ViewPlaylistActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
+        ArrayList<Track> shareTracks = DataBase.getShareTracks();
+        int i = 0;
+        for (Track t : DataBase.getAllTracks()) {
+            for (i = 0; i < shareTracks.size(); i++) {
+                if (t.getName().equals(shareTracks.get(i).getName()) &&
+                        t.getArtist().equals(shareTracks.get(i).getArtist())) {
+                    break;
+                }
+            }
+            shareTracks.set(i, t);
+        }
+
         SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         ArrayList<MockTrack> mockTracks = new ArrayList<>();
-        for (Track each : DataBase.getAllTracks()) {
+        for (Track each : shareTracks) {
             mockTracks.add(each.getMockTrack());
         }
         try {

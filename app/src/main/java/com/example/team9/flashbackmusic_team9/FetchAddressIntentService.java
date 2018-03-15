@@ -22,8 +22,9 @@ import static android.content.ContentValues.TAG;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
+ * reference: https://developer.android.com/training/location/display-address.html
+ * https://www.programcreek.com/java-api-examples/index.php?source_dir=Dashboard-master/app/src/main/java/nl/svendubbeld/car/service/FetchAddressIntentService.java
  */
 public class FetchAddressIntentService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
@@ -86,6 +87,7 @@ public class FetchAddressIntentService extends IntentService {
                     location.getLatitude(),
                     location.getLongitude(),
                     1);
+            System.out.println(location.getLongitude() + location.getLatitude());
         } catch (IOException ioException) {
             // Catch network or other I/O problems.
             errorMessage = "error1";
@@ -99,6 +101,7 @@ public class FetchAddressIntentService extends IntentService {
                     location.getLongitude(), illegalArgumentException);
         }
 
+        System.out.println(addresses);
         // Handle case where no address was found.
         if (addresses == null || addresses.size()  == 0) {
             if (errorMessage.isEmpty()) {

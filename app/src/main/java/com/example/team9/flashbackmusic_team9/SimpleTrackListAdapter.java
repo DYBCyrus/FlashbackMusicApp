@@ -32,6 +32,12 @@ public class SimpleTrackListAdapter extends ArrayAdapter< ITrack> {
         if (!track.hasDownloaded()) {
             ((TextView)convertView.findViewById(R.id.track_names)).setTextColor(Color.GRAY);
         }
+        else if (Player.getCurrentTrack().getName().equals(track.getName()) &&
+                Player.getCurrentTrack().getArtist().equals(track.getTrack().getArtist())) {
+            ((TextView)convertView.findViewById(R.id.track_names)).setTextColor(Color.RED);
+        } else {
+            ((TextView)convertView.findViewById(R.id.track_names)).setTextColor(Color.BLACK);
+        }
         return convertView;
     }
 }

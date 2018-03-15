@@ -26,7 +26,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -42,43 +41,28 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleBrowserClientRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.people.v1.PeopleService;
-import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.ListConnectionsResponse;
-import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
+    private PlayList vibemodeList;
 
     //Dropdown menu and its options
     private Spinner spinner;
     private static final String[]paths = {"title","album","artist","favorite status"};
+    private TrackListAdapter tracksAdapter;
 
     private LocationManager locationManager;
     private static Location mLocation;
@@ -104,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Creates DropDown menu
         spinner = (Spinner)findViewById(R.id.spinner);
-        ArrayAdapter<String>adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, paths);
+        ArrayAdapter<String>adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, paths);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
@@ -148,7 +132,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             if (location != null) {
                                 // Logic to handle location object
                                 mLocation = location;
-                                tryVibeMode();
+                                if (authCode != null) {
+                                    tryVibeMode();
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Please Log In first!", Toast.LENGTH_LONG).show();
+                                }
                             }
                         }
                     });
@@ -185,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 (ImageButton)findViewById(R.id.previous_button),
                 (ImageButton)findViewById(R.id.play_button),
                 (ImageButton)findViewById(R.id.next_button), this);
-        ListAdapter tracksAdapter = new TrackListAdapter(this,
+        tracksAdapter = new TrackListAdapter(this,
                 R.layout.list_item, DataBase.getAllTracks());
         DataBase.setMainTrackListView((TrackListAdapter)tracksAdapter);
         ListView trackView = (ListView) findViewById(R.id.track_list);
@@ -267,26 +255,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     //Function that takes care of the dropdown menu functionality
     public void onItemSelected(AdapterView<?>parent, View v, int position, long id){
+        Comparator<Track> comparator;
 
         switch(position){
-            case 0:
-                //Implement for title
-                break;
-
             case 1:
                 //Implement for album
+                comparator = new AlbumComparator();
                 break;
 
             case 2:
                 //Implement for artist
+                comparator = new ArtistComparator();
                 break;
 
             case 3:
                 //Implement for favorite status
+                comparator = new StatusComparator();
                 break;
 
+            default:
+                //Implement for title
+                comparator = new TitleComparator();
+                break;
         }
+        tracksAdapter.sort(comparator);
+        tracksAdapter.notifyDataSetChanged();
     }
+
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
@@ -320,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void processDownload(ArrayList<MockTrack> toDownload) {
 
         vibemodeTrack = toDownload;
+
         System.out.println("aaaaaaaaa");
         if (toDownload.isEmpty()) {
             Toast toast = Toast.makeText(this, "No Vibe Mode Tracks Available", Toast.LENGTH_SHORT);
@@ -327,13 +323,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         boolean processToVibeMode = false;
         for (MockTrack each : toDownload) {
+            System.out.println("toDownload "+each.getName());
             if (DataBase.contain(each)) {
+                System.out.println("contain!");
                 if (each.isPlayable()){
                     processToVibeMode = true;
                 }
             }
         }
+
+        ArrayList<MockTrack> orderTracks = new ArrayList<>();
+        for (MockTrack t : vibemodeTrack) {
+            if (t.hasDownloaded()) {
+                orderTracks.add(t);
+            }
+        }
+        vibemodeList = new PlayList(orderTracks, true);
+        vibemodeList.setViewTracks(vibemodeTrack);
+        MusicDownloadManager.registerPlayingOrderList(vibemodeList);
+
         if (processToVibeMode) {
+            System.out.println("in launch!!!");
             MusicDownloadManager.downloadAll(toDownload, true);
             launchModeActivity();
         }
@@ -346,8 +356,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
     public void launchModeActivity() {
 
-
-        PlayList vibemodeList = new PlayList(vibemodeTrack, true);
         if (vibemodeList.hasNext()) {
             Intent intent = new Intent(this, FlashBackActivity.class);
             System.out.println("ddddddddd");
@@ -355,36 +363,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Player.playPlayList(vibemodeList);
             startActivity(intent);
         }
-
-//        ArrayList<Track> list = new ArrayList<>();
-//
-//
-//
-//        PlayList flashbackList = new PlayList(list, true);
-//        if (flashbackList.hasNext()) {
-//            Intent intent = new Intent(this, FlashBackActivity.class);
-//            Player.playPlayList(flashbackList);
-//            startActivity(intent);
-//        }
-//        else {
-//            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-//            builder1.setMessage("No track available for flashback");
-//            builder1.setCancelable(true);
-//
-//            builder1.setPositiveButton(
-//                    "Got it",
-//                    new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            dialog.cancel();
-//                        }
-//                    });
-//
-//            AlertDialog alert11 = builder1.create();
-//            alert11.show();
-//        }
     }
 
-    //  /storage/emulated/0/Download/wtf
     public void launchNewDownload() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Please Type Your URL");
@@ -428,12 +408,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 Player.setCurrentTrackLocation(new LocationAdapter(mLocation));
+                System.out.println(MockTrackTime.now());
                 Player.setCurrentTrackTime(MockTrackTime.now());
 
                 MockTrack currentTrack = new MockTrack(Player.getCurrentTrack(), currentUser);
                 Firebase.upload(currentTrack);
-//                DatabaseReference rf = myRef.child(titleAndAuthor);
-//                rf.setValue(currentTrack.getMockTrack());
                 if (!Player.playNext()) {
                     Updateables.updateAll();
                 }
@@ -506,10 +485,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onPause() {
         super.onPause();
 
+        ArrayList<Track> shareTracks = DataBase.getShareTracks();
+        int i = 0;
+        for (Track t : DataBase.getAllTracks()) {
+            for (i = 0; i < shareTracks.size(); i++) {
+                if (t.getName().equals(shareTracks.get(i).getName()) &&
+                        t.getArtist().equals(shareTracks.get(i).getArtist())) {
+                    break;
+                }
+            }
+            shareTracks.set(i, t);
+        }
+
         SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         ArrayList<MockTrack> mockTracks = new ArrayList<>();
-        for (Track each : DataBase.getAllTracks()) {
+        for (Track each : shareTracks) {
             mockTracks.add(each.getMockTrack());
         }
         try {
@@ -519,9 +510,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         editor.putString("lastActivity", "normal");
         editor.apply();
-
-        MusicDownloadManager.abortAll();
-
     }
 
     /**
@@ -534,17 +522,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     /**
-     * set up people api and get a list of google contacts
+     * AsyncTask for getting google contact list
+     * People API: https://developers.google.com/people/v1/read-people
      * reference: https://developers.google.com/people/v1/getting-started
      * https://developers.google.com/people/v1/read-people
      * https://developers.google.com/identity/sign-in/android/start-integrating
-     * @throws IOException
-     */
-
-
-    /**
-     * AsyncTask for getting google contact list
-     * People API: https://developers.google.com/people/v1/read-people
      */
     private class GetFriendsTaskRunner extends AsyncTask<String, String, String> {
 

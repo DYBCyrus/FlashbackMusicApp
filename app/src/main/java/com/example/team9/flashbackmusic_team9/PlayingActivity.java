@@ -1,8 +1,11 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.widget.TextView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -28,10 +32,12 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     private TextView album;
     private TextView location;
     private TextView time;
+    private TextView username;
     private String mAddressOutput;
     private ImageButton fav;
     private SeekBar seekbar;
     public Button back;
+    public Track lastTrack;
 
 
     @Override
@@ -48,31 +54,37 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             public void onClick(View v)
             {
                 finish();
-
             }
         });
 
-        findViewById(R.id.viewPlaylist).setVisibility(View.INVISIBLE);
+        lastTrack = Player.getCurrentTrack();
+
+        Button display = (Button) findViewById(R.id.viewPlaylist);
+        if (Player.getPlayList() == null) {
+            display.setVisibility(View.INVISIBLE);
+        }
         fav = findViewById(R.id.likeButton);
         title = findViewById(R.id.title);
         artist = findViewById(R.id.artist);
         album = findViewById(R.id.album);
         location = findViewById(R.id.location);
         time = findViewById(R.id.time);
+        username = findViewById(R.id.username);
 
         final ImageButton fav = findViewById(R.id.likeButton);
         seekbar = findViewById(R.id.seekBar);
 
-        TextView title = findViewById(R.id.title);
-        TextView artist = findViewById(R.id.artist);
-        TextView album = findViewById(R.id.album);
-
-        title.setText(Player.getCurrentTrack().getName());
-        artist.setText(Player.getCurrentTrack().getArtist());
-        album.setText(Player.getCurrentTrack().getAlbum().getName());
+        Firebase.pullDownUpdatedUser(Player.getCurrentTrack().getMockTrack().getURL(), this);
 
         seekbar.setMax(Player.getPlayer().getDuration());
         seekbar.setProgress(Player.getPlayer().getCurrentPosition());
+
+        display.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchViewPlaylistActivity();
+            }
+        });
 
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             boolean userTouch;
@@ -145,25 +157,44 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
                 (ImageButton)findViewById(R.id.nextButton), this);
         Updateables.addUpdateable(this);
 
-
-
-
     }
 
+    public void launchViewPlaylistActivity() {
+        Intent intent = new Intent(this, ViewPlaylistActivity.class);
+        startActivity(intent);
+    }
 
-    protected void startIntentService() {
+    protected void startIntentService(Location loc) {
         AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
         Intent intent = new Intent(this, FetchAddressIntentService.class);
         intent.putExtra("receiver", mResultReceiver);
-        if (Player.getCurrentTrack().getLocation() != null) {
-            Location loc = new Location("");
-            loc.setLongitude(Player.getCurrentTrack().getLocation().getLongitude());
-            loc.setLatitude(Player.getCurrentTrack().getLocation().getLatitude());
+        if (loc != null) {
+
             intent.putExtra("location", loc);
             startService(intent);
         }
     }
 
+    public void displayHistory(String userName, Location loc, LocalDateTime date) {
+        time.setText(date == null ? "No Playing History" : date.toString());
+        if (loc == null) {
+            location.setText("No Playing History");
+        } else {
+            startIntentService(loc);
+        }
+        if (userName == null) {
+            username.setText("None");
+        }
+        else {
+            if (userName.equals(MainActivity.getUser().getName())) {
+                SpannableString spanString = new SpannableString("you");
+                spanString.setSpan(new StyleSpan(Typeface.ITALIC), 0, spanString.length(), 0);
+                username.setText(spanString);
+            } else{
+                username.setText(userName);
+            }
+        }
+    }
     public void update() {
         Track track = Player.getCurrentTrack();
         if (track == null) {
@@ -173,16 +204,15 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         title.setText(track.getName());
         artist.setText(track.getArtist());
         album.setText(track.getAlbum().getName());
-        if (track.getLocation() != null) {
-            startIntentService();
-        } else {
-            location.setText("No playing history");
+
+        if (lastTrack != track) {
+            location.setText("Loading");
+            time.setText("Loading");
+            username.setText("Loading");
+            Firebase.pullDownUpdatedUser(Player.getCurrentTrack().getUrl(), this);
+            lastTrack = track;
         }
-        if (track.getDate() != null) {
-            time.setText(track.getDate().toString());
-        } else {
-            time.setText("No playing history");
-        }
+
         switch (track.getStatus()) {
             case LIKE:
                 fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
@@ -225,10 +255,22 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     protected void onPause() {
         super.onPause();
 
+        ArrayList<Track> shareTracks = DataBase.getShareTracks();
+        int i = 0;
+        for (Track t : DataBase.getAllTracks()) {
+            for (i = 0; i < shareTracks.size(); i++) {
+                if (t.getName().equals(shareTracks.get(i).getName()) &&
+                        t.getArtist().equals(shareTracks.get(i).getArtist())) {
+                    break;
+                }
+            }
+            shareTracks.set(i, t);
+        }
+
         SharedPreferences prefs = getSharedPreferences("mode", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         ArrayList<MockTrack> mockTracks = new ArrayList<>();
-        for (Track each : DataBase.getAllTracks()) {
+        for (Track each : shareTracks) {
             mockTracks.add(each.getMockTrack());
         }
         try {

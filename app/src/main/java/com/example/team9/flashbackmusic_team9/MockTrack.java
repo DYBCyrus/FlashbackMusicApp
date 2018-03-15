@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * Created by cyrusdeng on 18/02/2018.
  */
 
-public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
+public class MockTrack implements Serializable, ITrack {
     private int year = -1;
     private int month;
     private int day;
@@ -54,7 +54,8 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
         setLocation(t.getLocation());
         setDate(t.getDate());
     }
-    public MockTrack(ILocation loc, LocalDateTime time, User lastUser, String Url) {
+    public MockTrack(String title, ILocation loc, LocalDateTime time, User lastUser, String Url) {
+        this.title = title;
         setLocation(loc);
         setDate(time);
         setUser(lastUser);
@@ -116,7 +117,7 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
         return album;
     }
     public void setDate(LocalDateTime date) {
-        if (location != null) {
+        if (date != null) {
             this.year = date.getYear();
             this.month = date.getMonthValue();
             this.day = date.getDayOfMonth();
@@ -131,11 +132,11 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
             this.longitude = location.getLongitude();
             this.latitude = location.getLatitude();
         }
+        this.location = location;
     }
     public void setStatus(Track.FavoriteStatus status) {this.status = status;}
 
-    @Override
-    public int compareTo(@NonNull MockTrack MockTrack) {
+    public int compare(@NonNull MockTrack MockTrack) {
         int thisScore = 0;
         int trackScore = 0;
         int thisTieScore = 0;
@@ -201,5 +202,11 @@ public class MockTrack implements Serializable, Comparable<MockTrack>, ITrack {
     @Override
     public Track getTrack() {
         return localTrack;
+    }
+
+    @Override
+    public int compareTo(@NonNull ITrack iTrack) {
+        MockTrack track = (MockTrack)iTrack;
+        return compare(track);
     }
 }
