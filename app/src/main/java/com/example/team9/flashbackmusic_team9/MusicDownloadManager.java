@@ -56,7 +56,7 @@ public class MusicDownloadManager {
                                 if (!hasDownloadedOne) {
                                     hasDownloadedOne = true;
                                     if (context instanceof MainActivity) {
-                                        System.out.println("ccccccccccc");
+                                        LOGGER.info("ccccccccccc");
 
                                         ((MainActivity) context).launchModeActivity();
                                         LOGGER.info("Download mode launch successfully");
