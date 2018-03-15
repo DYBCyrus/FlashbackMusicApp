@@ -24,7 +24,7 @@ public class ViewPlaylistActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ArrayList<ITrack> trackList = new ArrayList<>();
-        for ( ITrack each:Player.getPlayList().getPlayingTracks()) {
+        for ( ITrack each:Player.getPlayList().getViewTracks()) {
             if(each.isPlayable() || !each.hasDownloaded()) {
                 trackList.add(each);
             }
