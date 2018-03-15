@@ -11,7 +11,7 @@ import java.util.Stack;
  * Created by Chutong Yang on 2/5/2018.
  */
 
-public class Track implements Comparable<Track>, ITrack
+public class Track implements ITrack
 {
 //    private MockTrack mockTrack;
 
@@ -26,6 +26,12 @@ public class Track implements Comparable<Track>, ITrack
     private Stack<FavoriteStatusButton> fsButtons = new Stack<>();
     private int mockHour = -1;
     private int mockDate = -1;
+
+    @Override
+    public int compareTo(@NonNull ITrack iTrack) {
+        Track track = (Track)iTrack;
+        return compare(track);
+    }
 
     public enum FavoriteStatus {
         LIKE,DISLIKE,NEUTRAL
@@ -170,8 +176,8 @@ public class Track implements Comparable<Track>, ITrack
     public boolean hasPlayHistory() {
         return date != null && status != FavoriteStatus.DISLIKE;
     }
-    @Override
-    public int compareTo(@NonNull Track track) {
+
+    public int compare(@NonNull Track track) {
         int thisScore = 0;
         int trackScore = 0;
 
