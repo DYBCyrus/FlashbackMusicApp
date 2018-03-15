@@ -19,12 +19,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 /**
  * Created by cyrusdeng on 10/03/2018.
  */
 
 public class Firebase {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+
     public static FirebaseDatabase database;
     public static DatabaseReference myRef;
 
@@ -39,7 +43,7 @@ public class Firebase {
     }
 
     public static void upload(MockTrack currentTrack) {
-
+        LOGGER.info("URL in FireBase: "+ currentTrack.getURL().replace("/", "").replace(".", ""));
         myRef.child(currentTrack.getURL().replace("/", "").replace(".", "")).setValue(currentTrack);
     }
 
@@ -74,6 +78,7 @@ public class Firebase {
                 Collections.sort(toDownload);
                 for (MockTrack each : toDownload) {
                     System.out.println(each.getURL());
+                    LOGGER.info("pullDown URL" + each.getURL());
                 }
                 activity.processDownload(toDownload);
 
@@ -100,6 +105,7 @@ public class Firebase {
                     name = "None";
                 }
                 System.out.println(name);
+
                 if (name.equals(MainActivity.getUser().getName())) {
                     SpannableString spanString = new SpannableString("you");
                     spanString.setSpan(new StyleSpan(Typeface.ITALIC), 0, spanString.length(), 0);
@@ -107,6 +113,7 @@ public class Firebase {
                 } else {
                     toUpdate.setText(name);
                 }
+                LOGGER.info("Name in FireBase" + name);
             }
 
             @Override

@@ -6,26 +6,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.webkit.URLUtil;
 import android.widget.Toast;
-
-import org.mortbay.jetty.Main;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.logging.Logger;
 
 /**
  * Created by Kent on 3/4/2018.
  */
 
 public class MusicDownloadManager {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     private static Context context;
     private static DownloadManager downloadManager;
     private static MockTrack currentDownload;
@@ -61,6 +59,7 @@ public class MusicDownloadManager {
                                         System.out.println("ccccccccccc");
 
                                         ((MainActivity) context).launchModeActivity();
+                                        LOGGER.info("Download mode launch successfully");
                                     }
                                 }
                             }
@@ -91,7 +90,7 @@ public class MusicDownloadManager {
         }
 
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, null, null).replace("-","_"));
-
+        LOGGER.info("start download");
         // get download service and enqueue file
         downloadManager.enqueue(request);
     }
@@ -103,6 +102,7 @@ public class MusicDownloadManager {
         while(c.moveToNext()) {
             downloadManager.remove(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)));
         }
+        LOGGER.info("remove all");
     }
     public static boolean downloadAll(ArrayList<MockTrack> a, boolean hasDownloadedTrack) {
         hasDownloadedOne = hasDownloadedTrack;
@@ -111,7 +111,7 @@ public class MusicDownloadManager {
             currentDownload = toDownload.next();
             if (!currentDownload.hasDownloaded()) {
                 startDownloadTask(currentDownload.getURL());
-                System.out.println("bbbbbbbbbb");
+                LOGGER.info("Not downloading");
 
                 return true;
             }

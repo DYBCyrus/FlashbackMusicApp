@@ -11,12 +11,14 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 /**
  * Created by cyrusdeng on 17/02/2018.
  */
 
 public class SimpleTrackListAdapter extends ArrayAdapter< ITrack> {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     public SimpleTrackListAdapter(Context context, int resourceId, ArrayList<ITrack> tracks) {
         super(context, resourceId, tracks);
     }
@@ -27,7 +29,7 @@ public class SimpleTrackListAdapter extends ArrayAdapter< ITrack> {
         }
 
         ITrack track = getItem(position);
-        System.out.println(track.getName());
+        LOGGER.info(track.getName());
         ((TextView)convertView.findViewById(R.id.track_names)).setText(track.getName());
         if (!track.hasDownloaded()) {
             ((TextView)convertView.findViewById(R.id.track_names)).setTextColor(Color.GRAY);
