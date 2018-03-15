@@ -12,9 +12,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.webkit.URLUtil;
 import android.widget.Toast;
-
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ListIterator;
 import java.util.logging.Logger;
 
@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 public class MusicDownloadManager {
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static PlayList viewList;
     private static Context context;
     private static DownloadManager downloadManager;
     private static MockTrack currentDownload;
@@ -53,11 +54,13 @@ public class MusicDownloadManager {
                             if (currentDownload != null) {
                                 currentDownload.setTrack(loadedTrack);
                                 loadedTrack.setDataFromMockTrack(currentDownload);
+
+                                reorderPlayingList();
+
                                 if (!hasDownloadedOne) {
                                     hasDownloadedOne = true;
                                     if (context instanceof MainActivity) {
                                         LOGGER.info("ccccccccccc");
-
                                         ((MainActivity) context).launchModeActivity();
                                         LOGGER.info("Download mode launch successfully");
                                     }
@@ -112,7 +115,6 @@ public class MusicDownloadManager {
             if (!currentDownload.hasDownloaded()) {
                 startDownloadTask(currentDownload.getURL());
                 LOGGER.info("Not downloading");
-
                 return true;
             }
         }
@@ -121,5 +123,32 @@ public class MusicDownloadManager {
             toast.show();
         }
         return false;
+    }
+
+    public static void registerPlayingOrderList(PlayList viewList1) {
+        viewList = viewList1;
+    }
+
+    public static void reorderPlayingList() {
+        // have downloaded
+        ArrayList<MockTrack> t = (ArrayList<MockTrack>)viewList.getPlayingTracks();
+        Track currentPlaying = Player.getCurrentTrack();
+        int i;
+        for (i = 0; i < t.size(); i++) {
+            if (t.get(i).getTrack().equals(currentPlaying)) {
+                break;
+            }
+        }
+        ArrayList<MockTrack> suborder = new ArrayList<>(t.subList(((i+1)>t.size() ? i : (i+1)),t.size()));
+        suborder.add(currentDownload);
+        Collections.sort(suborder);
+
+        if (i+1 < t.size()) {
+            t.subList(i+1,t.size()).clear();
+        }
+        for (MockTrack track : suborder) {
+            t.add(track);
+        }
+        viewList.setPlayingTracks(t);
     }
 }

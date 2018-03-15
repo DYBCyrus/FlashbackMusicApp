@@ -43,8 +43,22 @@ public class Firebase {
     }
 
     public static void upload(MockTrack currentTrack) {
-        LOGGER.info("URL in FireBase: "+ currentTrack.getURL().replace("/", "").replace(".", ""));
-        myRef.child(currentTrack.getURL().replace("/", "").replace(".", "")).setValue(currentTrack);
+
+        DatabaseReference ref = myRef.child(currentTrack.getURL().replace("/", "").replace(".", ""));
+        ref.child("name").setValue(currentTrack.getName());
+        ref.child("album").setValue(currentTrack.getAlbum());
+        ref.child("url").setValue(currentTrack.getURL());
+        DatabaseReference historyRef = ref.child("playingHistory").push();
+        historyRef.child("userName").setValue(currentTrack.getUserName());
+        historyRef.child("userEmail").setValue(currentTrack.getUserEmail());
+        historyRef.child("latitude").setValue(currentTrack.getLatitude());
+        historyRef.child("longitude").setValue(currentTrack.getLongitude());
+        historyRef.child("year").setValue(currentTrack.getYear());
+        historyRef.child("month").setValue(currentTrack.getMonth());
+        historyRef.child("day").setValue(currentTrack.getDay());
+        historyRef.child("hour").setValue(currentTrack.getHour());
+        historyRef.child("minute").setValue(currentTrack.getMinute());
+        historyRef.child("second").setValue(currentTrack.getSecond());
     }
 
     public static void pullDown(final MainActivity activity) {
@@ -56,26 +70,29 @@ public class Firebase {
 
                 for (DataSnapshot trackData : dataSnapshot.getChildren()) {
                     System.out.println(trackData.getKey());
-                    ILocation loc = new LocationAdapter(new Location(""));
-                    loc.setLatitude((double)trackData.child("latitude").getValue());
-                    loc.setLongitude((double)trackData.child("longitude").getValue());
+                    ArrayList<MockTrack> toSort = new ArrayList<>();
+                    for (DataSnapshot history : trackData.child("playingHistory").getChildren()) {
+                        ILocation loc = new LocationAdapter(new Location(""));
+                        loc.setLatitude((double) history.child("latitude").getValue());
+                        loc.setLongitude((double) history.child("longitude").getValue());
 
-                    LocalDateTime time = LocalDateTime.of(
-                            ((Long)trackData.child("year").getValue()).intValue(),
-                            ((Long)trackData.child("month").getValue()).intValue(),
-                            ((Long)trackData.child("day").getValue()).intValue(),
-                            ((Long)trackData.child("hour").getValue()).intValue(),
-                            ((Long)trackData.child("minute").getValue()).intValue(),
-                            ((Long)trackData.child("second").getValue()).intValue()
-                    );
-                    User user = new User((String)trackData.child("user").child("email").getValue(),
-                            (String)trackData.child("user").child("name").getValue());
-                    String url = (String)trackData.child("url").getValue();
-                    String title = (String)trackData.child("name").getValue();
-                    MockTrack newTrack = new MockTrack(title, loc, time, user, url);
-                    toDownload.add(newTrack);
+                        LocalDateTime time = LocalDateTime.of(
+                                ((Long) history.child("year").getValue()).intValue(),
+                                ((Long) history.child("month").getValue()).intValue(),
+                                ((Long) history.child("day").getValue()).intValue(),
+                                ((Long) history.child("hour").getValue()).intValue(),
+                                ((Long) history.child("minute").getValue()).intValue(),
+                                ((Long) history.child("second").getValue()).intValue()
+                        );
+                        User user = new User((String) history.child("userEmail").getValue(),
+                                (String) history.child("userName").getValue());
+                        String url = (String) trackData.child("url").getValue();
+                        String title = (String) trackData.child("name").getValue();
+                        toSort.add(new MockTrack(title, loc, time, user, url));
+                    }
+                    Collections.sort(toSort);
+                    toDownload.add(toSort.get(0));
                 }
-                Collections.sort(toDownload);
                 for (MockTrack each : toDownload) {
                     System.out.println(each.getURL());
                     LOGGER.info("pullDown URL" + each.getURL());
@@ -94,27 +111,48 @@ public class Firebase {
     private static TextView toUpdate;
 
 
-    public static void pullDownUpdatedUser(String url, TextView t) {
-        toUpdate = t;
+    public static void pullDownUpdatedUser(String url, PlayingActivity activity) {
         DatabaseReference dref = myRef.child(url.replace("/", "").replace(".", ""));
         dref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                name = (String)dataSnapshot.child("userName").getValue();
-                if (name == null) {
-                    name = "None";
+                if (!dataSnapshot.child("playingHistory").hasChildren()) {
+                    activity.displayHistory(null, null, null);
                 }
-                System.out.println(name);
+                else {
+                    ArrayList<MockTrack> toSort = new ArrayList<>();
+                    for (DataSnapshot history : dataSnapshot.child("playingHistory").getChildren()) {
+                        ILocation loc = new LocationAdapter(new Location(""));
+                        loc.setLatitude((double) history.child("latitude").getValue());
+                        loc.setLongitude((double) history.child("longitude").getValue());
 
-                if (name.equals(MainActivity.getUser().getName())) {
-                    SpannableString spanString = new SpannableString("you");
-                    spanString.setSpan(new StyleSpan(Typeface.ITALIC), 0, spanString.length(), 0);
-                    toUpdate.setText(spanString);
-                } else {
-                    toUpdate.setText(name);
+                        LocalDateTime time = LocalDateTime.of(
+                                ((Long) history.child("year").getValue()).intValue(),
+                                ((Long) history.child("month").getValue()).intValue(),
+                                ((Long) history.child("day").getValue()).intValue(),
+                                ((Long) history.child("hour").getValue()).intValue(),
+                                ((Long) history.child("minute").getValue()).intValue(),
+                                ((Long) history.child("second").getValue()).intValue()
+                        );
+                        User user = new User((String) history.child("userEmail").getValue(),
+                                (String) history.child("userName").getValue());
+                        String url = (String) dataSnapshot.child("url").getValue();
+                        String title = (String) dataSnapshot.child("name").getValue();
+                        toSort.add(new MockTrack(title, loc, time, user, url));
+                    }
+                    Collections.sort(toSort);
+                    MockTrack t = toSort.get(0);
+                    String name = t.getUserName();
+
+                    Location loc = new Location("");
+                    loc.setLatitude(t.getLatitude());
+                    loc.setLongitude(t.getLongitude());
+                    LocalDateTime date= t.getDateTime();
+                    activity.displayHistory(name, loc, date);
                 }
-                LOGGER.info("Name in FireBase" + name);
+
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -123,5 +161,4 @@ public class Firebase {
         });
     }
 
-    public static String getName() {return name;}
 }

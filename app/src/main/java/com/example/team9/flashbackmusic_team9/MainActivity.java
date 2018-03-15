@@ -59,6 +59,8 @@ import java.util.logging.Logger;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+    private PlayList vibemodeList;
+
     //Dropdown menu and its options
     private Spinner spinner;
     private static final String[]paths = {"title","album","artist","favorite status"};
@@ -282,8 +284,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         tracksAdapter.sort(comparator);
         tracksAdapter.notifyDataSetChanged();
-//        System.out.println(DataBase.getAllTracks().get(0).getName());
-//        System.out.println(DataBase.getAllTracks().get(0).getStatus());
     }
 
 
@@ -319,6 +319,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void processDownload(ArrayList<MockTrack> toDownload) {
 
         vibemodeTrack = toDownload;
+
         System.out.println("aaaaaaaaa");
         if (toDownload.isEmpty()) {
             Toast toast = Toast.makeText(this, "No Vibe Mode Tracks Available", Toast.LENGTH_SHORT);
@@ -326,13 +327,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         boolean processToVibeMode = false;
         for (MockTrack each : toDownload) {
+            System.out.println("toDownload "+each.getName());
             if (DataBase.contain(each)) {
+                System.out.println("contain!");
                 if (each.isPlayable()){
                     processToVibeMode = true;
                 }
             }
         }
+
+        ArrayList<MockTrack> orderTracks = new ArrayList<>();
+        for (MockTrack t : vibemodeTrack) {
+            if (t.hasDownloaded()) {
+                orderTracks.add(t);
+            }
+        }
+        vibemodeList = new PlayList(orderTracks, true);
+        vibemodeList.setViewTracks(vibemodeTrack);
+        MusicDownloadManager.registerPlayingOrderList(vibemodeList);
+
         if (processToVibeMode) {
+            System.out.println("in launch!!!");
             MusicDownloadManager.downloadAll(toDownload, true);
             launchModeActivity();
         }
@@ -345,8 +360,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
     public void launchModeActivity() {
 
-
-        PlayList vibemodeList = new PlayList(vibemodeTrack, true);
         if (vibemodeList.hasNext()) {
             Intent intent = new Intent(this, FlashBackActivity.class);
             System.out.println("ddddddddd");
@@ -356,7 +369,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    //  /storage/emulated/0/Download/wtf
     public void launchNewDownload() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Please Type Your URL");

@@ -1,7 +1,5 @@
 package com.example.team9.flashbackmusic_team9;
 
-import android.content.res.AssetFileDescriptor;
-import android.location.Location;
 import android.media.MediaPlayer;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -17,10 +15,6 @@ public class Player {
 
     public static void start(Track track) {
         player.reset();
-//        if (track.getStatus() == Track.FavoriteStatus.DISLIKE) {
-//            playNext();
-//            return;
-//        }
         try {
             player.setDataSource(track.getPath());
             currentTrack = track;

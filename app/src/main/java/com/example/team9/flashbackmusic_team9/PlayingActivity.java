@@ -1,8 +1,11 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.widget.TextView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -33,6 +37,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
     private ImageButton fav;
     private SeekBar seekbar;
     public Button back;
+    public Track lastTrack;
 
 
     @Override
@@ -52,6 +57,8 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             }
         });
 
+        lastTrack = Player.getCurrentTrack();
+
         Button display = (Button) findViewById(R.id.viewPlaylist);
         if (Player.getPlayList() == null) {
             display.setVisibility(View.INVISIBLE);
@@ -67,7 +74,7 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         final ImageButton fav = findViewById(R.id.likeButton);
         seekbar = findViewById(R.id.seekBar);
 
-        Firebase.pullDownUpdatedUser(Player.getCurrentTrack().getMockTrack().getURL(), username);
+        Firebase.pullDownUpdatedUser(Player.getCurrentTrack().getMockTrack().getURL(), this);
 
         seekbar.setMax(Player.getPlayer().getDuration());
         seekbar.setProgress(Player.getPlayer().getCurrentPosition());
@@ -157,19 +164,37 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         startActivity(intent);
     }
 
-    protected void startIntentService() {
+    protected void startIntentService(Location loc) {
         AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
         Intent intent = new Intent(this, FetchAddressIntentService.class);
         intent.putExtra("receiver", mResultReceiver);
-        if (Player.getCurrentTrack().getLocation() != null) {
-            Location loc = new Location("");
-            loc.setLongitude(Player.getCurrentTrack().getLocation().getLongitude());
-            loc.setLatitude(Player.getCurrentTrack().getLocation().getLatitude());
+        if (loc != null) {
+
             intent.putExtra("location", loc);
             startService(intent);
         }
     }
 
+    public void displayHistory(String userName, Location loc, LocalDateTime date) {
+        time.setText(date == null ? "No Playing History" : date.toString());
+        if (loc == null) {
+            location.setText("No Playing History");
+        } else {
+            startIntentService(loc);
+        }
+        if (userName == null) {
+            username.setText("None");
+        }
+        else {
+            if (userName.equals(MainActivity.getUser().getName())) {
+                SpannableString spanString = new SpannableString("you");
+                spanString.setSpan(new StyleSpan(Typeface.ITALIC), 0, spanString.length(), 0);
+                username.setText(spanString);
+            } else{
+                username.setText(userName);
+            }
+        }
+    }
     public void update() {
         Track track = Player.getCurrentTrack();
         if (track == null) {
@@ -180,20 +205,14 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
         artist.setText(track.getArtist());
         album.setText(track.getAlbum().getName());
 
-        if (Player.getCurrentTrack() != null) {
-            Firebase.pullDownUpdatedUser(Player.getCurrentTrack().getMockTrack().getURL(), username);
+        if (lastTrack != track) {
+            location.setText("Loading");
+            time.setText("Loading");
+            username.setText("Loading");
+            Firebase.pullDownUpdatedUser(Player.getCurrentTrack().getUrl(), this);
+            lastTrack = track;
         }
 
-        if (track.getLocation() != null) {
-            startIntentService();
-        } else {
-            location.setText("No playing history");
-        }
-        if (track.getDate() != null) {
-            time.setText(track.getDate().toString());
-        } else {
-            time.setText("No playing history");
-        }
         switch (track.getStatus()) {
             case LIKE:
                 fav.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.check_mark,
