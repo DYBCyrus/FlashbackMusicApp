@@ -140,14 +140,19 @@ public class Firebase {
 
                         toSort.add(new MockTrack(title, loc, time, user, url));
                     }
-                    Collections.sort(toSort);
-                    MockTrack t = toSort.get(0);
-                    String name = t.getUserName();
+                    MockTrack mostRecentTrack = toSort.get(0);
+                    for (int i = 1; i < toSort.size(); i++) {
+                        MockTrack temp = toSort.get(i);
+                        if (temp.getDateTime().isAfter(mostRecentTrack.getDateTime()) && temp.getDateTime().isBefore(MockTrackTime.now())) {
+                            mostRecentTrack = temp;
+                        }
+                    }
+                    String name = mostRecentTrack.getUserName();
 
                     Location loc = new Location("");
-                    loc.setLatitude(t.getLatitude());
-                    loc.setLongitude(t.getLongitude());
-                    LocalDateTime date= t.getDateTime();
+                    loc.setLatitude(mostRecentTrack.getLatitude());
+                    loc.setLongitude(mostRecentTrack.getLongitude());
+                    LocalDateTime date= mostRecentTrack.getDateTime();
                     activity.displayHistory(name, loc, date);
                 }
 
