@@ -1,8 +1,6 @@
 package ScenarioTests;
 
-import android.support.test.espresso.DataInteraction;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.view.View;
@@ -14,20 +12,19 @@ import com.example.team9.flashbackmusic_team9.R;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -47,7 +44,8 @@ public class UserStory2ScenarioTest {
     public GrantPermissionRule permissionRule3 = GrantPermissionRule.grant(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
     @Test
-    public void TestVibeModeTrackList() {
+    public void TestViewTrackList()
+    {
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
@@ -58,7 +56,7 @@ public class UserStory2ScenarioTest {
         }
 
         ViewInteraction appCompatButton = onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.signin), withText("SignIn"),
+                allOf(withId(R.id.signin), withText("SignIn"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.support.design.widget.CoordinatorLayout")),
@@ -76,8 +74,6 @@ public class UserStory2ScenarioTest {
             e.printStackTrace();
         }
 
-        onView(withId(R.id.signin)).perform(click());
-
         ViewInteraction appCompatButton2 = onView(
                 allOf(withId(R.id.mode), withText("FlashBack"),
                         childAtPosition(
@@ -88,8 +84,43 @@ public class UserStory2ScenarioTest {
                         isDisplayed()));
         appCompatButton2.perform(click());
 
+        // Added a sleep statement to match the app's execution delay.
+        // The recommended way to handle such scenarios is to use Espresso idling resources:
+        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        DataInteraction song = onData(anything()).inAdapterView(withId(R.id.track_list)).atPosition(1);
+        ViewInteraction appCompatButton3 = onView(
+                allOf(withId(R.id.viewPlaylist), withText("View Playlist"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.CoordinatorLayout")),
+                                        1),
+                                0),
+                        isDisplayed()));
+        appCompatButton3.perform(click());
+
+        // Added a sleep statement to match the app's execution delay.
+        // The recommended way to handle such scenarios is to use Espresso idling resources:
+        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction listView = onView(
+                allOf(withId(R.id.simple_track_list),
+                        childAtPosition(
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
+                                        1),
+                                1),
+                        isDisplayed()));
+        listView.check(matches(isDisplayed()));
 
     }
 

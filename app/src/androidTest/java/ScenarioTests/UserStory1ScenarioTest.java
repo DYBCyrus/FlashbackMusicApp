@@ -1,9 +1,7 @@
 package ScenarioTests;
 
 
-import android.support.test.espresso.DataInteraction;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -17,13 +15,12 @@ import com.example.team9.flashbackmusic_team9.R;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -32,7 +29,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
 
 @LargeTest
@@ -52,9 +48,6 @@ public class UserStory1ScenarioTest {
 
     @Test
     public void TestVibeModePlayTrack() {
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -62,7 +55,7 @@ public class UserStory1ScenarioTest {
         }
 
         ViewInteraction appCompatButton = onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.signin), withText("SignIn"),
+                allOf(withId(R.id.signin), withText("SignIn"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.support.design.widget.CoordinatorLayout")),
@@ -80,8 +73,6 @@ public class UserStory1ScenarioTest {
             e.printStackTrace();
         }
 
-        onView(withId(R.id.signin)).perform(click());
-
         ViewInteraction appCompatButton2 = onView(
                 allOf(withId(R.id.mode), withText("FlashBack"),
                         childAtPosition(
@@ -92,16 +83,34 @@ public class UserStory1ScenarioTest {
                         isDisplayed()));
         appCompatButton2.perform(click());
 
-
-        DataInteraction song = onData(anything()).inAdapterView(withId(R.id.track_list)).atPosition(1);
-
+        // Added a sleep statement to match the app's execution delay.
+        // The recommended way to handle such scenarios is to use Espresso idling resources:
+        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        DataInteraction song1 = onData(anything()).inAdapterView(withId(R.id.nextButton)).atPosition(1);
-        song1.check(matches(isDisplayed()));
+
+        ViewInteraction appCompatImageButton = onView(
+                allOf(withId(R.id.play_pause_button),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.support.design.widget.CoordinatorLayout")),
+                                        1),
+                                11),
+                        isDisplayed()));
+        appCompatImageButton.perform(click());
+
+        ViewInteraction imageButton = onView(
+                allOf(withId(R.id.play_pause_button),
+                        childAtPosition(
+                                childAtPosition(
+                                        IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
+                                        1),
+                                11),
+                        isDisplayed()));
+        imageButton.check(matches(isDisplayed()));
 
     }
 
