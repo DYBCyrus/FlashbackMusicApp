@@ -55,8 +55,4 @@ public class MockTrackTime implements ILocalDateTime{
         return this.now().getSecond();
     }
 
-    public boolean isAfter(LocalDateTime time)
-    {
-        return true;
-    }
 }

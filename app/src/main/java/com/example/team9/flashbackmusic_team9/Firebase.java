@@ -19,12 +19,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 /**
  * Created by cyrusdeng on 10/03/2018.
  */
 
 public class Firebase {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+
     public static FirebaseDatabase database;
     public static DatabaseReference myRef;
 
@@ -54,7 +58,8 @@ public class Firebase {
         historyRef.child("day").setValue(currentTrack.getDay());
         historyRef.child("hour").setValue(currentTrack.getHour());
         historyRef.child("minute").setValue(currentTrack.getMinute());
-        historyRef.child("second").setValue(currentTrack.getSecond());    }
+        historyRef.child("second").setValue(currentTrack.getSecond());
+    }
 
     public static void pullDown(final MainActivity activity) {
         Query query = myRef.orderByKey();
@@ -90,6 +95,7 @@ public class Firebase {
                 }
                 for (MockTrack each : toDownload) {
                     System.out.println(each.getURL());
+                    LOGGER.info("pullDown URL" + each.getURL());
                 }
                 activity.processDownload(toDownload);
 

@@ -4,15 +4,14 @@ import android.location.Location;
 import android.support.test.rule.ActivityTestRule;
 
 import com.example.team9.flashbackmusic_team9.Album;
-import com.example.team9.flashbackmusic_team9.LocationAdapter;
 import com.example.team9.flashbackmusic_team9.MainActivity;
 import com.example.team9.flashbackmusic_team9.MockLocation;
 import com.example.team9.flashbackmusic_team9.MockTrack;
 import com.example.team9.flashbackmusic_team9.MockTrackTime;
 import com.example.team9.flashbackmusic_team9.Track;
+import com.example.team9.flashbackmusic_team9.User;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -27,18 +26,16 @@ public class JUnitTestMockTrack
     @Rule
     public ActivityTestRule<MainActivity> mainActivity = new ActivityTestRule<MainActivity>(MainActivity.class);
 
-    MockTrack track1;
-    MockTrack track2;
-    @Before
-    public void setUp()
-    {
-        track1 = new MockTrack(Track.FavoriteStatus.LIKE);
-        track2 = new MockTrack(Track.FavoriteStatus.LIKE);
-    }
-
     @Test
     public void testCompareTo()
     {
+        Album album1 = new Album("album1");
+        mainActivity.getActivity().setCurrentUser(new User("", ""));
+        MockTrack track1 = new MockTrack(new Track("Track1","Tony", album1, null), new User("",""));
+        MockTrack track2 = new MockTrack(new Track("Track2","Tony", album1, null), new User("",""));
+
+        track1.setStatus(Track.FavoriteStatus.LIKE);
+        track2.setStatus(Track.FavoriteStatus.LIKE);
         LocalDateTime dateTime = LocalDateTime.of(2018, 3, 3,12, 5);
         MockTrackTime.useFixedClockAt(dateTime);
 

@@ -2,8 +2,6 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -13,8 +11,10 @@ import android.widget.ListView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class ViewPlaylistActivity extends AppCompatActivity {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +68,7 @@ public class ViewPlaylistActivity extends AppCompatActivity {
         }
         try {
             editor.putString("tracks", ObjectSerializer.serialize(mockTracks));
+            LOGGER.info("Try serialization");
         } catch (IOException e) {
             e.printStackTrace();
         }

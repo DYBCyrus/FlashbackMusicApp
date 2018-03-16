@@ -10,12 +10,14 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 /**
  * Created by cyrusdeng on 05/02/2018.
  */
 
 public class TrackListAdapter extends ArrayAdapter<Track> {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     private int resouceId;
     public TrackListAdapter(Context context, int resourceId, ArrayList<Track> tracks) {
         super(context, resourceId, tracks);
@@ -30,6 +32,7 @@ public class TrackListAdapter extends ArrayAdapter<Track> {
         }
 
         ((TextView)convertView.findViewById(R.id.track_names)).setText(track.getName());
+        LOGGER.info(track.getName());
         FavoriteStatusButton fav = convertView.findViewById(R.id.change_status);
         track.addListeningFavoriteStatusButton(fav);
         return convertView;
