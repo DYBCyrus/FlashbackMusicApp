@@ -11,12 +11,25 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.webkit.URLUtil;
 import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
+
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ListIterator;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.logging.Logger;
 
 /**
@@ -53,7 +66,19 @@ public class MusicDownloadManager {
                         if (downloadFileLocalUri != null) {
                             System.out.println(downloadFileLocalUri);
                             File mFile = new File(downloadFileLocalUri);
-                            Track loadedTrack = DataBase.addDownloadedTrack(mFile.getAbsolutePath().substring(6), downloadUri);
+                            Track loadedTrack = null;
+                            if (mFile.getAbsolutePath().endsWith(".zip")) {
+                                ArrayList<File> unzipped = unpackZip(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), mFile.getName()));
+                                for( File each : unzipped) {
+                                    Track t = DataBase.addDownloadedTrack(each.getAbsolutePath(), downloadUri);
+                                    System.out.println(t.getName());
+                                    if (currentDownload != null && t.getName().equals(currentDownload.getName())) {
+                                        loadedTrack = t;
+                                    }
+                                }
+                            } else {
+                                loadedTrack = DataBase.addDownloadedTrack(mFile.getAbsolutePath().substring(6), downloadUri);
+                            }
                             if (currentDownload != null) {
                                 currentDownload.setTrack(loadedTrack);
                                 loadedTrack.setDataFromMockTrack(currentDownload);
@@ -87,10 +112,58 @@ public class MusicDownloadManager {
         };
         context.registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
+    private static ArrayList<File> unpackZip(File toUnzip)
+    {
+        InputStream is;
+        ZipInputStream zis;
+        ArrayList<File> unzippedFiles = new ArrayList<>();
+        try
+        {
+            String filename;
+            is = new FileInputStream(toUnzip);
+            zis = new ZipInputStream(new BufferedInputStream(is));
+            ZipEntry ze;
+            byte[] buffer = new byte[1024];
+            int count;
+            String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+            while ((ze = zis.getNextEntry()) != null)
+            {
+                filename = ze.getName();
+                File fmd = new File(path, filename);
+
+                // Need to create directories if not exists, or
+                // it will generate an Exception...
+                if (ze.isDirectory()) {
+                    fmd.mkdirs();
+                    continue;
+                }
+
+                FileOutputStream fout = new FileOutputStream(fmd);
+
+                // cteni zipu a zapis
+                while ((count = zis.read(buffer)) != -1)
+                {
+                    fout.write(buffer, 0, count);
+                }
+
+                fout.close();
+                zis.closeEntry();
+                unzippedFiles.add(fmd);
+            }
+
+            zis.close();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+
+        return unzippedFiles;
+    }
     public static void startDownloadTask(String url) {
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         currentRequest = request;
-        request.setMimeType("audio/MP3");
         // in order for this if to run, you must use the android 3.2 to compile your app
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             request.allowScanningByMediaScanner();
