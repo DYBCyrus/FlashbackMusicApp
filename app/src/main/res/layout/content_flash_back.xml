@@ -23,6 +23,14 @@
         android:layout_height="wrap_content"
         android:text = "BACK"/>
 
+    <Button
+        android:id = "@+id/setTime"
+        android:layout_marginTop = "15dp"
+        android:layout_marginLeft="280dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text = "set time"/>
+
     <ImageButton
         android:id="@+id/likeButton"
         android:layout_width="30dp"
