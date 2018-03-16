@@ -85,7 +85,9 @@ public class Firebase {
                                 (String) history.child("userName").getValue());
                         String url = (String) trackData.child("url").getValue();
                         String title = (String) trackData.child("name").getValue();
-                        toSort.add(new MockTrack(title, loc, time, user, url));
+                        if (!user.getEmail().equals(MainActivity.getUser().getEmail())) {
+                            toSort.add(new MockTrack(title, loc, time, user, url));
+                        }
                     }
                     Collections.sort(toSort);
                     toDownload.add(toSort.get(0));
@@ -135,6 +137,7 @@ public class Firebase {
                                 (String) history.child("userName").getValue());
                         String url = (String) dataSnapshot.child("url").getValue();
                         String title = (String) dataSnapshot.child("name").getValue();
+
                         toSort.add(new MockTrack(title, loc, time, user, url));
                     }
                     Collections.sort(toSort);
