@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         ArrayList<Track> allTracks = DataBase.getAllTracks();
+        System.out.println(currentTasks.size()+" share pref");
         if (currentTasks.size() == allTracks.size()) {
             for (int i = 0; i < allTracks.size(); i++) {
                 allTracks.get(i).setDataFromMockTrack(currentTasks.get(i));
@@ -486,7 +487,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onPause();
 
         ArrayList<Track> shareTracks = DataBase.getShareTracks();
-        int i = 0;
+        int i;
         for (Track t : DataBase.getAllTracks()) {
             for (i = 0; i < shareTracks.size(); i++) {
                 if (t.getName().equals(shareTracks.get(i).getName()) &&

@@ -1,10 +1,7 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.location.Location;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
 import android.widget.TextView;
 
 import com.google.firebase.FirebaseApp;

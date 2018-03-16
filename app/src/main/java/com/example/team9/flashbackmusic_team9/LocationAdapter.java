@@ -2,11 +2,13 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.location.Location;
 
+import java.io.Serializable;
+
 /**
  * Created by Chutong on 3/8/18.
  */
 
-public class LocationAdapter implements ILocation
+public class LocationAdapter implements ILocation, Serializable
 {
     Location location;
 
