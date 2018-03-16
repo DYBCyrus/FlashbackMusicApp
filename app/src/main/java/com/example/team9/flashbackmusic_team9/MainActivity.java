@@ -58,8 +58,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     private PlayList vibemodeList;
 
@@ -121,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         PackageManager.PERMISSION_GRANTED ||
                 checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
+            LOGGER.info("Asking permission");
         }
 
         // mode history
@@ -162,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         ArrayList<Track> allTracks = DataBase.getAllTracks();
+        System.out.println(currentTasks.size()+" share pref");
         if (currentTasks.size() == allTracks.size()) {
             for (int i = 0; i < allTracks.size(); i++) {
                 allTracks.get(i).setDataFromMockTrack(currentTasks.get(i));
@@ -190,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (track.getStatus() != Track.FavoriteStatus.DISLIKE) {
                     Player.start(track);
                     launchPlayingActivity();
+                    LOGGER.info("UI launch successfully");
                 }
             }
         });
@@ -505,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onPause();
 
         ArrayList<Track> shareTracks = DataBase.getShareTracks();
-        int i = 0;
+        int i;
         for (Track t : DataBase.getAllTracks()) {
             for (i = 0; i < shareTracks.size(); i++) {
                 if (t.getName().equals(shareTracks.get(i).getName()) &&

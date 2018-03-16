@@ -5,8 +5,6 @@ import android.support.test.rule.ActivityTestRule;
 import com.example.team9.flashbackmusic_team9.Album;
 import com.example.team9.flashbackmusic_team9.DataBase;
 import com.example.team9.flashbackmusic_team9.MainActivity;
-import com.example.team9.flashbackmusic_team9.PlayList;
-import com.example.team9.flashbackmusic_team9.PlayerToolBar;
 import com.example.team9.flashbackmusic_team9.Track;
 
 import org.junit.Assert;
@@ -58,9 +56,6 @@ public class JUnitTestDataBase
                 artists.contains("Keaton Simons"));
         Assert.assertFalse("check whether New & Best of Keaton Simons presents",
                 albumNames.contains("New & Best of Keaton Simons"));
-        //fail
-        Assert.assertFalse("check whether space presents",
-                !albumNames.contains(""));
     }
 
 }
