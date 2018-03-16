@@ -190,7 +190,9 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
                 SpannableString spanString = new SpannableString("you");
                 spanString.setSpan(new StyleSpan(Typeface.ITALIC), 0, spanString.length(), 0);
                 username.setText(spanString);
-            } else{
+            } else if (!MainActivity.getUser().getFriends().containsValue(userName)) {
+                username.setText("hello" + userName.hashCode());
+            } else {
                 username.setText(userName);
             }
         }

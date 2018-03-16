@@ -16,14 +16,15 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Logger;
 
 /**
  * Created by Kent on 3/4/2018.
  */
 
 public class MusicDownloadManager {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     private static PlayList viewList;
     private static Context context;
     private static DownloadManager downloadManager;
@@ -62,7 +63,9 @@ public class MusicDownloadManager {
                                 if (!hasDownloadedOne) {
                                     hasDownloadedOne = true;
                                     if (context instanceof MainActivity) {
+                                        LOGGER.info("ccccccccccc");
                                         ((MainActivity) context).launchModeActivity();
+                                        LOGGER.info("Download mode launch successfully");
                                     }
                                 }
                             }
@@ -95,6 +98,8 @@ public class MusicDownloadManager {
         }
 
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, null, null).replace("-","_"));
+
+        LOGGER.info("start download");
         // get download service and enqueue file
         downloadManager.enqueue(request);
     }
@@ -111,6 +116,7 @@ public class MusicDownloadManager {
         while(c.moveToNext()) {
             downloadManager.remove(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)));
         }
+        LOGGER.info("remove all");
     }
     public static boolean downloadAll(ArrayList<MockTrack> a, boolean hasDownloadedTrack) {
         hasDownloadedOne = hasDownloadedTrack;
@@ -119,6 +125,7 @@ public class MusicDownloadManager {
             currentDownload = toDownload.next();
             if (!currentDownload.hasDownloaded()) {
                 startDownloadTask(currentDownload.getURL());
+                LOGGER.info("Not downloading");
                 return true;
             }
         }
