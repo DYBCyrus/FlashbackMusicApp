@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Created by Chutong on 3/8/18.
  */
 
-public class LocationAdapter implements ILocation, Serializable
+public class LocationAdapter implements ILocation
 {
     Location location;
 

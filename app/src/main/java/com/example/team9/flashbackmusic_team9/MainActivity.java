@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     private PlayList vibemodeList;
+    private boolean canDownload = false;
 
     //Dropdown menu and its options
     private Spinner spinner;
@@ -234,8 +235,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
                     NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
                     if (info.isConnected()) {
-                        MusicDownloadManager.resumeDownload();
+                        if (canDownload) {
+                            canDownload = false;
+                            MusicDownloadManager.resumeDownload();
+                        }
                     } else {
+                        canDownload = true;
                         MusicDownloadManager.abortAll();
                     }
                 }
