@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ public class MusicDownloadManager {
     private static MockTrack currentDownload;
     private static ListIterator<MockTrack> toDownload;
     private static boolean hasDownloadedOne = false;
+    private static DownloadManager.Request currentRequest = null;
     public static void setup(Context c) {
         context = c;
         downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
@@ -44,6 +46,7 @@ public class MusicDownloadManager {
                     int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         // process download
+                        currentRequest = null;
                         String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
                         String downloadUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
                         if (downloadFileLocalUri != null) {
@@ -67,6 +70,7 @@ public class MusicDownloadManager {
                         String downloadFileTitle = c.getString(c.getColumnIndex(DownloadManager.COLUMN_TITLE));
                         Toast toast = Toast.makeText(context, downloadFileTitle, Toast.LENGTH_SHORT);
                         toast.show();
+
                     }
                 }
                 while (toDownload != null && toDownload.hasNext()) {
@@ -82,6 +86,7 @@ public class MusicDownloadManager {
     }
     public static void startDownloadTask(String url) {
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        currentRequest = request;
         request.setMimeType("audio/MP3");
         // in order for this if to run, you must use the android 3.2 to compile your app
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -90,11 +95,15 @@ public class MusicDownloadManager {
         }
 
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, null, null).replace("-","_"));
-
         // get download service and enqueue file
         downloadManager.enqueue(request);
     }
 
+    public static void resumeDownload() {
+        if (currentRequest != null) {
+            downloadManager.enqueue(currentRequest);
+        }
+    }
     public static void abortAll() {
         DownloadManager.Query query = new DownloadManager.Query();
         query.setFilterByStatus (DownloadManager.STATUS_FAILED|DownloadManager.STATUS_PENDING|DownloadManager.STATUS_RUNNING);
