@@ -11,8 +11,8 @@ import java.time.temporal.ChronoUnit;
 
 public class MockTrackTime implements ILocalDateTime{
 
-    private static Clock clock = Clock.systemDefaultZone();
     private static ZoneId zoneId = ZoneId.of("UTC-08:00");
+    private static Clock clock = Clock.systemDefaultZone().withZone(zoneId);
 
     public static LocalDateTime now() {
         return LocalDateTime.now(clock).truncatedTo(ChronoUnit.SECONDS);
