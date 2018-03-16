@@ -68,7 +68,7 @@ public class UserStory5ScenarioTest {
         }
 
         ViewInteraction appCompatButton2 = onView(
-                allOf(withId(R.id.mode), withText("FlashBack"),
+                allOf(withId(R.id.mode), withText("VibeMode"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.support.design.widget.CoordinatorLayout")),
