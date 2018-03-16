@@ -15,15 +15,16 @@ public class MockTrackTime implements ILocalDateTime{
     private static ZoneId zoneId = ZoneId.of("UTC-08:00");
 
     public static LocalDateTime now() {
-        return LocalDateTime.now(zoneId).truncatedTo(ChronoUnit.SECONDS);
+        return LocalDateTime.now(clock).truncatedTo(ChronoUnit.SECONDS);
     }
 
     public static void useFixedClockAt(LocalDateTime date){
         clock = Clock.fixed(date.atZone(zoneId).toInstant(), zoneId);
     }
 
-    public static void useSystemDefaultZoneClock(){
+    public static void useDefaultClock() {
         clock = Clock.systemDefaultZone();
+        clock = clock.withZone(zoneId);
     }
 
     private static Clock getClock() {

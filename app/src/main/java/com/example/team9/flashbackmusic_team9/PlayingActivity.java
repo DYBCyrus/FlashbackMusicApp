@@ -1,11 +1,15 @@
 package com.example.team9.flashbackmusic_team9;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.location.Location;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -151,12 +155,52 @@ public class PlayingActivity extends AppCompatActivity implements Updateable{
             }
         });
 
+        Button setTime = (Button)findViewById(R.id.setTime);
+        setTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                timeSet();
+            }
+        });
+
         PlayerToolBar playerToolBar = new PlayerToolBar(new Button(this),
                 (ImageButton)findViewById(R.id.prevButton),
                 (ImageButton)findViewById(R.id.play_pause_button),
                 (ImageButton)findViewById(R.id.nextButton), this);
         Updateables.addUpdateable(this);
 
+    }
+
+    public void timeSet() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Please set the time(separated by comma) or input now");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        builder.setView(input);
+        // Set up the buttons
+        builder.setPositiveButton("set", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (input.getText().toString() != null && !input.getText().toString().equals("now")) {
+                    String[] time = input.getText().toString().split(",");
+                    MockTrackTime.useFixedClockAt(LocalDateTime.of(Integer.parseInt(time[0]),
+                            Integer.parseInt(time[1]), Integer.parseInt(time[2]), Integer.parseInt(time[3]),
+                            Integer.parseInt(time[4]), Integer.parseInt(time[5])));
+                } else {
+                    MockTrackTime.useDefaultClock();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     public void launchViewPlaylistActivity() {
