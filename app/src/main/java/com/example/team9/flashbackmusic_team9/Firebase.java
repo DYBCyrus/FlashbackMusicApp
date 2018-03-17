@@ -90,7 +90,9 @@ public class Firebase {
                         }
                     }
                     Collections.sort(toSort);
-                    toDownload.add(toSort.get(0));
+                    if (!toSort.isEmpty()) {
+                        toDownload.add(toSort.get(0));
+                    }
                 }
                 for (MockTrack each : toDownload) {
                     System.out.println(each.getURL());
