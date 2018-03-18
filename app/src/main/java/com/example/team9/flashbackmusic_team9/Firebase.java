@@ -1,10 +1,7 @@
 package com.example.team9.flashbackmusic_team9;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.location.Location;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
 import android.widget.TextView;
 
 import com.google.firebase.FirebaseApp;
@@ -19,12 +16,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 /**
  * Created by cyrusdeng on 10/03/2018.
  */
 
 public class Firebase {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+
     public static FirebaseDatabase database;
     public static DatabaseReference myRef;
 
@@ -54,7 +55,8 @@ public class Firebase {
         historyRef.child("day").setValue(currentTrack.getDay());
         historyRef.child("hour").setValue(currentTrack.getHour());
         historyRef.child("minute").setValue(currentTrack.getMinute());
-        historyRef.child("second").setValue(currentTrack.getSecond());    }
+        historyRef.child("second").setValue(currentTrack.getSecond());
+    }
 
     public static void pullDown(final MainActivity activity) {
         Query query = myRef.orderByKey();
@@ -83,13 +85,18 @@ public class Firebase {
                                 (String) history.child("userName").getValue());
                         String url = (String) trackData.child("url").getValue();
                         String title = (String) trackData.child("name").getValue();
-                        toSort.add(new MockTrack(title, loc, time, user, url));
+                        if (!user.getEmail().equals(MainActivity.getUser().getEmail())) {
+                            toSort.add(new MockTrack(title, loc, time, user, url));
+                        }
                     }
                     Collections.sort(toSort);
-                    toDownload.add(toSort.get(0));
+                    if (!toSort.isEmpty()) {
+                        toDownload.add(toSort.get(0));
+                    }
                 }
                 for (MockTrack each : toDownload) {
                     System.out.println(each.getURL());
+                    LOGGER.info("pullDown URL" + each.getURL());
                 }
                 activity.processDownload(toDownload);
 
@@ -132,16 +139,22 @@ public class Firebase {
                                 (String) history.child("userName").getValue());
                         String url = (String) dataSnapshot.child("url").getValue();
                         String title = (String) dataSnapshot.child("name").getValue();
+
                         toSort.add(new MockTrack(title, loc, time, user, url));
                     }
-                    Collections.sort(toSort);
-                    MockTrack t = toSort.get(0);
-                    String name = t.getUserName();
+                    MockTrack mostRecentTrack = toSort.get(0);
+                    for (int i = 1; i < toSort.size(); i++) {
+                        MockTrack temp = toSort.get(i);
+                        if (temp.getDateTime().isAfter(mostRecentTrack.getDateTime()) && temp.getDateTime().isBefore(MockTrackTime.now())) {
+                            mostRecentTrack = temp;
+                        }
+                    }
+                    String name = mostRecentTrack.getUserName();
 
                     Location loc = new Location("");
-                    loc.setLatitude(t.getLatitude());
-                    loc.setLongitude(t.getLongitude());
-                    LocalDateTime date= t.getDateTime();
+                    loc.setLatitude(mostRecentTrack.getLatitude());
+                    loc.setLongitude(mostRecentTrack.getLongitude());
+                    LocalDateTime date= mostRecentTrack.getDateTime();
                     activity.displayHistory(name, loc, date);
                 }
 

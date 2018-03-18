@@ -39,7 +39,7 @@
         android:id="@+id/mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="FlashBack"
+        android:text="VibeMode"
         android:textSize="20dp"
         android:layout_marginBottom="530dp"
         android:layout_marginLeft="250dp"

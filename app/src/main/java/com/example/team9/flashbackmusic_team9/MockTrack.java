@@ -1,6 +1,5 @@
 package com.example.team9.flashbackmusic_team9;
 
-import android.location.Location;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
@@ -163,11 +162,13 @@ public class MockTrack implements Serializable, ITrack {
         }
 
         // google+ friends compare
-        if (MainActivity.getUser().isFriend(userEmail)) {
+        if (MainActivity.getUser().isFriend(userEmail) ||
+                userEmail.equals(MainActivity.getUser().getEmail())) {
             thisScore++;
             thisTieScore++;
         }
-        if (MainActivity.getUser().isFriend(MockTrack.getUserEmail())) {
+        if (MainActivity.getUser().isFriend(MockTrack.getUserEmail()) ||
+                MockTrack.getUserEmail().equals(MainActivity.getUser().getEmail())) {
             trackScore++;
             trackTieScore++;
         }

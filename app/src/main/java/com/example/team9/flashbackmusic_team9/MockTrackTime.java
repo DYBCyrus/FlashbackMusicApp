@@ -11,19 +11,20 @@ import java.time.temporal.ChronoUnit;
 
 public class MockTrackTime implements ILocalDateTime{
 
-    private static Clock clock = Clock.systemDefaultZone();
     private static ZoneId zoneId = ZoneId.of("UTC-08:00");
+    private static Clock clock = Clock.systemDefaultZone().withZone(zoneId);
 
     public static LocalDateTime now() {
-        return LocalDateTime.now(zoneId).truncatedTo(ChronoUnit.SECONDS);
+        return LocalDateTime.now(clock).truncatedTo(ChronoUnit.SECONDS);
     }
 
     public static void useFixedClockAt(LocalDateTime date){
         clock = Clock.fixed(date.atZone(zoneId).toInstant(), zoneId);
     }
 
-    public static void useSystemDefaultZoneClock(){
+    public static void useDefaultClock() {
         clock = Clock.systemDefaultZone();
+        clock = clock.withZone(zoneId);
     }
 
     private static Clock getClock() {
@@ -55,8 +56,4 @@ public class MockTrackTime implements ILocalDateTime{
         return this.now().getSecond();
     }
 
-    public boolean isAfter(LocalDateTime time)
-    {
-        return true;
-    }
 }

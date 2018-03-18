@@ -2,15 +2,19 @@ package com.example.team9.flashbackmusic_team9;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -54,10 +58,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     private PlayList vibemodeList;
+    private boolean canDownload = false;
 
     //Dropdown menu and its options
     private Spinner spinner;
@@ -117,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         PackageManager.PERMISSION_GRANTED ||
                 checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
+            LOGGER.info("Asking permission");
         }
 
         // mode history
@@ -158,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         ArrayList<Track> allTracks = DataBase.getAllTracks();
+        System.out.println(currentTasks.size()+" share pref");
         if (currentTasks.size() == allTracks.size()) {
             for (int i = 0; i < allTracks.size(); i++) {
                 allTracks.get(i).setDataFromMockTrack(currentTasks.get(i));
@@ -186,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (track.getStatus() != Track.FavoriteStatus.DISLIKE) {
                     Player.start(track);
                     launchPlayingActivity();
+                    LOGGER.info("UI launch successfully");
                 }
             }
         });
@@ -219,7 +229,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 launchSignInActivity();
             }
         });
-
+        BroadcastReceiver onInternetChange = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                    NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                    if (info.isConnected()) {
+                        if (canDownload) {
+                            canDownload = false;
+                            MusicDownloadManager.resumeDownload();
+                        }
+                    } else {
+                        canDownload = true;
+                        MusicDownloadManager.abortAll();
+                    }
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(onInternetChange, filter);
     }
 
     @Override
@@ -486,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onPause();
 
         ArrayList<Track> shareTracks = DataBase.getShareTracks();
-        int i = 0;
+        int i;
         for (Track t : DataBase.getAllTracks()) {
             for (i = 0; i < shareTracks.size(); i++) {
                 if (t.getName().equals(shareTracks.get(i).getName()) &&

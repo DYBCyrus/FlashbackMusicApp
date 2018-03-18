@@ -51,6 +51,11 @@
             android:name=".ViewPlaylistActivity"
             android:label="@string/title_activity_view_playlist"
             android:theme="@style/AppTheme.NoActionBar" />
+        <!--<receiver android:name=".NetworkStatusReceiver" android:enabled="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.net.wifi.WIFI_STATE_CHANGED" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
     </application>
 
 </manifest>

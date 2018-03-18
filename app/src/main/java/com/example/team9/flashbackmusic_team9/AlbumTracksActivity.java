@@ -83,48 +83,7 @@ public class AlbumTracksActivity extends AppCompatActivity {
             }
         });
         Button modeChange = (Button)findViewById(R.id.flash_mode);
-        modeChange.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                launchModeActivity();
-            }
-        });
-    }
-
-    /**
-     * Switch to flashback mode view
-     */
-    public void launchModeActivity() {
-        ArrayList<Track> list = new ArrayList<>();
-        for (Track each:DataBase.getAllTracks()) {
-            if (each.hasPlayHistory()) {
-                list.add(each);
-            }
-        }
-        Collections.sort(list);
-
-        PlayList flashbackList = new PlayList(list, true);
-        if (flashbackList.hasNext()) {
-            Intent intent = new Intent(this, FlashBackActivity.class);
-            Player.playPlayList(flashbackList);
-            startActivity(intent);
-        }
-        else {
-            AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-            builder1.setMessage("No track available for flashback");
-            builder1.setCancelable(true);
-
-            builder1.setPositiveButton(
-                    "Got it",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-
-            AlertDialog alert11 = builder1.create();
-            alert11.show();
-        }
+        modeChange.setVisibility(View.INVISIBLE);
     }
 
     public void launchActivity() {

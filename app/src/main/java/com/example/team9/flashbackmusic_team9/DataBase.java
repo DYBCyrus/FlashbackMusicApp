@@ -130,7 +130,7 @@ public class DataBase {
 
     public static boolean contain(MockTrack m) {
         for (Track each : allTracks) {
-            if (m.getURL().equals(each.getUrl())) {
+            if (m.getURL().equals(each.getUrl()) && m.getName().equals(each.getName())) {
                 System.out.println(each.getUrl());
                 m.setTrack(each);
                 return true;
